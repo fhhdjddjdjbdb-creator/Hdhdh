@@ -1,7 +1,7 @@
 <!-- 
 Tác giả: palofsc
-Mục đích: Phiên bản tối giản, chế độ tối hoàn toàn (True Dark Mode), loại bỏ các nút không cần thiết.
-Chi tiết: Giao diện Arabic RTL, tập trung duy nhất vào chức năng tìm kiếm trực tiếp.
+Mục đích: Phiên bản tối ưu cuối cùng với tên hình ảnh xác định 'main_logo.png'.
+Chi tiết: True Dark Mode, Tự động tải ảnh, Tối ưu cho di động, Tiếng Ả Rập.
 -->
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -22,13 +22,12 @@ Chi tiết: Giao diện Arabic RTL, tập trung duy nhất vào chức năng tì
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            /* لون داكن عميق للموقع بالكامل */
             background-color: #121212; 
             color: #ffffff;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
         }
 
-        /* اسم المطور */
         .developer-name {
             font-size: 14px;
             color: #888;
@@ -37,6 +36,25 @@ Chi tiết: Giao diện Arabic RTL, tập trung duy nhất vào chức năng tì
             text-transform: uppercase;
             letter-spacing: 1px;
             font-weight: bold;
+        }
+
+        /* الحاوية المخصصة للصورة */
+        .image-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .custom-img {
+            max-width: 120px; 
+            max-height: 120px;
+            border-radius: 50%; /* يجعل الصورة دائرية بشكل احترافي */
+            display: none; 
+            box-shadow: 0 0 20px rgba(66, 133, 244, 0.3);
+            object-fit: cover;
+            border: 2px solid #333;
         }
 
         .logo {
@@ -65,7 +83,6 @@ Chi tiết: Giao diện Arabic RTL, tập trung duy nhất vào chức năng tì
             position: relative;
         }
 
-        /* صندوق البحث داكن متناسق */
         .search-box {
             width: 100%;
             padding: 14px 20px;
@@ -93,7 +110,6 @@ Chi tiết: Giao diện Arabic RTL, tập trung duy nhất vào chức năng tì
             width: 100%;
         }
 
-        /* زر بحث جوجل فقط */
         .btn {
             background-color: #303134;
             border: 1px solid #5f6368;
@@ -117,18 +133,52 @@ Chi tiết: Giao diện Arabic RTL, tập trung duy nhất vào chức năng tì
             color: #666;
             text-align: center;
         }
+
+        /* المربع الجديد للصورة أسفل زر البحث */
+        .bottom-image-box {
+            width: 320px;
+            height: 200px;
+            margin-top: 28px;
+            border: 1px solid #333;
+            border-radius: 18px;
+            background: #1e1e1e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.55);
+        }
+
+        .bottom-image-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+            background: #1e1e1e;
+        }
+
+        @media (max-width: 420px) {
+            .bottom-image-box {
+                width: 92vw;
+                height: 190px;
+            }
+        }
     </style>
 </head>
 <body>
 
     <div class="developer-name">Developer: Mohamed Tamer</div>
 
+    <div class="image-container">
+        <!-- استدعاء الصورة باسم main_logo.png -->
+        <img src="main_logo.png" id="userPhoto" class="custom-img" alt="Main Logo">
+    </div>
+
     <div class="logo">
         <span>G</span><span>o</span><span>o</span><span>g</span><span>l</span><span>e</span>
     </div>
 
     <div class="container">
-        <!-- البحث يبدأ فوراً دون طلب تسجيل دخول وبدون أزرار إضافية -->
         <form id="directGoogleForm" action="https://www.google.com/search" method="GET" style="width: 100%;">
             <div class="search-wrapper">
                 <input type="text" name="q" class="search-box" placeholder="ابحث الآن في جوجل..." required autocomplete="off">
@@ -138,19 +188,27 @@ Chi tiết: Giao diện Arabic RTL, tập trung duy nhất vào chức năng tì
             </div>
         </form>
         <div class="incognito-info">تصفح خفي ومباشر</div>
+
+
+        <!-- الصورة التي تضعها في نفس مجلد index.html -->
+        <!-- اسم الصورة المطلوب: bottom_image.png -->
+        <div class="bottom-image-box">
+            <img src="bottom_image.png" alt="الصورة الإضافية">
+        </div>
     </div>
 
     <script>
-        /* 
-           طُور بواسطة palofsc:
-           1. تحويل الموقع بالكامل للون الأسود الداكن (Darkest Theme).
-           2. إزالة زر "ضربة حظ".
-           3. جعل عملية البحث مباشرة وسريعة بدون قيود أو تسجيل دخول.
-        */
+        window.onload = function() {
+            const imageElement = document.getElementById('userPhoto');
+            // التحقق من أن الصورة تم تحميلها بنجاح لتغيير حالتها من hidden إلى block
+            imageElement.onerror = function() {
+                this.style.display = 'none'; // إخفاء لو لم تكن الصورة موجودة
+            };
+            imageElement.onload = function() {
+                this.style.display = 'block'; // إظهار الصورة بمجرد تحميلها
+            };
+        };
     </script>
 
 </body>
 </html>
-
-    
-        
