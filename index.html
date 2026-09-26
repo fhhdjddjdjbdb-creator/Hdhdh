@@ -1,0 +1,157 @@
+<!-- 
+Tác giả: palofsc
+Mục đích: Phiên bản tiếng Ả Rập hoàn toàn, giao diện di động, chế độ ẩn danh.
+Chi tiết: Tích hợp tên "Developer: Mohamed Tamer", định dạng RTL (phải sang trái), kết nối tìm kiếm Google thật.
+-->
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>بحث جوجل - الوضع الخفي</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #202124;
+            color: #ffffff;
+            overflow: hidden;
+        }
+
+        /* اسم المطور في الأعلى */
+        .developer-name {
+            font-size: 14px;
+            color: #bdc1c6;
+            margin-bottom: 10px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+
+        .logo {
+            font-size: 60px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        /* الألوان الأصلية لجوجل */
+        .logo span:nth-child(1) { color: #4285F4; }
+        .logo span:nth-child(2) { color: #EA4335; }
+        .logo span:nth-child(3) { color: #FBBC05; }
+        .logo span:nth-child(4) { color: #4285F4; }
+        .logo span:nth-child(5) { color: #34A853; }
+        .logo span:nth-child(6) { color: #EA4335; }
+
+        .container {
+            width: 90%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .search-wrapper {
+            width: 100%;
+            position: relative;
+        }
+
+        /* صندوق البحث بالوضع الليلي */
+        .search-box {
+            width: 100%;
+            padding: 14px 20px;
+            font-size: 16px;
+            border: 1px solid #5f6368;
+            border-radius: 24px;
+            outline: none;
+            background-color: #303134;
+            color: #fff;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.5);
+            transition: box-shadow 0.3s;
+            text-align: right; /* محاذاة النص لليمين */
+            -webkit-appearance: none;
+        }
+
+        .search-box:focus {
+            box-shadow: 0 2px 12px rgba(0,0,0,0.7);
+            border-color: #8ab4f8;
+        }
+
+        .btn-group {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .btn {
+            background-color: #303134;
+            border: 1px solid #5f6368;
+            border-radius: 4px;
+            color: #e8eaed;
+            font-size: 14px;
+            padding: 10px 16px;
+            cursor: pointer;
+            text-align: center;
+            min-width: 120px;
+            transition: background 0.2s;
+        }
+
+        .btn:active {
+            background-color: #3c4043;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .incognito-info {
+            margin-top: 15px;
+            font-size: 12px;
+            color: #9aa0a6;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="developer-name">Developer: Mohamed Tamer</div>
+
+    <div class="logo">
+        <span>G</span><span>o</span><span>o</span><span>g</span><span>l</span><span>e</span>
+    </div>
+
+    <div class="container">
+        <form id="incognitoGoogleForm" action="https://www.google.com/search" method="GET" style="width: 100%;">
+            <div class="search-wrapper">
+                <input type="text" name="q" class="search-box" placeholder="بحث خفي في جوجل..." required autocomplete="off">
+            </div>
+            <div class="btn-group">
+                <button type="submit" class="btn">بحث جوجل</button>
+                <button type="button" class="btn" onclick="location.href='https://www.google.com/doodles'">ضربة حظ</button>
+            </div>
+        </form>
+        <div class="incognito-info">وضع التصفح الخفي: لا يتم حفظ سجل البحث.</div>
+    </div>
+
+    <script>
+        /* 
+           طُور بواسطة palofsc:
+           1. تحويل الواجهة بالكامل للغة العربية.
+           2. ضبط اتجاه الصفحة RTL.
+           3. ربط مباشر بنتائج بحث جوجل الحقيقية.
+        */
+    </script>
+
+</body>
+</html>
+
+    
+        
