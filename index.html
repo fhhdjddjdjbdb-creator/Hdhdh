@@ -502,47 +502,33 @@ function bioErrorMessage(err){
 }
 
 /* ---------- WebAuthn ---------- */
-/* ---------- WebAuthn / WebView compatibility ---------- */
-function isAndroidWebView(){
-  const ua=navigator.userAgent||'';
-  return /; wv\)|\bwv\b|Version\/4\.0.*Chrome\//i.test(ua) && /Android/i.test(ua);
-}
-function getWebAuthnOriginInfo(){
-  return {
-    secure:!!window.isSecureContext && location.protocol!=='file:',
-    origin:location.origin||'',
-    host:location.hostname||''
-  };
-}
 async function registerBiometric(){
-  if(!navigator.credentials || !navigator.credentials.create) throw new DOMException('WebAuthn غير متاح في WebView','NotSupportedError');
   const challenge=new Uint8Array(32);crypto.getRandomValues(challenge);
   const userId=new Uint8Array(16);crypto.getRandomValues(userId);
-  const rpId=location.hostname||undefined;
-  const publicKey={
-    challenge:challenge,
-    rp:{name:'Google Search App',...(rpId?{id:rpId}:{})},
-    user:{id:userId,name:'user@local',displayName:'مستخدم'},
-    pubKeyCredParams:[
-      {type:'public-key',alg:-7},
-      {type:'public-key',alg:-257},
-      {type:'public-key',alg:-37}
-    ],
-    authenticatorSelection:{
-      authenticatorAttachment:'platform',
-      userVerification:'required',
-      residentKey:'preferred',
-      requireResidentKey:false
-    },
-    timeout:60000,
-    attestation:'none'
-  };
-  const cred=await navigator.credentials.create({publicKey});
+  const cred=await navigator.credentials.create({
+    publicKey:{
+      challenge:challenge,
+      rp:{name:'Google Search App'},
+      user:{id:userId,name:'user@local',displayName:'مستخدم'},
+      pubKeyCredParams:[
+        {type:'public-key',alg:-7},
+        {type:'public-key',alg:-257},
+        {type:'public-key',alg:-37}
+      ],
+      authenticatorSelection:{
+        authenticatorAttachment:'platform',
+        userVerification:'required',
+        residentKey:'preferred',
+        requireResidentKey:false
+      },
+      timeout:60000,
+      attestation:'none'
+    }
+  });
   if(!cred||!cred.rawId) throw new Error('failed');
   return bufToB64url(cred.rawId);
 }
 async function verifyBiometric(credId){
-  if(!navigator.credentials || !navigator.credentials.get) throw new DOMException('WebAuthn غير متاح في WebView','NotSupportedError');
   const challenge=new Uint8Array(32);crypto.getRandomValues(challenge);
   const assertion=await navigator.credentials.get({
     publicKey:{
@@ -554,16 +540,8 @@ async function verifyBiometric(credId){
   });
   return !!assertion;
 }
-async function biometricSupported(){
-  if(!window.isSecureContext || location.protocol==='file:') return false;
-  if(!window.PublicKeyCredential || !navigator.credentials ||
-     !navigator.credentials.create || !navigator.credentials.get) return false;
-  try{
-    if(PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable){
-      return await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-    }
-  }catch(e){}
-  return true;
+function biometricSupported(){
+  return !!(window.PublicKeyCredential&&navigator.credentials&&navigator.credentials.create&&navigator.credentials.get);
 }
 
 /* ---------- شاشة القفل ---------- */
@@ -628,10 +606,8 @@ async function tryBiometricUnlock(auto){
   const cfg=getLockConfig();
   if(!cfg||cfg.type!=='biometric') return;
 
-  if(!(await biometricSupported())){
-    lockErrBio.textContent=isAndroidWebView()
-      ? '⚠️ WebView في التطبيق لا يوفّر WebAuthn للبصمة. يجب أن يكون التطبيق نفسه مهيأ لدعم بصمة Android.'
-      : '⚠️ بصمة الإصبع غير مدعومة في هذا المتصفح.';
+  if(!biometricSupported()){
+    lockErrBio.textContent='⚠️ بصمة الإصبع غير مدعومة في هذا المتصفح.';
     return;
   }
   if(!window.isSecureContext||location.protocol==='file:'){
@@ -749,10 +725,8 @@ document.getElementById('saveBio').onclick=async()=>{
     setSettingsMsg('⚠️ لا يمكن تفعيل الطريقتين معًا. أزل كلمة المرور أولًا.','err');
     return;
   }
-  if(!(await biometricSupported())){
-    setSettingsMsg(isAndroidWebView()
-      ? '⚠️ التطبيق يعمل داخل WebView لا يوفّر WebAuthn للبصمة. لا يمكن تفعيل البصمة من HTML وحده.'
-      : '⚠️ بصمة الإصبع غير مدعومة في هذا المتصفح.','err');
+  if(!biometricSupported()){
+    setSettingsMsg('⚠️ بصمة الإصبع غير مدعومة في هذا المتصفح.','err');
     return;
   }
   if(!window.isSecureContext||location.protocol==='file:'){
