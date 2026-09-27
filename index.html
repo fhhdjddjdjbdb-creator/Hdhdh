@@ -120,6 +120,7 @@ body{
 }
 .voice-title{font-size:28px;font-weight:700;margin:24px 0 8px}
 .voice-status{color:var(--muted);font-size:14px;min-height:22px}
+.voice-live{width:100%;min-height:58px;margin-top:12px;padding:12px 14px;border:1px solid var(--border);border-radius:16px;background:var(--panel2);color:var(--text);font-size:18px;line-height:1.6;display:flex;align-items:center;justify-content:center;overflow-wrap:anywhere}
 .voice-bars{display:flex;align-items:center;justify-content:center;gap:5px;height:45px;margin-top:14px}
 .voice-bars i{display:block;width:5px;height:12px;border-radius:5px;background:var(--accent);animation:voiceBars .8s ease-in-out infinite}
 .voice-bars i:nth-child(2){animation-delay:.1s}.voice-bars i:nth-child(3){animation-delay:.2s}
@@ -188,7 +189,8 @@ body{
   <div class="voice-card">
     <div class="voice-mic">🎙</div>
     <div class="voice-title">جارٍ الاستماع...</div>
-    <div class="voice-status" id="voiceStatus">تحدث الآن، وسأكتب كلامك في مربع البحث</div>
+    <div class="voice-status" id="voiceStatus">تحدث الآن، وسأكتب كلامك هنا</div>
+    <div class="voice-live" id="voiceLive" aria-live="polite">تحدث الآن...</div>
     <div class="voice-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
     <button class="voice-cancel" id="voiceCancel" type="button">إلغاء</button>
   </div>
@@ -286,6 +288,7 @@ modal.onclick=e=>{if(e.target===modal)modal.style.display='none'};
 
 const voiceModal=document.getElementById('voiceModal');
 const voiceStatus=document.getElementById('voiceStatus');
+const voiceLive=document.getElementById('voiceLive');
 const voiceButton=document.getElementById('voice');
 
 let recognition=null;
@@ -312,6 +315,7 @@ function closeVoiceModal(){
   voiceModal.setAttribute('aria-hidden','true');
   voiceButton.disabled=false;
   voiceButton.style.opacity='1';
+  voiceLive.textContent='تحدث الآن...';
 }
 
 function finishVoice(){
@@ -371,6 +375,7 @@ voiceButton.onclick=async()=>{
   voiceButton.disabled=true;
   voiceButton.style.opacity='.55';
   voiceStatus.textContent='اسمح للميكروفون من نافذة المتصفح...';
+  voiceLive.textContent='في انتظار السماح بالميكروفون...';
 
   // أول ضغطة: نافذة السماح الحقيقية التي يوفرها المتصفح/النظام.
   const permissionState=await requestMicrophonePermission();
@@ -386,12 +391,13 @@ voiceButton.onclick=async()=>{
   // بعد السماح يبدأ التعرف الصوتي الحقيقي.
   recognition=new SpeechRecognition();
   recognition.lang='ar-EG';
-  recognition.continuous=false;
+  recognition.continuous=true;
   recognition.interimResults=true;
-  recognition.maxAlternatives=1;
+  recognition.maxAlternatives=3;
 
   recognition.onstart=()=>{
     voiceStatus.textContent='🎙️ جارٍ الاستماع... تحدث الآن';
+    voiceLive.textContent='تحدث الآن...';
   };
 
   recognition.onresult=(event)=>{
@@ -412,6 +418,7 @@ voiceButton.onclick=async()=>{
       input.value=liveText;
       updateClear();
       voiceStatus.textContent='🎙️ أستمع...';
+      voiceLive.textContent=liveText;
 
       clearSilenceTimer();
       silenceTimer=setTimeout(()=>finishVoice(),1200);
@@ -422,21 +429,30 @@ voiceButton.onclick=async()=>{
     clearSilenceTimer();
 
     if(event.error==='not-allowed'||event.error==='service-not-allowed'){
-      closeVoiceModal();
+      voiceStatus.textContent='⚠️ اسمح للميكروفون من إعدادات الموقع ثم حاول مرة أخرى.';
+      voiceButton.disabled=false;
+      voiceButton.style.opacity='1';
       return;
     }
 
     if(event.error==='no-speech'){
-      closeVoiceModal();
+      // لا نغلق فورًا؛ نترك المستخدم يحاول الكلام داخل جلسة الاستماع.
+      voiceStatus.textContent='🎙️ لم أسمع كلامًا بعد... تحدث الآن';
       return;
     }
 
     if(event.error==='aborted'){
-      closeVoiceModal();
+      if(!voiceClosing){
+        voiceStatus.textContent='🎙️ توقف الاستماع. حاول مرة أخرى.';
+        voiceButton.disabled=false;
+        voiceButton.style.opacity='1';
+      }
       return;
     }
 
-    closeVoiceModal();
+    voiceStatus.textContent='⚠️ حدثت مشكلة في التعرف الصوتي. حاول مرة أخرى.';
+    voiceButton.disabled=false;
+    voiceButton.style.opacity='1';
   };
 
   recognition.onend=()=>{
