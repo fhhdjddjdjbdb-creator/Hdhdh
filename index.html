@@ -325,7 +325,7 @@ html.prelock body > *:not(.lock-screen){display:none!important}
   </div>
 </div>
 
-<!-- ================== بداية السكريبت (الجزء الثالث) ================== -->
+<!-- ================== بداية السكريبت (الجزء الرابع) ================== -->
 <script>
 /* ============ عناصر أساسية ============ */
 const input=document.getElementById('input');
@@ -341,10 +341,35 @@ const isAndroidApp=!!(window.Android||window.AndroidBridge||window.AndroidInterf
 const isFileProtocol=location.protocol==='file:';
 const isSecure=(window.isSecureContext===true);
 
+/* ============ دوال تخزين آمنة (try/catch) ============ */
+function safeGet(key,def){
+  try{const v=localStorage.getItem(key);return v===null?def:v}catch(e){return def}
+}
+function safeSet(key,val){
+  try{localStorage.setItem(key,val)}catch(e){}
+}
+function safeRemove(key){
+  try{localStorage.removeItem(key)}catch(e){}
+}
+
+/* ============ جسر أندرويد ============ */
+function hasNativeBridge(){
+  return !!(window.Android && typeof window.Android.authenticateBiometric === 'function');
+}
+function nativeBiometricAvailable(){
+  if(!hasNativeBridge()) return false;
+  try{
+    if(typeof window.Android.isBiometricAvailable==='function'){
+      return !!window.Android.isBiometricAvailable();
+    }
+    return true;
+  }catch(e){return false}
+}
+
 /* ============ الثيم ============ */
 function setTheme(theme){
   document.body.classList.toggle('light',theme==='light');
-  try{localStorage.setItem('siteTheme',theme)}catch(e){}
+  safeSet('siteTheme',theme);
   document.getElementById('theme').textContent=theme==='light'?'☀':'☾';
 }
 function toggleTheme(){
@@ -361,15 +386,6 @@ function updateEngine(){
 function updateClear(){clearBtn.style.display=input.value?'block':'none'}
 
 /* ============ السجل ============ */
-function safeGet(key,def){
-  try{return localStorage.getItem(key)}catch(e){return def}
-}
-function safeSet(key,val){
-  try{localStorage.setItem(key,val)}catch(e){}
-}
-function safeRemove(key){
-  try{localStorage.removeItem(key)}catch(e){}
-}
 function getHistory(){
   try{return JSON.parse(safeGet('searchHistory','[]')||'[]')}catch(e){return[]}
 }
@@ -406,7 +422,7 @@ document.getElementById('form').onsubmit=e=>{
 clearBtn.onclick=()=>{input.value='';updateClear();input.focus()};
 input.oninput=updateClear;
 
-/* ============ نسخ البحث (يدعم كل البيئات) ============ */
+/* ============ نسخ البحث (3 طرق) ============ */
 document.getElementById('copy').onclick=async()=>{
   const q=input.value.trim();if(!q)return;
   let copied=false;
@@ -416,22 +432,20 @@ document.getElementById('copy').onclick=async()=>{
     try{await navigator.clipboard.writeText(q);copied=true}catch(e){}
   }
 
-  // 2) الطريقة القديمة execCommand
+  // 2) execCommand (الطريقة القديمة)
   if(!copied){
     try{
-      input.select();
-      input.setSelectionRange(0,99999);
+      input.select();input.setSelectionRange(0,99999);
       copied=document.execCommand('copy');
     }catch(e){}
   }
 
-  // 3) الجسر الأصلي في APK (لو موجود)
+  // 3) جسر أندرويد
   if(!copied&&isAndroidApp){
     try{
       const bridge=window.Android||window.AndroidBridge||window.AndroidInterface;
       if(bridge&&typeof bridge.copyToClipboard==='function'){
-        bridge.copyToClipboard(q);
-        copied=true;
+        bridge.copyToClipboard(q);copied=true;
       }
     }catch(e){}
   }
@@ -443,7 +457,6 @@ document.getElementById('copy').onclick=async()=>{
 document.getElementById('open').onclick=()=>{
   const q=input.value.trim();if(!q)return;
   const url=/^https?:\/\//i.test(q)?q:'https://'+q;
-  // في APK نستخدم window.open وإلا location
   try{
     const w=window.open(url,'_blank');
     if(!w) location.href=url;
@@ -513,18 +526,16 @@ function randomHex(n){
       return Array.from(a).map(b=>b.toString(16).padStart(2,'0')).join('');
     }
   }catch(e){}
-  // بديل يدوي في حال عدم وجود crypto
   let s='';
   for(let i=0;i<n*2;i++) s+='0123456789abcdef'[Math.floor(Math.random()*16)];
   return s;
 }
 
-/* ---------- تشفير كلمة المرور (يدعم file:// بدون crypto.subtle) ---------- */
+/* ---------- تشفير كلمة المرور (يدعم file:// و APK) ---------- */
 async function hashPassword(password,salt){
   const str=salt+'::'+password+'::app-lock-v1';
   const data=new TextEncoder().encode(str);
 
-  // 1) crypto.subtle إن كان متاحًا
   if(window.crypto&&crypto.subtle&&crypto.subtle.digest){
     try{
       const buf=await crypto.subtle.digest('SHA-256',data);
@@ -532,7 +543,7 @@ async function hashPassword(password,salt){
     }catch(e){}
   }
 
-  // 2) بديل قوي نسبيًا (FNV-1a مزدوج + خلط) يعمل في أي بيئة
+  // بديل FNV-1a مزدوج يعمل في أي بيئة
   let h1=0x811c9dc5,h2=0x01000193,h3=0x9e3779b9,h4=0x85ebca6b;
   for(let i=0;i<data.length;i++){
     const b=data[i];
@@ -542,7 +553,6 @@ async function hashPassword(password,salt){
     h4=Math.imul(h4^b,0x27d4eb2f)>>>0;
   }
   const out=[h1,h2,h3,h4].map(x=>x.toString(16).padStart(8,'0')).join('');
-  // أعِد العمليات مرتين لزيادة الطول
   let h5=0xdeadbeef,h6=0xcafebabe;
   for(let i=data.length-1;i>=0;i--){
     const b=data[i];
@@ -576,27 +586,24 @@ function bioErrorMessage(err){
     case 'NotAllowedError':return 'تم إلغاء عملية البصمة أو رفضها. حاول مرة أخرى.';
     case 'InvalidStateError':return 'هذه البصمة مسجّلة بالفعل على الجهاز.';
     case 'NotSupportedError':return 'البصمة غير مدعومة على هذا الجهاز أو المتصفح.';
-    case 'SecurityError':return 'البصمة تحتاج اتصالاً آمنًا (HTTPS) أو تشغيل داخل تطبيق أندرويد مُعدّ لذلك.';
+    case 'SecurityError':return 'البصمة تحتاج اتصالاً آمنًا (HTTPS) أو تشغيل داخل تطبيق أندرويد مُعدّ.';
     case 'AbortError':return 'تم إلغاء عملية البصمة.';
     case 'TimeoutError':return 'انتهى وقت التحقق من البصمة.';
     case 'ConstraintError':return 'لا يوجد مستشعر بصمة مناسب في هذا الجهاز.';
-    default:return 'تعذر إكمال عملية البصمة.'+(msg?' ('+name+')':'');
+    default:return 'تعذر إكمال عملية البصمة.'+(name?' ('+name+')':'');
   }
 }
 
-/* ---------- كشف الدعم ---------- */
+/* ---------- كشف دعم البصمة ---------- */
 function biometricSupported(){
-  return !!(window.PublicKeyCredential&&navigator.credentials
-            &&navigator.credentials.create&&navigator.credentials.get);
+  if(hasNativeBridge()) return true; // APK
+  return !!(window.PublicKeyCredential && navigator.credentials
+            && navigator.credentials.create && navigator.credentials.get);
 }
 function biometricSecureOk(){
-  // نسمح بالبصمة في:
-  // - HTTPS
-  // - localhost
-  // - داخل تطبيق أندرويد (file:// أو WebView)
-  if(window.isSecureContext) return true;
+  if(hasNativeBridge()) return true;       // APK مسموح دائمًا
+  if(window.isSecureContext) return true;  // HTTPS
   if(isFileProtocol) return true;
-  if(isAndroidApp) return true;
   if(location.hostname==='localhost'||location.hostname==='127.0.0.1') return true;
   return false;
 }
@@ -668,6 +675,7 @@ function showLockScreen(){
     lockHint.textContent='اضغط الزر ثم ضع بصمتك لفتح التطبيق';
     lockPassArea.style.display='none';
     lockBioArea.style.display='block';
+    // محاولة تلقائية (في APK يفتح Native مباشرة)
     if(!bioAutoTried){
       bioAutoTried=true;
       setTimeout(()=>{tryBiometricUnlock(true)},400);
@@ -700,17 +708,18 @@ async function checkPassword(){
   }
 }
 
+/* ---------- التحقق من البصمة (Native أو WebAuthn) ---------- */
 async function tryBiometricUnlock(auto){
   if(unlocked||bioBusy) return;
   const cfg=getLockConfig();
   if(!cfg||cfg.type!=='biometric') return;
 
   if(!biometricSupported()){
-    lockErrBio.textContent='⚠️ بصمة الإصبع غير مدعومة في هذا المتصفح.';
+    lockErrBio.textContent='⚠️ بصمة الإصبع غير مدعومة في هذا الجهاز.';
     return;
   }
   if(!biometricSecureOk()){
-    lockErrBio.textContent='⚠️ البصمة تحتاج تشغيل التطبيق داخل بيئة آمنة (HTTPS أو تطبيق أندرويد مُعدّ).';
+    lockErrBio.textContent='⚠️ البصمة تحتاج تشغيل التطبيق داخل بيئة آمنة.';
     return;
   }
 
@@ -720,6 +729,36 @@ async function tryBiometricUnlock(auto){
   lockBioBtn.textContent='جارٍ التحقق...';
   lockErrBio.textContent='';
 
+  /* ===== المسار 1: جسر أندرويد (APK) ===== */
+  if(hasNativeBridge()){
+    window.onNativeBiometricSuccess=function(){
+      window.onNativeBiometricSuccess=null;
+      window.onNativeBiometricError=null;
+      bioBusy=false;
+      lockBioBtn.disabled=false;
+      lockBioBtn.textContent=oldText||'استخدام البصمة';
+      lockErrBio.textContent='';
+      unlockApp();
+    };
+    window.onNativeBiometricError=function(msg){
+      window.onNativeBiometricSuccess=null;
+      window.onNativeBiometricError=null;
+      bioBusy=false;
+      lockBioBtn.disabled=false;
+      lockBioBtn.textContent=oldText||'استخدام البصمة';
+      lockErrBio.textContent='⚠️ '+(msg||'تعذر التحقق من البصمة.');
+    };
+    try{ window.Android.authenticateBiometric(); }
+    catch(e){
+      bioBusy=false;
+      lockBioBtn.disabled=false;
+      lockBioBtn.textContent=oldText||'استخدام البصمة';
+      lockErrBio.textContent='⚠️ تعذر تشغيل البصمة.';
+    }
+    return;
+  }
+
+  /* ===== المسار 2: WebAuthn (متصفح) ===== */
   try{
     const ok=await verifyBiometric(cfg.credId);
     if(ok){unlockApp();return;}
@@ -824,12 +863,26 @@ document.getElementById('saveBio').onclick=async()=>{
     setSettingsMsg('⚠️ لا يمكن تفعيل الطريقتين معًا. أزل كلمة المرور أولًا.','err');
     return;
   }
+
+  /* ===== مسار APK: الجسر الأصلي ===== */
+  if(hasNativeBridge()){
+    if(!nativeBiometricAvailable()){
+      setSettingsMsg('⚠️ لا يوجد مستشعر بصمة متاح على هذا الجهاز.','err');
+      return;
+    }
+    setLockConfig({type:'biometric',native:true,created:Date.now()});
+    refreshSettingsUI();
+    setSettingsMsg('✅ تم تفعيل البصمة. سيُطلب منك التحقق بالبصمة في كل مرة تفتح التطبيق.','ok');
+    return;
+  }
+
+  /* ===== مسار المتصفح: WebAuthn ===== */
   if(!biometricSupported()){
     setSettingsMsg('⚠️ بصمة الإصبع غير مدعومة في هذا المتصفح.','err');
     return;
   }
   if(!biometricSecureOk()){
-    setSettingsMsg('⚠️ البصمة تحتاج HTTPS أو تشغيل داخل تطبيق أندرويد مُعدّ للبصمة.','err');
+    setSettingsMsg('⚠️ البصمة تحتاج HTTPS أو تشغيل داخل تطبيق أندرويد مُعدّ.','err');
     return;
   }
 
@@ -840,7 +893,6 @@ document.getElementById('saveBio').onclick=async()=>{
   setSettingsMsg('');
 
   try{
-    // تحقق اختياري من وجود مستشعر
     if(window.PublicKeyCredential&&PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable){
       try{
         const available=await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
@@ -849,9 +901,8 @@ document.getElementById('saveBio').onclick=async()=>{
           btn.disabled=false;btn.textContent=oldText;
           return;
         }
-      }catch(e){/* نتجاهل الخطأ ونحاول التسجيل مباشرة */}
+      }catch(e){}
     }
-
     const credId=await registerBiometric();
     setLockConfig({type:'biometric',credId:credId,created:Date.now()});
     refreshSettingsUI();
@@ -1018,7 +1069,7 @@ refreshSettingsUI();
 /* فحص القفل عند فتح التطبيق */
 showLockScreen();
 
-/* حفظ في حال رجوع المستخدم للصفحة من الخلفية */
+/* القفل عند العودة من الخلفية */
 document.addEventListener('visibilitychange',()=>{
   if(document.visibilityState==='visible'&&!unlocked){
     const cfg=getLockConfig();
