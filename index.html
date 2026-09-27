@@ -2,9 +2,10 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>بحث خفي ومباشر</title>
 <script>
+/* منع ظهور المحتوى قبل التحقق من القفل */
 try{if(localStorage.getItem('appLockConfig'))document.documentElement.classList.add('prelock')}catch(e){}
 </script>
 <style>
@@ -22,7 +23,7 @@ body.light{
 body{
   margin:0;min-height:100vh;padding:14px 0 28px;
   font-family:Tahoma,Arial,sans-serif;background:var(--bg);color:var(--text);
-  overflow-x:hidden;transition:.25s ease;-webkit-tap-highlight-color:transparent
+  overflow-x:hidden;transition:.25s ease
 }
 *{transition:background-color .25s,color .25s,border-color .25s,box-shadow .25s}
 .top{
@@ -64,7 +65,7 @@ body{
 .btn{
   min-height:50px;border:1px solid var(--border);border-radius:25px;
   background:var(--panel2);color:var(--text);font-weight:700;cursor:pointer;
-  padding:8px 10px;overflow-wrap:anywhere;font-family:inherit
+  padding:8px 10px;overflow-wrap:anywhere
 }
 .btn.primary{background:var(--accent);border-color:var(--accent2);color:#fff}
 .btn:disabled{opacity:.45;cursor:not-allowed}
@@ -73,11 +74,11 @@ body{
   background:var(--panel);box-shadow:0 5px 20px var(--shadow)
 }
 .section-head{display:flex;justify-content:space-between;align-items:center;font-weight:800}
-.small-btn{border:0;background:transparent;color:var(--muted);cursor:pointer;font-family:inherit}
+.small-btn{border:0;background:transparent;color:var(--muted);cursor:pointer}
 .history-item{display:flex;gap:8px;align-items:center;padding:10px 0;border-top:1px solid var(--border);margin-top:8px}
-.history-q{flex:1;border:0;background:transparent;color:var(--text);text-align:right;cursor:pointer;font-family:inherit;font-size:14px}
+.history-q{flex:1;border:0;background:transparent;color:var(--text);text-align:right;cursor:pointer}
 .quick{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:24px}
-.quick button{min-height:86px;border:1px solid var(--border);border-radius:17px;background:var(--panel2);color:var(--text);cursor:pointer;font-weight:700;font-family:inherit}
+.quick button{min-height:86px;border:1px solid var(--border);border-radius:17px;background:var(--panel2);color:var(--text);cursor:pointer;font-weight:700}
 .quick span{display:block;font-size:23px;margin-bottom:6px}
 .bottom{
   width:100%;min-height:180px;margin-top:28px;border:1px solid var(--border);
@@ -93,9 +94,11 @@ body{
 }
 .modal-box h3{margin:0 0 8px}
 .modal-box .muted-p{color:var(--muted);font-size:13px;margin:0 0 6px;line-height:1.7}
-.modal-box button{border:1px solid var(--border);border-radius:20px;background:var(--panel2);color:var(--text);padding:9px 18px;cursor:pointer;font-family:inherit}
+.modal-box button{border:1px solid var(--border);border-radius:20px;background:var(--panel2);color:var(--text);padding:9px 18px;cursor:pointer}
 .modal-box button.primary{background:var(--accent);border-color:var(--accent2);color:#fff}
 .modal-box .close-row{margin-top:14px;display:flex;justify-content:flex-start}
+
+/* ====== بطاقات الأمان داخل الإعدادات ====== */
 .sec-card{
   border:1px solid var(--border);border-radius:16px;padding:14px;margin:12px 0;
   background:var(--panel2);text-align:right
@@ -113,12 +116,16 @@ body{
 .sec-msg.err{color:var(--accent2)}
 .sec-msg.ok{color:#34A853}
 body.light .sec-msg.ok{color:#1e8e3e}
+
+/* ====== مدخلات موحّدة ====== */
 .lock-input{
   width:100%;min-height:52px;border:1px solid var(--border);border-radius:16px;
   background:var(--input);color:var(--text);padding:10px 16px;font-size:16px;
   text-align:right;outline:0;margin-bottom:10px;font-family:inherit
 }
 .lock-input:focus{border-color:var(--accent)}
+
+/* ====== شاشة القفل ====== */
 .lock-screen{
   position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;
   background:var(--bg);padding:20px
@@ -143,6 +150,7 @@ html.prelock body > *:not(.lock-screen){display:none!important}
 .bio-icon{font-size:56px;margin-bottom:6px}
 .shake{animation:shake .38s}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-9px)}60%{transform:translateX(9px)}}
+
 @media(max-width:650px){
   .actions{grid-template-columns:repeat(2,minmax(0,1fr))}
   .quick{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -158,6 +166,7 @@ html.prelock body > *:not(.lock-screen){display:none!important}
   .actions,.quick{grid-template-columns:1fr}
   .engine,.engine:last-child{flex-basis:100%}
 }
+
 .voice-modal{
   position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;
   background:rgba(0,0,0,.62);padding:20px
@@ -183,7 +192,7 @@ html.prelock body > *:not(.lock-screen){display:none!important}
 .voice-bars i:nth-child(4){animation-delay:.3s}.voice-bars i:nth-child(5){animation-delay:.4s}
 .voice-cancel{
   margin-top:20px;border:1px solid var(--border);border-radius:24px;
-  background:var(--panel2);color:var(--text);padding:10px 22px;cursor:pointer;font-family:inherit
+  background:var(--panel2);color:var(--text);padding:10px 22px;cursor:pointer
 }
 @keyframes voicePulse{50%{transform:scale(1.06);box-shadow:0 0 0 20px color-mix(in srgb,var(--accent) 4%,transparent)}}
 @keyframes voiceBars{0%,100%{height:12px}50%{height:36px}}
@@ -324,8 +333,6 @@ html.prelock body > *:not(.lock-screen){display:none!important}
     </div>
   </div>
 </div>
-
-<!-- ================== بداية السكريبت (الجزء الرابع) ================== -->
 <script>
 /* ============ عناصر أساسية ============ */
 const input=document.getElementById('input');
@@ -336,40 +343,10 @@ const engines={
 };
 let engine='google';
 
-/* ============ كشف بيئة التطبيق ============ */
-const isAndroidApp=!!(window.Android||window.AndroidBridge||window.AndroidInterface);
-const isFileProtocol=location.protocol==='file:';
-const isSecure=(window.isSecureContext===true);
-
-/* ============ دوال تخزين آمنة (try/catch) ============ */
-function safeGet(key,def){
-  try{const v=localStorage.getItem(key);return v===null?def:v}catch(e){return def}
-}
-function safeSet(key,val){
-  try{localStorage.setItem(key,val)}catch(e){}
-}
-function safeRemove(key){
-  try{localStorage.removeItem(key)}catch(e){}
-}
-
-/* ============ جسر أندرويد ============ */
-function hasNativeBridge(){
-  return !!(window.Android && typeof window.Android.authenticateBiometric === 'function');
-}
-function nativeBiometricAvailable(){
-  if(!hasNativeBridge()) return false;
-  try{
-    if(typeof window.Android.isBiometricAvailable==='function'){
-      return !!window.Android.isBiometricAvailable();
-    }
-    return true;
-  }catch(e){return false}
-}
-
 /* ============ الثيم ============ */
 function setTheme(theme){
   document.body.classList.toggle('light',theme==='light');
-  safeSet('siteTheme',theme);
+  localStorage.setItem('siteTheme',theme);
   document.getElementById('theme').textContent=theme==='light'?'☀':'☾';
 }
 function toggleTheme(){
@@ -386,12 +363,10 @@ function updateEngine(){
 function updateClear(){clearBtn.style.display=input.value?'block':'none'}
 
 /* ============ السجل ============ */
-function getHistory(){
-  try{return JSON.parse(safeGet('searchHistory','[]')||'[]')}catch(e){return[]}
-}
+function getHistory(){return JSON.parse(localStorage.getItem('searchHistory')||'[]')}
 function saveHistory(q){
   let h=getHistory().filter(x=>x!==q);h.unshift(q);
-  safeSet('searchHistory',JSON.stringify(h.slice(0,5)));renderHistory();
+  localStorage.setItem('searchHistory',JSON.stringify(h.slice(0,5)));renderHistory();
 }
 function escapeHtml(x){const d=document.createElement('div');d.textContent=x;return d.innerHTML}
 function renderHistory(){
@@ -409,7 +384,7 @@ function renderHistory(){
   });
   document.querySelectorAll('.del').forEach(b=>b.onclick=()=>{
     const x=getHistory();x.splice(+b.dataset.i,1);
-    safeSet('searchHistory',JSON.stringify(x));renderHistory();
+    localStorage.setItem('searchHistory',JSON.stringify(x));renderHistory();
   });
 }
 
@@ -422,55 +397,19 @@ document.getElementById('form').onsubmit=e=>{
 clearBtn.onclick=()=>{input.value='';updateClear();input.focus()};
 input.oninput=updateClear;
 
-/* ============ نسخ البحث (3 طرق) ============ */
 document.getElementById('copy').onclick=async()=>{
   const q=input.value.trim();if(!q)return;
-  let copied=false;
-
-  // 1) Clipboard API الحديثة
-  if(navigator.clipboard&&navigator.clipboard.writeText){
-    try{await navigator.clipboard.writeText(q);copied=true}catch(e){}
-  }
-
-  // 2) execCommand (الطريقة القديمة)
-  if(!copied){
-    try{
-      input.select();input.setSelectionRange(0,99999);
-      copied=document.execCommand('copy');
-    }catch(e){}
-  }
-
-  // 3) جسر أندرويد
-  if(!copied&&isAndroidApp){
-    try{
-      const bridge=window.Android||window.AndroidBridge||window.AndroidInterface;
-      if(bridge&&typeof bridge.copyToClipboard==='function'){
-        bridge.copyToClipboard(q);copied=true;
-      }
-    }catch(e){}
-  }
-
-  alert(copied?'تم نسخ البحث':'تعذر النسخ، انسخ يدويًا');
+  try{await navigator.clipboard.writeText(q)}catch{input.select();document.execCommand('copy')}
+  alert('تم نسخ البحث');
 };
-
-/* ============ فتح الرابط ============ */
 document.getElementById('open').onclick=()=>{
   const q=input.value.trim();if(!q)return;
-  const url=/^https?:\/\//i.test(q)?q:'https://'+q;
-  try{
-    const w=window.open(url,'_blank');
-    if(!w) location.href=url;
-  }catch(e){location.href=url}
+  window.open(/^https?:\/\//i.test(q)?q:'https://'+q,'_blank');
 };
-
-/* ============ مسح الكل ============ */
-function clearEverything(){
-  input.value='';safeRemove('searchHistory');
-  renderHistory();updateClear();input.focus();
-}
+function clearEverything(){input.value='';localStorage.removeItem('searchHistory');renderHistory();updateClear();input.focus()}
 document.getElementById('clearAll').onclick=clearEverything;
 document.getElementById('clearHistory').onclick=()=>{
-  safeRemove('searchHistory');renderHistory();
+  localStorage.removeItem('searchHistory');renderHistory();
 };
 
 /* ============ أزرار سريعة ============ */
@@ -482,12 +421,7 @@ document.getElementById('quickHistory').onclick=()=>{
   section.style.boxShadow='0 0 0 3px var(--accent), 0 8px 28px var(--shadow)';
   setTimeout(()=>section.style.boxShadow='',900);
 };
-document.getElementById('privacy').onclick=()=>alert(
-  'السجل محفوظ محليًا على هذا الجهاز فقط.\n'+
-  'كلمة المرور محفوظة مشفّرة (SHA-256 + Salt).\n'+
-  'البصمة لا تُرسل لأي مكان، تبقى داخل الجهاز.\n'+
-  'لا يوجد أي اتصال بسيرفر خارجي.'
-);
+document.getElementById('privacy').onclick=()=>alert('السجل محفوظ محليًا على هذا الجهاز فقط، وكلمة المرور/البصمة لا تُرسل لأي مكان.');
 /* =========================================================
    نظام قفل التطبيق: كلمة مرور أو بصمة (طريقة واحدة فقط)
    ========================================================= */
@@ -510,59 +444,35 @@ let bioBusy=false;
 let bioAutoTried=false;
 
 function getLockConfig(){
-  try{return JSON.parse(safeGet(LOCK_KEY,'null')||'null')}catch(e){return null}
+  try{return JSON.parse(localStorage.getItem(LOCK_KEY)||'null')}catch(e){return null}
 }
 function setLockConfig(cfg){
-  if(cfg) safeSet(LOCK_KEY,JSON.stringify(cfg));
-  else safeRemove(LOCK_KEY);
+  if(cfg) localStorage.setItem(LOCK_KEY,JSON.stringify(cfg));
+  else localStorage.removeItem(LOCK_KEY);
 }
 
 /* ---------- أدوات مساعدة ---------- */
 function randomHex(n){
-  try{
-    const a=new Uint8Array(n);
-    if(window.crypto&&crypto.getRandomValues){
-      crypto.getRandomValues(a);
-      return Array.from(a).map(b=>b.toString(16).padStart(2,'0')).join('');
-    }
-  }catch(e){}
-  let s='';
-  for(let i=0;i<n*2;i++) s+='0123456789abcdef'[Math.floor(Math.random()*16)];
-  return s;
+  const a=new Uint8Array(n);
+  if(window.crypto&&crypto.getRandomValues) crypto.getRandomValues(a);
+  else for(let i=0;i<n;i++) a[i]=Math.floor(Math.random()*256);
+  return Array.from(a).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
-
-/* ---------- تشفير كلمة المرور (يدعم file:// و APK) ---------- */
 async function hashPassword(password,salt){
-  const str=salt+'::'+password+'::app-lock-v1';
-  const data=new TextEncoder().encode(str);
-
+  const data=new TextEncoder().encode(salt+'::'+password+'::app-lock');
   if(window.crypto&&crypto.subtle&&crypto.subtle.digest){
     try{
       const buf=await crypto.subtle.digest('SHA-256',data);
       return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
     }catch(e){}
   }
-
-  // بديل FNV-1a مزدوج يعمل في أي بيئة
-  let h1=0x811c9dc5,h2=0x01000193,h3=0x9e3779b9,h4=0x85ebca6b;
+  let h1=0x811c9dc5,h2=0x01000193;
   for(let i=0;i<data.length;i++){
-    const b=data[i];
-    h1^=b; h1=Math.imul(h1,16777619)>>>0;
-    h2=Math.imul(h2^b,2246822519)>>>0;
-    h3=Math.imul(h3^b,2654435761)>>>0;
-    h4=Math.imul(h4^b,0x27d4eb2f)>>>0;
+    h1^=data[i];h1=Math.imul(h1,16777619)>>>0;
+    h2=Math.imul(h2^data[i],2246822519)>>>0;
   }
-  const out=[h1,h2,h3,h4].map(x=>x.toString(16).padStart(8,'0')).join('');
-  let h5=0xdeadbeef,h6=0xcafebabe;
-  for(let i=data.length-1;i>=0;i--){
-    const b=data[i];
-    h5=Math.imul(h5^b,0x9e3779b1)>>>0;
-    h6=Math.imul(h6^b,0x85ebca77)>>>0;
-  }
-  return 'fb'+out+h5.toString(16)+h6.toString(16);
+  return 'fb'+h1.toString(16)+h2.toString(16);
 }
-
-/* ---------- Base64 URL helpers ---------- */
 function bufToB64url(buf){
   const bytes=new Uint8Array(buf);
   let str='';
@@ -577,67 +487,62 @@ function b64urlToBuf(s){
   for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
   return bytes.buffer;
 }
-
-/* ---------- رسائل خطأ البصمة ---------- */
 function bioErrorMessage(err){
   const name=(err&&err.name)?err.name:'';
-  const msg=(err&&err.message)?(' '+err.message):'';
   switch(name){
     case 'NotAllowedError':return 'تم إلغاء عملية البصمة أو رفضها. حاول مرة أخرى.';
     case 'InvalidStateError':return 'هذه البصمة مسجّلة بالفعل على الجهاز.';
     case 'NotSupportedError':return 'البصمة غير مدعومة على هذا الجهاز أو المتصفح.';
-    case 'SecurityError':return 'البصمة تحتاج اتصالاً آمنًا (HTTPS) أو تشغيل داخل تطبيق أندرويد مُعدّ.';
+    case 'SecurityError':return 'البصمة تحتاج فتح الموقع عبر HTTPS أو localhost.';
     case 'AbortError':return 'تم إلغاء عملية البصمة.';
     case 'TimeoutError':return 'انتهى وقت التحقق من البصمة.';
     case 'ConstraintError':return 'لا يوجد مستشعر بصمة مناسب في هذا الجهاز.';
-    default:return 'تعذر إكمال عملية البصمة.'+(name?' ('+name+')':'');
+    default:return 'تعذر إكمال عملية البصمة.';
   }
 }
 
-/* ---------- كشف دعم البصمة ---------- */
-function biometricSupported(){
-  if(hasNativeBridge()) return true; // APK
-  return !!(window.PublicKeyCredential && navigator.credentials
-            && navigator.credentials.create && navigator.credentials.get);
+/* ---------- WebAuthn ---------- */
+/* ---------- WebAuthn / WebView compatibility ---------- */
+function isAndroidWebView(){
+  const ua=navigator.userAgent||'';
+  return /; wv\)|\bwv\b|Version\/4\.0.*Chrome\//i.test(ua) && /Android/i.test(ua);
 }
-function biometricSecureOk(){
-  if(hasNativeBridge()) return true;       // APK مسموح دائمًا
-  if(window.isSecureContext) return true;  // HTTPS
-  if(isFileProtocol) return true;
-  if(location.hostname==='localhost'||location.hostname==='127.0.0.1') return true;
-  return false;
+function getWebAuthnOriginInfo(){
+  return {
+    secure:!!window.isSecureContext && location.protocol!=='file:',
+    origin:location.origin||'',
+    host:location.hostname||''
+  };
 }
-
-/* ---------- WebAuthn: تسجيل البصمة ---------- */
 async function registerBiometric(){
+  if(!navigator.credentials || !navigator.credentials.create) throw new DOMException('WebAuthn غير متاح في WebView','NotSupportedError');
   const challenge=new Uint8Array(32);crypto.getRandomValues(challenge);
   const userId=new Uint8Array(16);crypto.getRandomValues(userId);
-  const cred=await navigator.credentials.create({
-    publicKey:{
-      challenge:challenge,
-      rp:{name:'Google Search App'},
-      user:{id:userId,name:'user@local',displayName:'مستخدم'},
-      pubKeyCredParams:[
-        {type:'public-key',alg:-7},
-        {type:'public-key',alg:-257},
-        {type:'public-key',alg:-37}
-      ],
-      authenticatorSelection:{
-        authenticatorAttachment:'platform',
-        userVerification:'required',
-        residentKey:'preferred',
-        requireResidentKey:false
-      },
-      timeout:60000,
-      attestation:'none'
-    }
-  });
+  const rpId=location.hostname||undefined;
+  const publicKey={
+    challenge:challenge,
+    rp:{name:'Google Search App',...(rpId?{id:rpId}:{})},
+    user:{id:userId,name:'user@local',displayName:'مستخدم'},
+    pubKeyCredParams:[
+      {type:'public-key',alg:-7},
+      {type:'public-key',alg:-257},
+      {type:'public-key',alg:-37}
+    ],
+    authenticatorSelection:{
+      authenticatorAttachment:'platform',
+      userVerification:'required',
+      residentKey:'preferred',
+      requireResidentKey:false
+    },
+    timeout:60000,
+    attestation:'none'
+  };
+  const cred=await navigator.credentials.create({publicKey});
   if(!cred||!cred.rawId) throw new Error('failed');
   return bufToB64url(cred.rawId);
 }
-
-/* ---------- WebAuthn: التحقق من البصمة ---------- */
 async function verifyBiometric(credId){
+  if(!navigator.credentials || !navigator.credentials.get) throw new DOMException('WebAuthn غير متاح في WebView','NotSupportedError');
   const challenge=new Uint8Array(32);crypto.getRandomValues(challenge);
   const assertion=await navigator.credentials.get({
     publicKey:{
@@ -648,6 +553,17 @@ async function verifyBiometric(credId){
     }
   });
   return !!assertion;
+}
+async function biometricSupported(){
+  if(!window.isSecureContext || location.protocol==='file:') return false;
+  if(!window.PublicKeyCredential || !navigator.credentials ||
+     !navigator.credentials.create || !navigator.credentials.get) return false;
+  try{
+    if(PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable){
+      return await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+    }
+  }catch(e){}
+  return true;
 }
 
 /* ---------- شاشة القفل ---------- */
@@ -675,10 +591,9 @@ function showLockScreen(){
     lockHint.textContent='اضغط الزر ثم ضع بصمتك لفتح التطبيق';
     lockPassArea.style.display='none';
     lockBioArea.style.display='block';
-    // محاولة تلقائية (في APK يفتح Native مباشرة)
     if(!bioAutoTried){
       bioAutoTried=true;
-      setTimeout(()=>{tryBiometricUnlock(true)},400);
+      setTimeout(()=>{tryBiometricUnlock(true)},350);
     }
   }
 }
@@ -708,18 +623,19 @@ async function checkPassword(){
   }
 }
 
-/* ---------- التحقق من البصمة (Native أو WebAuthn) ---------- */
 async function tryBiometricUnlock(auto){
   if(unlocked||bioBusy) return;
   const cfg=getLockConfig();
   if(!cfg||cfg.type!=='biometric') return;
 
-  if(!biometricSupported()){
-    lockErrBio.textContent='⚠️ بصمة الإصبع غير مدعومة في هذا الجهاز.';
+  if(!(await biometricSupported())){
+    lockErrBio.textContent=isAndroidWebView()
+      ? '⚠️ WebView في التطبيق لا يوفّر WebAuthn للبصمة. يجب أن يكون التطبيق نفسه مهيأ لدعم بصمة Android.'
+      : '⚠️ بصمة الإصبع غير مدعومة في هذا المتصفح.';
     return;
   }
-  if(!biometricSecureOk()){
-    lockErrBio.textContent='⚠️ البصمة تحتاج تشغيل التطبيق داخل بيئة آمنة.';
+  if(!window.isSecureContext||location.protocol==='file:'){
+    lockErrBio.textContent='⚠️ البصمة تحتاج فتح الموقع عبر HTTPS أو localhost.';
     return;
   }
 
@@ -729,36 +645,6 @@ async function tryBiometricUnlock(auto){
   lockBioBtn.textContent='جارٍ التحقق...';
   lockErrBio.textContent='';
 
-  /* ===== المسار 1: جسر أندرويد (APK) ===== */
-  if(hasNativeBridge()){
-    window.onNativeBiometricSuccess=function(){
-      window.onNativeBiometricSuccess=null;
-      window.onNativeBiometricError=null;
-      bioBusy=false;
-      lockBioBtn.disabled=false;
-      lockBioBtn.textContent=oldText||'استخدام البصمة';
-      lockErrBio.textContent='';
-      unlockApp();
-    };
-    window.onNativeBiometricError=function(msg){
-      window.onNativeBiometricSuccess=null;
-      window.onNativeBiometricError=null;
-      bioBusy=false;
-      lockBioBtn.disabled=false;
-      lockBioBtn.textContent=oldText||'استخدام البصمة';
-      lockErrBio.textContent='⚠️ '+(msg||'تعذر التحقق من البصمة.');
-    };
-    try{ window.Android.authenticateBiometric(); }
-    catch(e){
-      bioBusy=false;
-      lockBioBtn.disabled=false;
-      lockBioBtn.textContent=oldText||'استخدام البصمة';
-      lockErrBio.textContent='⚠️ تعذر تشغيل البصمة.';
-    }
-    return;
-  }
-
-  /* ===== المسار 2: WebAuthn (متصفح) ===== */
   try{
     const ok=await verifyBiometric(cfg.credId);
     if(ok){unlockApp();return;}
@@ -863,26 +749,14 @@ document.getElementById('saveBio').onclick=async()=>{
     setSettingsMsg('⚠️ لا يمكن تفعيل الطريقتين معًا. أزل كلمة المرور أولًا.','err');
     return;
   }
-
-  /* ===== مسار APK: الجسر الأصلي ===== */
-  if(hasNativeBridge()){
-    if(!nativeBiometricAvailable()){
-      setSettingsMsg('⚠️ لا يوجد مستشعر بصمة متاح على هذا الجهاز.','err');
-      return;
-    }
-    setLockConfig({type:'biometric',native:true,created:Date.now()});
-    refreshSettingsUI();
-    setSettingsMsg('✅ تم تفعيل البصمة. سيُطلب منك التحقق بالبصمة في كل مرة تفتح التطبيق.','ok');
+  if(!(await biometricSupported())){
+    setSettingsMsg(isAndroidWebView()
+      ? '⚠️ التطبيق يعمل داخل WebView لا يوفّر WebAuthn للبصمة. لا يمكن تفعيل البصمة من HTML وحده.'
+      : '⚠️ بصمة الإصبع غير مدعومة في هذا المتصفح.','err');
     return;
   }
-
-  /* ===== مسار المتصفح: WebAuthn ===== */
-  if(!biometricSupported()){
-    setSettingsMsg('⚠️ بصمة الإصبع غير مدعومة في هذا المتصفح.','err');
-    return;
-  }
-  if(!biometricSecureOk()){
-    setSettingsMsg('⚠️ البصمة تحتاج HTTPS أو تشغيل داخل تطبيق أندرويد مُعدّ.','err');
+  if(!window.isSecureContext||location.protocol==='file:'){
+    setSettingsMsg('⚠️ البصمة تعمل فقط عند فتح الموقع عبر HTTPS أو localhost، وليس من ملف محلي.','err');
     return;
   }
 
@@ -893,16 +767,18 @@ document.getElementById('saveBio').onclick=async()=>{
   setSettingsMsg('');
 
   try{
+    let available=true;
     if(window.PublicKeyCredential&&PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable){
       try{
-        const available=await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-        if(!available){
-          setSettingsMsg('⚠️ لا يوجد مستشعر بصمة متاح على هذا الجهاز.','err');
-          btn.disabled=false;btn.textContent=oldText;
-          return;
-        }
-      }catch(e){}
+        available=await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+      }catch(e){available=true;}
     }
+    if(!available){
+      setSettingsMsg('⚠️ لا يوجد مستشعر بصمة متاح على هذا الجهاز.','err');
+      btn.disabled=false;btn.textContent=oldText;
+      return;
+    }
+
     const credId=await registerBiometric();
     setLockConfig({type:'biometric',credId:credId,created:Date.now()});
     refreshSettingsUI();
@@ -938,40 +814,52 @@ let silenceTimer=null;
 let finalTranscript='';
 
 function clearSilenceTimer(){
-  if(silenceTimer){clearTimeout(silenceTimer);silenceTimer=null;}
+  if(silenceTimer){
+    clearTimeout(silenceTimer);
+    silenceTimer=null;
+  }
 }
+
 function closeVoiceModal(){
   voiceClosing=true;
   clearSilenceTimer();
-  if(recognition){try{recognition.stop()}catch(e){}}
+
+  if(recognition){
+    try{recognition.stop()}catch(e){}
+  }
+
   voiceModal.classList.remove('show');
   voiceModal.setAttribute('aria-hidden','true');
   voiceButton.disabled=false;
   voiceButton.style.opacity='1';
 }
+
 function finishVoice(){
   clearSilenceTimer();
-  if(recognition){try{recognition.stop()}catch(e){}}
+  if(recognition){
+    try{recognition.stop()}catch(e){}
+  }
 }
 
 document.getElementById('voiceCancel').onclick=closeVoiceModal;
 
 async function requestMicrophonePermission(){
-  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
-    voiceStatus.textContent='⚠️ الميكروفون غير مدعوم في هذه البيئة.';
+  if(!window.isSecureContext || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    voiceStatus.textContent='⚠️ الميكروفون يحتاج فتح الموقع عبر HTTPS أو localhost. لا تغلق النافذة؛ افتح الموقع من رابط آمن ثم اضغط الميكروفون مرة أخرى.';
     return 'unsupported';
   }
+
   try{
     const stream=await navigator.mediaDevices.getUserMedia({audio:true});
     stream.getTracks().forEach(track=>track.stop());
     return 'granted';
   }catch(error){
-    if(error&&(error.name==='NotAllowedError'||error.name==='PermissionDeniedError')){
-      voiceStatus.textContent='🎙️ تم رفض صلاحية الميكروفون. اضغط سماح ثم جرّب مرة أخرى.';
-    }else if(error&&error.name==='NotFoundError'){
+    if(error && (error.name==='NotAllowedError' || error.name==='PermissionDeniedError')){
+      voiceStatus.textContent='🎙️ تم رفض صلاحية الميكروفون. اضغط سماح في إعدادات الموقع ثم جرّب مرة أخرى.';
+    }else if(error && error.name==='NotFoundError'){
       voiceStatus.textContent='🎙️ لم يتم العثور على ميكروفون في الجهاز.';
     }else{
-      voiceStatus.textContent='🎙️ تعذر الوصول إلى الميكروفون.';
+      voiceStatus.textContent='🎙️ تعذر الوصول إلى الميكروفون. اضغط مرة أخرى بعد السماح له من المتصفح.';
     }
     return 'denied';
   }
@@ -1001,6 +889,7 @@ voiceButton.onclick=async()=>{
   voiceStatus.textContent='اسمح للميكروفون من نافذة المتصفح...';
 
   const permissionState=await requestMicrophonePermission();
+
   if(permissionState!=='granted'){
     voiceButton.disabled=false;
     voiceButton.style.opacity='1';
@@ -1013,20 +902,29 @@ voiceButton.onclick=async()=>{
   recognition.interimResults=true;
   recognition.maxAlternatives=1;
 
-  recognition.onstart=()=>{voiceStatus.textContent='🎙️ جارٍ الاستماع... تحدث الآن';};
+  recognition.onstart=()=>{
+    voiceStatus.textContent='🎙️ جارٍ الاستماع... تحدث الآن';
+  };
 
   recognition.onresult=(event)=>{
     let interimTranscript='';
+
     for(let i=0;i<event.results.length;i++){
       const result=event.results[i];
-      if(result.isFinal) finalTranscript+=result[0].transcript+' ';
-      else interimTranscript+=result[0].transcript;
+      if(result.isFinal){
+        finalTranscript += result[0].transcript + ' ';
+      }else{
+        interimTranscript += result[0].transcript;
+      }
     }
-    const liveText=(finalTranscript+interimTranscript).trim();
+
+    const liveText=(finalTranscript + interimTranscript).trim();
+
     if(liveText){
       input.value=liveText;
       updateClear();
       voiceStatus.textContent='🎙️ أستمع...';
+
       clearSilenceTimer();
       silenceTimer=setTimeout(()=>finishVoice(),1200);
     }
@@ -1034,20 +932,36 @@ voiceButton.onclick=async()=>{
 
   recognition.onerror=(event)=>{
     clearSilenceTimer();
-    if(['not-allowed','service-not-allowed','no-speech','aborted'].includes(event.error)){
-      closeVoiceModal();return;
+
+    if(event.error==='not-allowed'||event.error==='service-not-allowed'){
+      closeVoiceModal();
+      return;
     }
+
+    if(event.error==='no-speech'){
+      closeVoiceModal();
+      return;
+    }
+
+    if(event.error==='aborted'){
+      closeVoiceModal();
+      return;
+    }
+
     closeVoiceModal();
   };
 
   recognition.onend=()=>{
     clearSilenceTimer();
-    const query=(finalTranscript||input.value||'').trim();
+
+    const query=(finalTranscript || input.value || '').trim();
+
     voiceClosing=true;
     voiceModal.classList.remove('show');
     voiceModal.setAttribute('aria-hidden','true');
     voiceButton.disabled=false;
     voiceButton.style.opacity='1';
+
     if(query){
       input.value=query;
       updateClear();
@@ -1056,26 +970,20 @@ voiceButton.onclick=async()=>{
     }
   };
 
-  try{recognition.start()}catch(e){closeVoiceModal()}
+  try{
+    recognition.start();
+  }catch(e){
+    closeVoiceModal();
+  }
 };
 
 /* =========================================================
    التشغيل
    ========================================================= */
-setTheme(safeGet('siteTheme','dark')||'dark');
+setTheme(localStorage.getItem('siteTheme')||'dark');
 updateEngine();renderHistory();updateClear();
 refreshSettingsUI();
 
 /* فحص القفل عند فتح التطبيق */
 showLockScreen();
-
-/* القفل عند العودة من الخلفية */
-document.addEventListener('visibilitychange',()=>{
-  if(document.visibilityState==='visible'&&!unlocked){
-    const cfg=getLockConfig();
-    if(cfg) showLockScreen();
-  }
-});
 </script>
-</body>
-</html>
