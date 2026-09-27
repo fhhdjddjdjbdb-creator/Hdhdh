@@ -294,7 +294,7 @@ const voiceButton=document.getElementById('voice');
 let recognition=null;
 let voiceClosing=false;
 let silenceTimer=null;
-let finalTranscript='';
+let transcriptParts=[];
 
 function clearSilenceTimer(){
   if(silenceTimer){
@@ -306,11 +306,9 @@ function clearSilenceTimer(){
 function closeVoiceModal(){
   voiceClosing=true;
   clearSilenceTimer();
-
   if(recognition){
-    try{recognition.stop()}catch(e){}
+    try{recognition.abort()}catch(e){}
   }
-
   voiceModal.classList.remove('show');
   voiceModal.setAttribute('aria-hidden','true');
   voiceButton.disabled=false;
@@ -320,8 +318,6 @@ function closeVoiceModal(){
 
 function finishVoice(){
   clearSilenceTimer();
-
-  // نوقف التعرف فورًا عند انتهاء كلام المستخدم.
   if(recognition){
     try{recognition.stop()}catch(e){}
   }
@@ -331,23 +327,28 @@ document.getElementById('voiceCancel').onclick=closeVoiceModal;
 
 async function requestMicrophonePermission(){
   if(!window.isSecureContext || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
-    voiceStatus.textContent='⚠️ الميكروفون يحتاج فتح الموقع عبر HTTPS أو localhost. لا تغلق النافذة؛ افتح الموقع من رابط آمن ثم اضغط الميكروفون مرة أخرى.';
+    voiceStatus.textContent='⚠️ الميكروفون يحتاج HTTPS أو localhost.';
     return 'unsupported';
   }
 
   try{
-    // طلب صلاحية الميكروفون الحقيقي الذي يعرضه المتصفح/النظام.
-    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
-    // بعد الحصول على الصلاحية، SpeechRecognition يتولى التعرف على الكلام.
+    const stream=await navigator.mediaDevices.getUserMedia({
+      audio:{
+        echoCancellation:true,
+        noiseSuppression:true,
+        autoGainControl:true,
+        channelCount:1
+      }
+    });
     stream.getTracks().forEach(track=>track.stop());
     return 'granted';
   }catch(error){
-    if(error && (error.name==='NotAllowedError' || error.name==='PermissionDeniedError')){
-      voiceStatus.textContent='🎙️ تم رفض صلاحية الميكروفون. اضغط سماح في إعدادات الموقع ثم جرّب مرة أخرى.';
+    if(error && (error.name==='NotAllowedError'||error.name==='PermissionDeniedError')){
+      voiceStatus.textContent='🎙️ اسمح للميكروفون من نافذة المتصفح ثم اضغط مرة أخرى.';
     }else if(error && error.name==='NotFoundError'){
-      voiceStatus.textContent='🎙️ لم يتم العثور على ميكروفون في الجهاز.';
+      voiceStatus.textContent='🎙️ لم يتم العثور على ميكروفون.';
     }else{
-      voiceStatus.textContent='🎙️ تعذر الوصول إلى الميكروفون. اضغط مرة أخرى بعد السماح له من المتصفح.';
+      voiceStatus.textContent='🎙️ تعذر الوصول إلى الميكروفون. حاول مرة أخرى.';
     }
     return 'denied';
   }
@@ -360,13 +361,12 @@ voiceButton.onclick=async()=>{
     voiceStatus.textContent='التعرف الصوتي غير مدعوم في هذا المتصفح.';
     voiceModal.classList.add('show');
     voiceModal.setAttribute('aria-hidden','false');
-    setTimeout(closeVoiceModal,1800);
     return;
   }
 
   clearSilenceTimer();
   voiceClosing=false;
-  finalTranscript='';
+  transcriptParts=[];
   input.value='';
   updateClear();
 
@@ -377,23 +377,21 @@ voiceButton.onclick=async()=>{
   voiceStatus.textContent='اسمح للميكروفون من نافذة المتصفح...';
   voiceLive.textContent='في انتظار السماح بالميكروفون...';
 
-  // أول ضغطة: نافذة السماح الحقيقية التي يوفرها المتصفح/النظام.
   const permissionState=await requestMicrophonePermission();
 
-  // مهم: لا نخفي زر الميكروفون ولا نغلق واجهة الاستماع إذا رفض المتصفح
-  // الصلاحية أو كانت الصفحة file://؛ المستخدم يستطيع المحاولة مرة أخرى.
   if(permissionState!=='granted'){
     voiceButton.disabled=false;
     voiceButton.style.opacity='1';
     return;
   }
 
-  // بعد السماح يبدأ التعرف الصوتي الحقيقي.
   recognition=new SpeechRecognition();
+
+  // إعدادات لتحسين العربية والتقاط الكلام أثناء النطق.
   recognition.lang='ar-EG';
   recognition.continuous=true;
   recognition.interimResults=true;
-  recognition.maxAlternatives=3;
+  recognition.maxAlternatives=1;
 
   recognition.onstart=()=>{
     voiceStatus.textContent='🎙️ جارٍ الاستماع... تحدث الآن';
@@ -401,40 +399,38 @@ voiceButton.onclick=async()=>{
   };
 
   recognition.onresult=(event)=>{
-    let interimTranscript='';
+    let changed=false;
 
-    // نعالج النتائج الجديدة فقط حتى لا يتكرر الكلام على الشاشة.
+    // نحفظ كل نتيجة في مكانها بدل جمعها مرة أخرى.
+    // هذا يمنع مشكلة: "أهلا أهلا بيك".
     for(let i=event.resultIndex;i<event.results.length;i++){
       const result=event.results[i];
-      const transcript=result[0].transcript;
-
-      if(result.isFinal){
-        finalTranscript += transcript + ' ';
-      }else{
-        interimTranscript += transcript;
+      if(result && result[0]){
+        transcriptParts[i]=result[0].transcript;
+        changed=true;
       }
     }
 
-    const liveText=(finalTranscript + interimTranscript).trim();
+    if(!changed) return;
+
+    const liveText=transcriptParts.filter(Boolean).join(' ').replace(/\s+/g,' ').trim();
 
     if(liveText){
-      // يظهر الكلام فورًا أثناء تحدث المستخدم.
+      // النص يظهر فورًا أثناء الكلام.
       input.value=liveText;
       updateClear();
       voiceStatus.textContent='🎙️ جارٍ الاستماع...';
       voiceLive.textContent=liveText;
 
-      // كل نتيجة صوتية جديدة تعني أن المستخدم ما زال يتكلم.
-      // يبدأ عداد السكوت من جديد، وعند عدم وصول كلام جديد ينتهي البحث.
+      // لا نبحث إلا بعد توقف حقيقي عن الكلام.
       clearSilenceTimer();
-      silenceTimer=setTimeout(()=>finishVoice(),1400);
+      silenceTimer=setTimeout(finishVoice,1500);
     }
   };
 
   recognition.onerror=(event)=>{
-    clearSilenceTimer();
-
     if(event.error==='not-allowed'||event.error==='service-not-allowed'){
+      clearSilenceTimer();
       voiceStatus.textContent='⚠️ اسمح للميكروفون من إعدادات الموقع ثم حاول مرة أخرى.';
       voiceButton.disabled=false;
       voiceButton.style.opacity='1';
@@ -442,29 +438,24 @@ voiceButton.onclick=async()=>{
     }
 
     if(event.error==='no-speech'){
-      // لا نغلق فورًا؛ نترك المستخدم يحاول الكلام داخل جلسة الاستماع.
-      voiceStatus.textContent='🎙️ لم أسمع كلامًا بعد... تحدث الآن';
+      // لا نغلق النافذة بمجرد عدم التقاط صوت.
+      voiceStatus.textContent='🎙️ جارٍ الاستماع... تحدث الآن';
       return;
     }
 
     if(event.error==='aborted'){
-      if(!voiceClosing){
-        voiceStatus.textContent='🎙️ توقف الاستماع. حاول مرة أخرى.';
-        voiceButton.disabled=false;
-        voiceButton.style.opacity='1';
-      }
       return;
     }
 
     voiceStatus.textContent='⚠️ حدثت مشكلة في التعرف الصوتي. حاول مرة أخرى.';
-    voiceButton.disabled=false;
-    voiceButton.style.opacity='1';
   };
 
   recognition.onend=()=>{
     clearSilenceTimer();
 
-    const query=(finalTranscript || input.value || '').trim();
+    if(voiceClosing) return;
+
+    const query=transcriptParts.filter(Boolean).join(' ').replace(/\s+/g,' ').trim() || input.value.trim();
 
     voiceClosing=true;
     voiceModal.classList.remove('show');
@@ -473,21 +464,26 @@ voiceButton.onclick=async()=>{
     voiceButton.style.opacity='1';
 
     if(query){
-      input.value=query;
-      updateClear();
       saveHistory(query);
 
-      // البحث تلقائيًا بعد انتهاء الكلام مثل تجربة Google.
-      window.location.href=engines.google(query);
+      // نمسح خانة الموقع قبل الانتقال حتى لا تبقى الجملة عند الرجوع للموقع.
+      input.value='';
+      updateClear();
+
+      // البحث التلقائي في Google.
+      window.location.replace(engines.google(query));
     }
   };
 
   try{
     recognition.start();
   }catch(e){
-    closeVoiceModal();
+    voiceStatus.textContent='⚠️ تعذر بدء الميكروفون. اضغط مرة أخرى.';
+    voiceButton.disabled=false;
+    voiceButton.style.opacity='1';
   }
 };
+
 setTheme(localStorage.getItem('siteTheme')||'dark');
 updateEngine();renderHistory();updateClear();
 </script>
