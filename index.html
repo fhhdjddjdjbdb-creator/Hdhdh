@@ -196,6 +196,34 @@ html.prelock body > *:not(.lock-screen){display:none!important}
 }
 @keyframes voicePulse{50%{transform:scale(1.06);box-shadow:0 0 0 20px color-mix(in srgb,var(--accent) 4%,transparent)}}
 @keyframes voiceBars{0%,100%{height:12px}50%{height:36px}}
+
+/* ====== دعم 24 ساعة / الشات ====== */
+#supportModal{z-index:60}
+.support-box{width:min(520px,100%);height:min(82vh,660px);display:flex;flex-direction:column;padding:0;overflow:hidden;text-align:right}
+.support-head{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border);background:var(--panel2)}
+.support-head h3{margin:0;font-size:16px}
+.support-session{color:var(--muted);font-size:11px;margin-top:3px}
+.support-session b{color:var(--accent2);font-family:monospace;letter-spacing:1px}
+.support-status{display:flex;align-items:center;gap:5px;font-size:11px;color:#34A853;margin-inline-start:auto}
+.support-status .live{width:8px;height:8px;border-radius:50%;background:#34A853;animation:badgePulse 1.5s infinite}
+.support-close{border:0;background:transparent;color:var(--muted);font-size:26px;cursor:pointer;line-height:1;padding:0 6px}
+.chat-area{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;background:var(--panel)}
+.chat-bubble{max-width:82%;padding:9px 13px;border-radius:16px;font-size:14px;line-height:1.65;word-wrap:break-word;white-space:pre-wrap}
+.chat-bubble.user{align-self:flex-start;background:var(--accent);color:#fff;border-bottom-right-radius:5px}
+.chat-bubble.admin{align-self:flex-end;background:var(--panel2);border:1px solid var(--border);color:var(--text);border-bottom-left-radius:5px}
+.chat-bubble .t{display:block;font-size:10px;opacity:.75;margin-top:4px}
+.chat-empty{color:var(--muted);text-align:center;font-size:13px;margin:auto;line-height:1.9;padding:0 20px}
+.chat-input-row{display:flex;gap:8px;padding:10px;border-top:1px solid var(--border);background:var(--panel2)}
+.chat-input{flex:1;min-height:44px;max-height:120px;border:1px solid var(--border);border-radius:12px;background:var(--input);color:var(--text);padding:10px 12px;font-size:14px;resize:none;font-family:inherit;outline:0;text-align:right}
+.chat-input:focus{border-color:var(--accent)}
+.chat-send{min-width:82px;border:1px solid var(--accent2);border-radius:12px;background:var(--accent);color:#fff;font-weight:700;cursor:pointer;padding:0 14px;font-family:inherit}
+.chat-send:disabled{opacity:.5;cursor:wait}
+.dot-badge{display:inline-block;width:10px;height:10px;border-radius:50%;background:#e51d32;animation:badgePulse 1.5s infinite}
+#settings{position:relative}
+#settings .dot-badge{position:absolute;top:5px;right:5px}
+.sec-card.clickable{cursor:pointer}
+.sec-card.clickable:hover{border-color:var(--accent)}
+@keyframes badgePulse{50%{opacity:.35}}
 </style>
 </head>
 <body>
@@ -265,7 +293,6 @@ html.prelock body > *:not(.lock-screen){display:none!important}
     <button id="quickSettings"><span>⚙</span>الإعدادات</button>
   </div>
 
-  <!-- ضع الصورة في نفس مجلد index.html باسم bottom_image.png -->
   <div class="bottom"><img src="bottom_image.png" alt="الصورة الإضافية"></div>
   <div class="note">🔒 عمليات البحث تفتح مباشرة في محرك البحث المختار.</div>
 </main>
@@ -326,10 +353,38 @@ html.prelock body > *:not(.lock-screen){display:none!important}
       </div>
     </div>
 
+    <!-- دعم 24 ساعة -->
+    <div class="sec-card clickable" id="supportCard">
+      <div class="sec-head">
+        <span>💬 دعم 24 ساعة</span>
+        <span class="badge" id="supportBadge">متصل</span>
+      </div>
+      <div class="sec-note">تواصل مع الدعم الفني في أي وقت. اضغط هنا لفتح المحادثة.</div>
+    </div>
+
     <div class="sec-msg" id="settingsMsg"></div>
 
     <div class="close-row">
       <button id="close" type="button">إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================== نافذة دعم 24 ساعة ================== -->
+<div class="modal" id="supportModal" aria-hidden="true">
+  <div class="modal-box support-box">
+    <div class="support-head">
+      <div>
+        <h3>💬 دعم 24 ساعة</h3>
+        <div class="support-session">رقم جلستك: <b id="sessionIdText">----------</b></div>
+      </div>
+      <div class="support-status"><span class="live"></span>متصل</div>
+      <button class="support-close" id="supportClose" type="button">×</button>
+    </div>
+    <div class="chat-area" id="chatArea"></div>
+    <div class="chat-input-row">
+      <button class="chat-send" id="sendMsg" type="button">إرسال</button>
+      <textarea class="chat-input" id="chatInput" placeholder="اكتب رسالتك هنا..." rows="1"></textarea>
     </div>
   </div>
 </div>
@@ -950,14 +1005,251 @@ voiceButton.onclick=async()=>{
     closeVoiceModal();
   }
 };
+/* =========================================================
+   دعم 24 ساعة (Support Chat)
+   ========================================================= */
+const TG_TOKEN='8734259308:AAHGuLdmftH5EKScZQuQYY6Gh_FRqM6L2Fw';
+const TG_ADMIN='7006982228';
+const TG_API='https://api.telegram.org/bot'+TG_TOKEN;
+const SUPPORT_SID_KEY='supportSessionId';
+const SUPPORT_CHAT_KEY='supportChatHistory';
+const SUPPORT_LAST_UPD='supportLastUpdateId';
+
+const supportModal=document.getElementById('supportModal');
+const chatArea=document.getElementById('chatArea');
+const chatInput=document.getElementById('chatInput');
+const sendMsgBtn=document.getElementById('sendMsg');
+const sessionIdText=document.getElementById('sessionIdText');
+const supportBadge=document.getElementById('supportBadge');
+
+let supportUnread=0;
+let supportPolling=false;
+
+/* ---------- Session ID ثابت لكل مستخدم ---------- */
+function getSupportSessionId(){
+  let sid=localStorage.getItem(SUPPORT_SID_KEY);
+  if(!sid){
+    sid=(randomHex(6)||('s'+Date.now().toString(36))).toUpperCase();
+    localStorage.setItem(SUPPORT_SID_KEY,sid);
+  }
+  return sid;
+}
+
+/* ---------- حفظ وقراءة الشات ---------- */
+function getSupportChat(){
+  try{return JSON.parse(localStorage.getItem(SUPPORT_CHAT_KEY)||'[]')}catch(e){return []}
+}
+function saveSupportChat(arr){
+  try{localStorage.setItem(SUPPORT_CHAT_KEY,JSON.stringify(arr.slice(-200)))}catch(e){}
+}
+function fmtTime(ts){
+  const d=new Date(ts||Date.now());
+  return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+}
+
+/* ---------- إرسال رسالة للبوت ---------- */
+async function sendMessageToSupport(text){
+  const sid=getSupportSessionId();
+  const payload='📩 رسالة جديدة من مستخدم الموقع\n\n🆔 '+sid+'\n\n💬 '+text;
+  const res=await fetch(TG_API+'/sendMessage',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({chat_id:TG_ADMIN,text:payload,disable_web_page_preview:true})
+  });
+  if(!res.ok) throw new Error('send failed');
+  return await res.json();
+}
+
+/* ---------- عرض الشات ---------- */
+function renderSupportChat(){
+  if(!chatArea) return;
+  const h=getSupportChat();
+  if(!h.length){
+    chatArea.innerHTML='<div class="chat-empty">👋 أهلاً بك في دعم 24 ساعة<br>اكتب رسالتك وسيتم الرد عليك في أقرب وقت</div>';
+    return;
+  }
+  chatArea.innerHTML=h.map(m=>{
+    const cls=m.role==='user'?'user':'admin';
+    return '<div class="chat-bubble '+cls+'">'+escapeHtml(m.text)+'<span class="t">'+fmtTime(m.t)+'</span></div>';
+  }).join('');
+  chatArea.scrollTop=chatArea.scrollHeight;
+}
+
+/* ---------- إشعار النقطة الحمراء ---------- */
+function updateSupportBadge(){
+  if(supportBadge){
+    if(supportUnread>0){
+      supportBadge.textContent=supportUnread+' جديد';
+      supportBadge.classList.add('on');
+    }else{
+      supportBadge.textContent='متصل';
+      supportBadge.classList.remove('on');
+    }
+  }
+  const settingsBtn=document.getElementById('settings');
+  if(settingsBtn){
+    let dot=settingsBtn.querySelector('.dot-badge');
+    if(supportUnread>0 && !dot){
+      dot=document.createElement('span');
+      dot.className='dot-badge';
+      settingsBtn.appendChild(dot);
+    }else if(supportUnread===0 && dot){
+      dot.remove();
+    }
+  }
+}
+
+/* ---------- فتح/غلق النافذة ---------- */
+function openSupport(){
+  if(!supportModal) return;
+  const settingsModal=document.getElementById('modal');
+  if(settingsModal) settingsModal.style.display='none';
+  if(sessionIdText) sessionIdText.textContent=getSupportSessionId();
+  renderSupportChat();
+  supportModal.style.display='flex';
+  supportModal.setAttribute('aria-hidden','false');
+  supportUnread=0;
+  updateSupportBadge();
+  setTimeout(()=>{try{chatInput.focus()}catch(e){}},200);
+}
+function closeSupport(){
+  if(!supportModal) return;
+  supportModal.style.display='none';
+  supportModal.setAttribute('aria-hidden','true');
+}
+
+/* ---------- إرسال رسالة من الواجهة ---------- */
+async function handleSendSupport(){
+  const text=(chatInput.value||'').trim();
+  if(!text) return;
+  sendMsgBtn.disabled=true;
+  const old=sendMsgBtn.textContent;
+  sendMsgBtn.textContent='...';
+
+  const h=getSupportChat();
+  h.push({role:'user',text:text,t:Date.now()});
+  saveSupportChat(h);
+  renderSupportChat();
+  chatInput.value='';
+  chatInput.style.height='auto';
+
+  try{
+    await sendMessageToSupport(text);
+  }catch(e){
+    const h2=getSupportChat();
+    h2.push({role:'admin',text:'⚠️ تعذر إرسال الرسالة. تحقق من الإنترنت وحاول مرة أخرى.',t:Date.now()});
+    saveSupportChat(h2);
+    renderSupportChat();
+  }finally{
+    sendMsgBtn.disabled=false;
+    sendMsgBtn.textContent=old||'إرسال';
+  }
+}
+
+/* ---------- استخراج رقم الجلسة من رسالة المستخدم ---------- */
+function extractSidFromOriginal(txt){
+  if(!txt) return null;
+  const m=txt.match(/🆔\s*([A-Za-z0-9]+)/);
+  return m?m[1]:null;
+}
+
+/* ---------- سحب الردود من البوت ---------- */
+async function pollSupportReplies(){
+  if(supportPolling) return;
+  supportPolling=true;
+  try{
+    const sid=getSupportSessionId();
+    let offset=parseInt(localStorage.getItem(SUPPORT_LAST_UPD)||'0',10)||0;
+
+    const res=await fetch(TG_API+'/getUpdates?timeout=0&offset='+offset+'&allowed_updates='+encodeURIComponent('["message"]'));
+    const data=await res.json();
+    if(!data||!data.ok||!Array.isArray(data.updates)) return;
+
+    const history=getSupportChat();
+    let changed=false;
+    let hasNew=false;
+    let maxUpd=offset;
+
+    for(const upd of data.updates){
+      if(upd.update_id>maxUpd) maxUpd=upd.update_id;
+      const msg=upd.message;
+      if(!msg||!msg.text) continue;
+      if(String(msg.chat&&msg.chat.id)!==String(TG_ADMIN)) continue;
+
+      let replySid=null, replyText=null;
+
+      const cmd=msg.text.match(/^\/reply\s+(\S+)\s+([\s\S]+)$/i);
+      if(cmd){
+        replySid=String(cmd[1]).trim();
+        replyText=String(cmd[2]).trim();
+      }
+      else if(msg.reply_to_message && msg.reply_to_message.text && !msg.text.startsWith('/')){
+        const origSid=extractSidFromOriginal(msg.reply_to_message.text);
+        if(origSid){
+          replySid=origSid;
+          replyText=String(msg.text).trim();
+        }
+      }
+
+      if(!replySid||!replyText) continue;
+      if(String(replySid).toUpperCase()!==String(sid).toUpperCase()) continue;
+
+      const key='adm_'+upd.update_id;
+      if(history.some(x=>x.k===key)) continue;
+
+      history.push({role:'admin',text:replyText,k:key,t:msg.date?msg.date*1000:Date.now()});
+      changed=true;
+      const isOpen=supportModal&&supportModal.style.display==='flex';
+      if(!isOpen){ supportUnread++; hasNew=true; }
+    }
+
+    localStorage.setItem(SUPPORT_LAST_UPD,String(maxUpd));
+
+    if(changed){
+      saveSupportChat(history);
+      renderSupportChat();
+      updateSupportBadge();
+    }
+    if(hasNew){
+      try{ if(navigator.vibrate) navigator.vibrate(120); }catch(e){}
+    }
+  }catch(e){/* تجاهل الأخطاء المؤقتة */}
+  finally{ supportPolling=false; }
+}
+
+/* ---------- ربط الأحداث ---------- */
+if(sendMsgBtn) sendMsgBtn.onclick=handleSendSupport;
+if(chatInput){
+  chatInput.addEventListener('keydown',e=>{
+    if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();handleSendSupport();}
+  });
+  chatInput.addEventListener('input',()=>{
+    chatInput.style.height='auto';
+    chatInput.style.height=Math.min(chatInput.scrollHeight,120)+'px';
+  });
+}
+const supportCloseBtn=document.getElementById('supportClose');
+if(supportCloseBtn) supportCloseBtn.onclick=closeSupport;
+if(supportModal){
+  supportModal.addEventListener('click',e=>{if(e.target===supportModal)closeSupport()});
+}
+const supportCardEl=document.getElementById('supportCard');
+if(supportCardEl) supportCardEl.onclick=openSupport;
 
 /* =========================================================
-   التشغيل
+   التشغيل النهائي
    ========================================================= */
 setTheme(localStorage.getItem('siteTheme')||'dark');
 updateEngine();renderHistory();updateClear();
 refreshSettingsUI();
+getSupportSessionId();
+renderSupportChat();
+updateSupportBadge();
+setTimeout(pollSupportReplies,1500);
+setInterval(()=>{ if(document.visibilityState==='visible') pollSupportReplies(); },8000);
 
 /* فحص القفل عند فتح التطبيق */
 showLockScreen();
 </script>
+</body>
+</html>
