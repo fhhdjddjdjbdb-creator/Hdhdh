@@ -403,25 +403,31 @@ voiceButton.onclick=async()=>{
   recognition.onresult=(event)=>{
     let interimTranscript='';
 
-    for(let i=0;i<event.results.length;i++){
+    // نعالج النتائج الجديدة فقط حتى لا يتكرر الكلام على الشاشة.
+    for(let i=event.resultIndex;i<event.results.length;i++){
       const result=event.results[i];
+      const transcript=result[0].transcript;
+
       if(result.isFinal){
-        finalTranscript += result[0].transcript + ' ';
+        finalTranscript += transcript + ' ';
       }else{
-        interimTranscript += result[0].transcript;
+        interimTranscript += transcript;
       }
     }
 
     const liveText=(finalTranscript + interimTranscript).trim();
 
     if(liveText){
+      // يظهر الكلام فورًا أثناء تحدث المستخدم.
       input.value=liveText;
       updateClear();
-      voiceStatus.textContent='🎙️ أستمع...';
+      voiceStatus.textContent='🎙️ جارٍ الاستماع...';
       voiceLive.textContent=liveText;
 
+      // كل نتيجة صوتية جديدة تعني أن المستخدم ما زال يتكلم.
+      // يبدأ عداد السكوت من جديد، وعند عدم وصول كلام جديد ينتهي البحث.
       clearSilenceTimer();
-      silenceTimer=setTimeout(()=>finishVoice(),1200);
+      silenceTimer=setTimeout(()=>finishVoice(),1400);
     }
   };
 
