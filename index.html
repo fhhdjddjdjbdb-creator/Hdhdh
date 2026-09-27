@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>بحث خفي ومباشر</title>
+<script>
+/* منع ظهور المحتوى قبل التحقق من القفل */
+try{if(localStorage.getItem('appLockConfig'))document.documentElement.classList.add('prelock')}catch(e){}
+</script>
 <style>
 *{box-sizing:border-box}
 :root{
@@ -64,6 +68,7 @@ body{
   padding:8px 10px;overflow-wrap:anywhere
 }
 .btn.primary{background:var(--accent);border-color:var(--accent2);color:#fff}
+.btn:disabled{opacity:.45;cursor:not-allowed}
 .section{
   margin-top:24px;padding:17px;border:1px solid var(--border);border-radius:18px;
   background:var(--panel);box-shadow:0 5px 20px var(--shadow)
@@ -83,8 +88,69 @@ body{
 .bottom img{width:100%;height:100%;max-height:360px;object-fit:contain;display:block}
 .note{text-align:center;color:var(--muted);font-size:12px;margin-top:18px}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.62);display:none;align-items:center;justify-content:center;padding:18px;z-index:5}
-.modal-box{width:min(420px,100%);background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:19px;padding:20px;text-align:right}
+.modal-box{
+  width:min(440px,100%);max-height:88vh;overflow:auto;background:var(--panel);color:var(--text);
+  border:1px solid var(--border);border-radius:19px;padding:20px;text-align:right
+}
+.modal-box h3{margin:0 0 8px}
+.modal-box .muted-p{color:var(--muted);font-size:13px;margin:0 0 6px;line-height:1.7}
 .modal-box button{border:1px solid var(--border);border-radius:20px;background:var(--panel2);color:var(--text);padding:9px 18px;cursor:pointer}
+.modal-box button.primary{background:var(--accent);border-color:var(--accent2);color:#fff}
+.modal-box .close-row{margin-top:14px;display:flex;justify-content:flex-start}
+
+/* ====== بطاقات الأمان داخل الإعدادات ====== */
+.sec-card{
+  border:1px solid var(--border);border-radius:16px;padding:14px;margin:12px 0;
+  background:var(--panel2);text-align:right
+}
+.sec-card.disabled{opacity:.5}
+.sec-head{display:flex;justify-content:space-between;align-items:center;font-weight:800;margin-bottom:10px;font-size:15px}
+.badge{
+  font-size:11px;font-weight:700;padding:3px 10px;border-radius:12px;
+  background:var(--panel);border:1px solid var(--border);color:var(--muted)
+}
+.badge.on{background:var(--accent);border-color:var(--accent2);color:#fff}
+.sec-note{color:var(--muted);font-size:12px;line-height:1.7;margin:8px 0 0}
+.sec-card .btn{width:100%;margin-top:8px}
+.sec-msg{font-size:13px;min-height:20px;margin-top:10px;line-height:1.7}
+.sec-msg.err{color:var(--accent2)}
+.sec-msg.ok{color:#34A853}
+body.light .sec-msg.ok{color:#1e8e3e}
+
+/* ====== مدخلات موحّدة ====== */
+.lock-input{
+  width:100%;min-height:52px;border:1px solid var(--border);border-radius:16px;
+  background:var(--input);color:var(--text);padding:10px 16px;font-size:16px;
+  text-align:right;outline:0;margin-bottom:10px;font-family:inherit
+}
+.lock-input:focus{border-color:var(--accent)}
+
+/* ====== شاشة القفل ====== */
+.lock-screen{
+  position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;
+  background:var(--bg);padding:20px
+}
+.lock-screen.show{display:flex}
+html.prelock .lock-screen{display:flex}
+html.prelock body > *:not(.lock-screen){display:none!important}
+.lock-card{
+  width:min(420px,100%);background:var(--panel);border:1px solid var(--border);
+  border-radius:24px;padding:28px 22px;text-align:center;box-shadow:0 18px 50px var(--shadow)
+}
+.lock-icon{font-size:46px;line-height:1;margin-bottom:8px}
+.lock-title{font-size:21px;font-weight:800;margin:6px 0}
+.lock-hint{color:var(--muted);font-size:13px;margin:0 0 18px;line-height:1.7}
+.lock-btn{
+  width:100%;min-height:52px;border-radius:16px;border:1px solid var(--accent2);
+  background:var(--accent);color:#fff;font-weight:700;font-size:16px;cursor:pointer;font-family:inherit
+}
+.lock-btn.ghost{background:var(--panel2);border-color:var(--border);color:var(--text)}
+.lock-btn:disabled{opacity:.6;cursor:wait}
+.lock-err{color:var(--accent2);font-size:13px;min-height:20px;margin-bottom:8px;line-height:1.7}
+.bio-icon{font-size:56px;margin-bottom:6px}
+.shake{animation:shake .38s}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-9px)}60%{transform:translateX(9px)}}
+
 @media(max-width:650px){
   .actions{grid-template-columns:repeat(2,minmax(0,1fr))}
   .quick{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -130,13 +196,34 @@ body{
 }
 @keyframes voicePulse{50%{transform:scale(1.06);box-shadow:0 0 0 20px color-mix(in srgb,var(--accent) 4%,transparent)}}
 @keyframes voiceBars{0%,100%{height:12px}50%{height:36px}}
-
 </style>
 </head>
 <body>
+
+<!-- ================== شاشة القفل ================== -->
+<div class="lock-screen" id="lockScreen" aria-hidden="true">
+  <div class="lock-card" id="lockCard">
+    <div class="lock-icon" id="lockIcon">🔒</div>
+    <div class="lock-title" id="lockTitle">التطبيق مقفل</div>
+    <div class="lock-hint" id="lockHint">أدخل كلمة المرور للمتابعة</div>
+
+    <div id="lockPassArea">
+      <input type="password" id="lockPassInput" class="lock-input" placeholder="كلمة المرور" autocomplete="off">
+      <div class="lock-err" id="lockErr"></div>
+      <button class="lock-btn" id="lockSubmit" type="button">دخول</button>
+    </div>
+
+    <div id="lockBioArea" style="display:none">
+      <div class="bio-icon">🖐</div>
+      <div class="lock-err" id="lockErrBio"></div>
+      <button class="lock-btn" id="lockBioBtn" type="button">استخدام البصمة</button>
+    </div>
+  </div>
+</div>
+
 <div class="top">
   <button class="icon-btn" id="theme" title="تغيير الوضع">☾</button>
-  <button class="icon-btn" id="settings" title="الإعدادات">⚙</button>
+  <button class="icon-btn" id="settings" title="الإعدادات والأمان">⚙</button>
 </div>
 <div class="dev">المطور: Mohamed Tamer</div>
 
@@ -183,7 +270,6 @@ body{
   <div class="note">🔒 عمليات البحث تفتح مباشرة في محرك البحث المختار.</div>
 </main>
 
-
 <div class="voice-modal" id="voiceModal" aria-hidden="true">
   <div class="voice-card">
     <div class="voice-mic">🎙</div>
@@ -194,15 +280,61 @@ body{
   </div>
 </div>
 
+<!-- ================== نافذة الإعدادات ================== -->
 <div class="modal" id="modal">
   <div class="modal-box">
-    <h3>الإعدادات</h3>
-    <p>اختر محرك البحث من الأعلى، واستخدم زر الثيم لتغيير الوضع. الاختيار محفوظ تلقائيًا على الجهاز.</p>
-    <button id="close">إغلاق</button>
+    <h3>الإعدادات والأمان</h3>
+    <p class="muted-p">
+      اختر <b>طريقة واحدة فقط</b> لقفل التطبيق: كلمة مرور أو بصمة الإصبع.
+      لا يمكن تفعيل الطريقتين معًا، وسيُطلب منك التحقق في كل مرة تفتح فيها التطبيق.
+    </p>
+
+    <!-- كلمة المرور -->
+    <div class="sec-card" id="passCard">
+      <div class="sec-head">
+        <span>🔑 كلمة المرور</span>
+        <span class="badge" id="passBadge">غير مُفعّلة</span>
+      </div>
+
+      <div id="passSetup">
+        <input type="password" id="newPass" class="lock-input" placeholder="كلمة المرور الجديدة" autocomplete="new-password">
+        <input type="password" id="newPass2" class="lock-input" placeholder="تأكيد كلمة المرور" autocomplete="new-password">
+        <button class="btn primary" id="savePass" type="button">حفظ كلمة المرور</button>
+      </div>
+
+      <div id="passActive" style="display:none">
+        <button class="btn" id="removePass" type="button">إزالة كلمة المرور</button>
+        <div class="sec-note">✅ كلمة المرور مُفعّلة. سيتم طلبها عند كل فتح للتطبيق.</div>
+      </div>
+    </div>
+
+    <!-- البصمة -->
+    <div class="sec-card" id="bioCard">
+      <div class="sec-head">
+        <span>🖐 بصمة الإصبع</span>
+        <span class="badge" id="bioBadge">غير مُفعّلة</span>
+      </div>
+
+      <div id="bioSetup">
+        <button class="btn primary" id="saveBio" type="button">تسجيل البصمة</button>
+        <div class="sec-note">سيظهر لك مستشعر البصمة الحقيقي في جهازك لتسجيل بصمتك.</div>
+      </div>
+
+      <div id="bioActive" style="display:none">
+        <button class="btn" id="removeBio" type="button">إزالة البصمة</button>
+        <div class="sec-note">✅ البصمة مُفعّلة. سيتم التحقق منها عند كل فتح للتطبيق.</div>
+      </div>
+    </div>
+
+    <div class="sec-msg" id="settingsMsg"></div>
+
+    <div class="close-row">
+      <button id="close" type="button">إغلاق</button>
+    </div>
   </div>
 </div>
-
 <script>
+/* ============ عناصر أساسية ============ */
 const input=document.getElementById('input');
 const clearBtn=document.getElementById('clear');
 const historyEl=document.getElementById('history');
@@ -211,6 +343,7 @@ const engines={
 };
 let engine='google';
 
+/* ============ الثيم ============ */
 function setTheme(theme){
   document.body.classList.toggle('light',theme==='light');
   localStorage.setItem('siteTheme',theme);
@@ -219,19 +352,29 @@ function setTheme(theme){
 function toggleTheme(){
   setTheme(document.body.classList.contains('light')?'dark':'light');
 }
+
+/* ============ محرك البحث ============ */
 function updateEngine(){
   document.querySelectorAll('.engine').forEach(b=>b.classList.add('active'));
   input.placeholder='إبحث الآن في Google...';
 }
+
+/* ============ زر المسح ============ */
 function updateClear(){clearBtn.style.display=input.value?'block':'none'}
+
+/* ============ السجل ============ */
 function getHistory(){return JSON.parse(localStorage.getItem('searchHistory')||'[]')}
 function saveHistory(q){
   let h=getHistory().filter(x=>x!==q);h.unshift(q);
   localStorage.setItem('searchHistory',JSON.stringify(h.slice(0,5)));renderHistory();
 }
+function escapeHtml(x){const d=document.createElement('div');d.textContent=x;return d.innerHTML}
 function renderHistory(){
   const h=getHistory();
-  if(!h.length){historyEl.innerHTML='<div style="color:var(--muted);text-align:center;padding:14px">لا توجد عمليات بحث سابقة</div>';return}
+  if(!h.length){
+    historyEl.innerHTML='<div style="color:var(--muted);text-align:center;padding:14px">لا توجد عمليات بحث سابقة</div>';
+    return;
+  }
   historyEl.innerHTML=h.map((q,i)=>`<div class="history-item">
     <button class="small-btn del" data-i="${i}">×</button>
     <button class="history-q" data-q="${encodeURIComponent(q)}">⌕ ${escapeHtml(q)}</button>
@@ -244,8 +387,8 @@ function renderHistory(){
     localStorage.setItem('searchHistory',JSON.stringify(x));renderHistory();
   });
 }
-function escapeHtml(x){const d=document.createElement('div');d.textContent=x;return d.innerHTML}
 
+/* ============ أحداث البحث ============ */
 document.querySelectorAll('.engine').forEach(b=>b.onclick=()=>updateEngine());
 document.getElementById('form').onsubmit=e=>{
   e.preventDefault();const q=input.value.trim();if(!q)return;
@@ -269,6 +412,7 @@ document.getElementById('clearHistory').onclick=()=>{
   localStorage.removeItem('searchHistory');renderHistory();
 };
 
+/* ============ أزرار سريعة ============ */
 document.getElementById('theme').onclick=toggleTheme;
 document.getElementById('quickTheme').onclick=toggleTheme;
 document.getElementById('quickHistory').onclick=()=>{
@@ -277,13 +421,363 @@ document.getElementById('quickHistory').onclick=()=>{
   section.style.boxShadow='0 0 0 3px var(--accent), 0 8px 28px var(--shadow)';
   setTimeout(()=>section.style.boxShadow='',900);
 };
-document.getElementById('privacy').onclick=()=>alert('السجل محفوظ محليًا على هذا الجهاز فقط.');
+document.getElementById('privacy').onclick=()=>alert('السجل محفوظ محليًا على هذا الجهاز فقط، وكلمة المرور/البصمة لا تُرسل لأي مكان.');
+/* =========================================================
+   نظام قفل التطبيق: كلمة مرور أو بصمة (طريقة واحدة فقط)
+   ========================================================= */
+const LOCK_KEY='appLockConfig';
+const lockScreen=document.getElementById('lockScreen');
+const lockCard=document.getElementById('lockCard');
+const lockIcon=document.getElementById('lockIcon');
+const lockTitle=document.getElementById('lockTitle');
+const lockHint=document.getElementById('lockHint');
+const lockPassArea=document.getElementById('lockPassArea');
+const lockBioArea=document.getElementById('lockBioArea');
+const lockPassInput=document.getElementById('lockPassInput');
+const lockErr=document.getElementById('lockErr');
+const lockErrBio=document.getElementById('lockErrBio');
+const lockSubmit=document.getElementById('lockSubmit');
+const lockBioBtn=document.getElementById('lockBioBtn');
+
+let unlocked=false;
+let bioBusy=false;
+let bioAutoTried=false;
+
+function getLockConfig(){
+  try{return JSON.parse(localStorage.getItem(LOCK_KEY)||'null')}catch(e){return null}
+}
+function setLockConfig(cfg){
+  if(cfg) localStorage.setItem(LOCK_KEY,JSON.stringify(cfg));
+  else localStorage.removeItem(LOCK_KEY);
+}
+
+/* ---------- أدوات مساعدة ---------- */
+function randomHex(n){
+  const a=new Uint8Array(n);
+  if(window.crypto&&crypto.getRandomValues) crypto.getRandomValues(a);
+  else for(let i=0;i<n;i++) a[i]=Math.floor(Math.random()*256);
+  return Array.from(a).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+async function hashPassword(password,salt){
+  const data=new TextEncoder().encode(salt+'::'+password+'::app-lock');
+  if(window.crypto&&crypto.subtle&&crypto.subtle.digest){
+    try{
+      const buf=await crypto.subtle.digest('SHA-256',data);
+      return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+    }catch(e){}
+  }
+  let h1=0x811c9dc5,h2=0x01000193;
+  for(let i=0;i<data.length;i++){
+    h1^=data[i];h1=Math.imul(h1,16777619)>>>0;
+    h2=Math.imul(h2^data[i],2246822519)>>>0;
+  }
+  return 'fb'+h1.toString(16)+h2.toString(16);
+}
+function bufToB64url(buf){
+  const bytes=new Uint8Array(buf);
+  let str='';
+  for(let i=0;i<bytes.length;i++) str+=String.fromCharCode(bytes[i]);
+  return btoa(str).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function b64urlToBuf(s){
+  s=String(s).replace(/-/g,'+').replace(/_/g,'/');
+  while(s.length%4) s+='=';
+  const bin=atob(s);
+  const bytes=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+  return bytes.buffer;
+}
+function bioErrorMessage(err){
+  const name=(err&&err.name)?err.name:'';
+  switch(name){
+    case 'NotAllowedError':return 'تم إلغاء عملية البصمة أو رفضها. حاول مرة أخرى.';
+    case 'InvalidStateError':return 'هذه البصمة مسجّلة بالفعل على الجهاز.';
+    case 'NotSupportedError':return 'البصمة غير مدعومة على هذا الجهاز أو المتصفح.';
+    case 'SecurityError':return 'البصمة تحتاج فتح الموقع عبر HTTPS أو localhost.';
+    case 'AbortError':return 'تم إلغاء عملية البصمة.';
+    case 'TimeoutError':return 'انتهى وقت التحقق من البصمة.';
+    case 'ConstraintError':return 'لا يوجد مستشعر بصمة مناسب في هذا الجهاز.';
+    default:return 'تعذر إكمال عملية البصمة.';
+  }
+}
+
+/* ---------- WebAuthn ---------- */
+async function registerBiometric(){
+  const challenge=new Uint8Array(32);crypto.getRandomValues(challenge);
+  const userId=new Uint8Array(16);crypto.getRandomValues(userId);
+  const cred=await navigator.credentials.create({
+    publicKey:{
+      challenge:challenge,
+      rp:{name:'Google Search App'},
+      user:{id:userId,name:'user@local',displayName:'مستخدم'},
+      pubKeyCredParams:[
+        {type:'public-key',alg:-7},
+        {type:'public-key',alg:-257},
+        {type:'public-key',alg:-37}
+      ],
+      authenticatorSelection:{
+        authenticatorAttachment:'platform',
+        userVerification:'required',
+        residentKey:'preferred',
+        requireResidentKey:false
+      },
+      timeout:60000,
+      attestation:'none'
+    }
+  });
+  if(!cred||!cred.rawId) throw new Error('failed');
+  return bufToB64url(cred.rawId);
+}
+async function verifyBiometric(credId){
+  const challenge=new Uint8Array(32);crypto.getRandomValues(challenge);
+  const assertion=await navigator.credentials.get({
+    publicKey:{
+      challenge:challenge,
+      allowCredentials:[{type:'public-key',id:b64urlToBuf(credId),transports:['internal']}],
+      userVerification:'required',
+      timeout:60000
+    }
+  });
+  return !!assertion;
+}
+function biometricSupported(){
+  return !!(window.PublicKeyCredential&&navigator.credentials&&navigator.credentials.create&&navigator.credentials.get);
+}
+
+/* ---------- شاشة القفل ---------- */
+function showLockScreen(){
+  const cfg=getLockConfig();
+  if(!cfg){unlockApp();return;}
+
+  document.documentElement.classList.add('prelock');
+  lockScreen.classList.add('show');
+  lockScreen.setAttribute('aria-hidden','false');
+  lockErr.textContent='';
+  lockErrBio.textContent='';
+
+  if(cfg.type==='password'){
+    lockIcon.textContent='🔒';
+    lockTitle.textContent='التطبيق مقفل';
+    lockHint.textContent='أدخل كلمة المرور للمتابعة';
+    lockPassArea.style.display='block';
+    lockBioArea.style.display='none';
+    lockPassInput.value='';
+    setTimeout(()=>{try{lockPassInput.focus()}catch(e){}},180);
+  }else{
+    lockIcon.textContent='🖐';
+    lockTitle.textContent='التطبيق مقفل';
+    lockHint.textContent='اضغط الزر ثم ضع بصمتك لفتح التطبيق';
+    lockPassArea.style.display='none';
+    lockBioArea.style.display='block';
+    if(!bioAutoTried){
+      bioAutoTried=true;
+      setTimeout(()=>{tryBiometricUnlock(true)},350);
+    }
+  }
+}
+function unlockApp(){
+  unlocked=true;
+  document.documentElement.classList.remove('prelock');
+  lockScreen.classList.remove('show');
+  lockScreen.setAttribute('aria-hidden','true');
+}
+
+async function checkPassword(){
+  if(unlocked) return;
+  const cfg=getLockConfig();
+  if(!cfg||cfg.type!=='password') return;
+  const val=lockPassInput.value;
+  if(!val){lockErr.textContent='أدخل كلمة المرور أولًا';return;}
+  const h=await hashPassword(val,cfg.salt);
+  if(h===cfg.hash){
+    lockErr.textContent='';
+    unlockApp();
+  }else{
+    lockErr.textContent='كلمة المرور غير صحيحة';
+    lockPassInput.value='';
+    try{lockPassInput.focus()}catch(e){}
+    lockCard.classList.add('shake');
+    setTimeout(()=>lockCard.classList.remove('shake'),420);
+  }
+}
+
+async function tryBiometricUnlock(auto){
+  if(unlocked||bioBusy) return;
+  const cfg=getLockConfig();
+  if(!cfg||cfg.type!=='biometric') return;
+
+  if(!biometricSupported()){
+    lockErrBio.textContent='⚠️ بصمة الإصبع غير مدعومة في هذا المتصفح.';
+    return;
+  }
+  if(!window.isSecureContext||location.protocol==='file:'){
+    lockErrBio.textContent='⚠️ البصمة تحتاج فتح الموقع عبر HTTPS أو localhost.';
+    return;
+  }
+
+  bioBusy=true;
+  const oldText=lockBioBtn.textContent;
+  lockBioBtn.disabled=true;
+  lockBioBtn.textContent='جارٍ التحقق...';
+  lockErrBio.textContent='';
+
+  try{
+    const ok=await verifyBiometric(cfg.credId);
+    if(ok){unlockApp();return;}
+    lockErrBio.textContent='تعذر التحقق من البصمة.';
+  }catch(err){
+    lockErrBio.textContent=bioErrorMessage(err);
+  }finally{
+    bioBusy=false;
+    lockBioBtn.disabled=false;
+    lockBioBtn.textContent=oldText||'استخدام البصمة';
+  }
+}
+
+lockSubmit.onclick=checkPassword;
+lockBioBtn.onclick=()=>tryBiometricUnlock(false);
+lockPassInput.addEventListener('keydown',e=>{
+  if(e.key==='Enter'){e.preventDefault();checkPassword();}
+});
+
+/* ---------- الإعدادات ---------- */
 const modal=document.getElementById('modal');
-document.getElementById('settings').onclick=()=>modal.style.display='flex';
-document.getElementById('quickSettings').onclick=()=>modal.style.display='flex';
+const settingsMsg=document.getElementById('settingsMsg');
+
+function setSettingsMsg(text,type){
+  settingsMsg.textContent=text||'';
+  settingsMsg.className='sec-msg'+(type==='err'?' err':(type==='ok'?' ok':''));
+}
+
+function refreshSettingsUI(){
+  const cfg=getLockConfig();
+  const passActive=!!cfg&&cfg.type==='password';
+  const bioActive=!!cfg&&cfg.type==='biometric';
+
+  const passBadge=document.getElementById('passBadge');
+  const bioBadge=document.getElementById('bioBadge');
+  passBadge.textContent=passActive?'مُفعّلة':'غير مُفعّلة';
+  passBadge.classList.toggle('on',passActive);
+  bioBadge.textContent=bioActive?'مُفعّلة':'غير مُفعّلة';
+  bioBadge.classList.toggle('on',bioActive);
+
+  document.getElementById('passSetup').style.display=passActive?'none':'block';
+  document.getElementById('passActive').style.display=passActive?'block':'none';
+  document.getElementById('bioSetup').style.display=bioActive?'none':'block';
+  document.getElementById('bioActive').style.display=bioActive?'block':'none';
+
+  document.getElementById('passCard').classList.toggle('disabled',bioActive);
+  document.getElementById('bioCard').classList.toggle('disabled',passActive);
+  document.getElementById('savePass').disabled=bioActive;
+  document.getElementById('saveBio').disabled=passActive;
+}
+
+function openSettings(){
+  setSettingsMsg('');
+  document.getElementById('newPass').value='';
+  document.getElementById('newPass2').value='';
+  refreshSettingsUI();
+  modal.style.display='flex';
+}
+
+document.getElementById('settings').onclick=openSettings;
+document.getElementById('quickSettings').onclick=openSettings;
 document.getElementById('close').onclick=()=>modal.style.display='none';
 modal.onclick=e=>{if(e.target===modal)modal.style.display='none'};
 
+/* ---------- حفظ كلمة المرور ---------- */
+document.getElementById('savePass').onclick=async()=>{
+  const cfg=getLockConfig();
+  if(cfg&&cfg.type==='biometric'){
+    setSettingsMsg('⚠️ لا يمكن تفعيل الطريقتين معًا. أزل البصمة أولًا.','err');
+    return;
+  }
+  const p1=document.getElementById('newPass').value;
+  const p2=document.getElementById('newPass2').value;
+
+  if(!p1){setSettingsMsg('⚠️ اكتب كلمة المرور أولًا.','err');return;}
+  if(p1.length<4){setSettingsMsg('⚠️ كلمة المرور يجب أن تكون 4 أحرف على الأقل.','err');return;}
+  if(p1!==p2){setSettingsMsg('⚠️ كلمتا المرور غير متطابقتين. أعد كتابتهما.','err');return;}
+
+  const salt=randomHex(16);
+  const hash=await hashPassword(p1,salt);
+  setLockConfig({type:'password',salt:salt,hash:hash,created:Date.now()});
+
+  document.getElementById('newPass').value='';
+  document.getElementById('newPass2').value='';
+  refreshSettingsUI();
+  setSettingsMsg('✅ تم حفظ كلمة المرور. سيُطلب منك إدخالها في كل مرة تفتح التطبيق.','ok');
+};
+
+document.getElementById('removePass').onclick=()=>{
+  const cfg=getLockConfig();
+  if(!cfg||cfg.type!=='password') return;
+  if(!confirm('هل تريد إزالة كلمة المرور؟ سيُفتح التطبيق بدون قفل.')) return;
+  setLockConfig(null);
+  refreshSettingsUI();
+  setSettingsMsg('تم إزالة كلمة المرور.','ok');
+};
+
+/* ---------- تسجيل البصمة ---------- */
+document.getElementById('saveBio').onclick=async()=>{
+  const cfg=getLockConfig();
+  if(cfg&&cfg.type==='password'){
+    setSettingsMsg('⚠️ لا يمكن تفعيل الطريقتين معًا. أزل كلمة المرور أولًا.','err');
+    return;
+  }
+  if(!biometricSupported()){
+    setSettingsMsg('⚠️ بصمة الإصبع غير مدعومة في هذا المتصفح.','err');
+    return;
+  }
+  if(!window.isSecureContext||location.protocol==='file:'){
+    setSettingsMsg('⚠️ البصمة تعمل فقط عند فتح الموقع عبر HTTPS أو localhost، وليس من ملف محلي.','err');
+    return;
+  }
+
+  const btn=document.getElementById('saveBio');
+  const oldText=btn.textContent;
+  btn.disabled=true;
+  btn.textContent='جارٍ التسجيل...';
+  setSettingsMsg('');
+
+  try{
+    let available=true;
+    if(window.PublicKeyCredential&&PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable){
+      try{
+        available=await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+      }catch(e){available=true;}
+    }
+    if(!available){
+      setSettingsMsg('⚠️ لا يوجد مستشعر بصمة متاح على هذا الجهاز.','err');
+      btn.disabled=false;btn.textContent=oldText;
+      return;
+    }
+
+    const credId=await registerBiometric();
+    setLockConfig({type:'biometric',credId:credId,created:Date.now()});
+    refreshSettingsUI();
+    setSettingsMsg('✅ تم تسجيل البصمة. سيُطلب منك التحقق بالبصمة في كل مرة تفتح التطبيق.','ok');
+  }catch(err){
+    setSettingsMsg('⚠️ '+bioErrorMessage(err),'err');
+  }finally{
+    btn.disabled=false;
+    btn.textContent=oldText||'تسجيل البصمة';
+    refreshSettingsUI();
+  }
+};
+
+document.getElementById('removeBio').onclick=()=>{
+  const cfg=getLockConfig();
+  if(!cfg||cfg.type!=='biometric') return;
+  if(!confirm('هل تريد إزالة البصمة؟ سيُفتح التطبيق بدون قفل.')) return;
+  setLockConfig(null);
+  refreshSettingsUI();
+  setSettingsMsg('تم إزالة البصمة.','ok');
+};
+
+/* =========================================================
+   التعرف الصوتي
+   ========================================================= */
 const voiceModal=document.getElementById('voiceModal');
 const voiceStatus=document.getElementById('voiceStatus');
 const voiceButton=document.getElementById('voice');
@@ -316,8 +810,6 @@ function closeVoiceModal(){
 
 function finishVoice(){
   clearSilenceTimer();
-
-  // نوقف التعرف فورًا عند انتهاء كلام المستخدم.
   if(recognition){
     try{recognition.stop()}catch(e){}
   }
@@ -332,9 +824,7 @@ async function requestMicrophonePermission(){
   }
 
   try{
-    // طلب صلاحية الميكروفون الحقيقي الذي يعرضه المتصفح/النظام.
     const stream=await navigator.mediaDevices.getUserMedia({audio:true});
-    // بعد الحصول على الصلاحية، SpeechRecognition يتولى التعرف على الكلام.
     stream.getTracks().forEach(track=>track.stop());
     return 'granted';
   }catch(error){
@@ -372,18 +862,14 @@ voiceButton.onclick=async()=>{
   voiceButton.style.opacity='.55';
   voiceStatus.textContent='اسمح للميكروفون من نافذة المتصفح...';
 
-  // أول ضغطة: نافذة السماح الحقيقية التي يوفرها المتصفح/النظام.
   const permissionState=await requestMicrophonePermission();
 
-  // مهم: لا نخفي زر الميكروفون ولا نغلق واجهة الاستماع إذا رفض المتصفح
-  // الصلاحية أو كانت الصفحة file://؛ المستخدم يستطيع المحاولة مرة أخرى.
   if(permissionState!=='granted'){
     voiceButton.disabled=false;
     voiceButton.style.opacity='1';
     return;
   }
 
-  // بعد السماح يبدأ التعرف الصوتي الحقيقي.
   recognition=new SpeechRecognition();
   recognition.lang='ar-EG';
   recognition.continuous=false;
@@ -454,8 +940,6 @@ voiceButton.onclick=async()=>{
       input.value=query;
       updateClear();
       saveHistory(query);
-
-      // البحث تلقائيًا بعد انتهاء الكلام مثل تجربة Google.
       window.location.href=engines.google(query);
     }
   };
@@ -466,8 +950,14 @@ voiceButton.onclick=async()=>{
     closeVoiceModal();
   }
 };
+
+/* =========================================================
+   التشغيل
+   ========================================================= */
 setTheme(localStorage.getItem('siteTheme')||'dark');
 updateEngine();renderHistory();updateClear();
+refreshSettingsUI();
+
+/* فحص القفل عند فتح التطبيق */
+showLockScreen();
 </script>
-</body>
-</html>
