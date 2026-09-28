@@ -291,7 +291,7 @@ html.prelock body > *:not(.lock-screen){display:none!important}
 <!-- ================== شاشة القفل ================== -->
 <div class="lock-screen" id="lockScreen" aria-hidden="true">
   <div class="lock-card" id="lockCard">
-    <div class="lock-icon" id="lockIcon">🔒</div>
+    <div class="lock-icon" id="lockIcon">🔐</div>
     <div class="lock-title" id="lockTitle">التطبيق مقفل</div>
     <div class="lock-hint" id="lockHint">أدخل كلمة المرور للمتابعة</div>
 
@@ -302,9 +302,9 @@ html.prelock body > *:not(.lock-screen){display:none!important}
     </div>
 
     <div id="lockBioArea" style="display:none">
-      <div class="bio-icon">🖐</div>
+      <div class="bio-icon">🙂</div>
       <div class="lock-err" id="lockErrBio"></div>
-      <button class="lock-btn" id="lockBioBtn" type="button">استخدام البصمة</button>
+      <button class="lock-btn" id="lockBioBtn" type="button">استخدام الوجه</button>
     </div>
   </div>
 </div>
@@ -378,7 +378,7 @@ html.prelock body > *:not(.lock-screen){display:none!important}
   </div>
 
   <div class="bottom"><img src="bottom_image.png" alt="الصورة الإضافية"></div>
-  <div class="note">🔒 عمليات البحث تفتح مباشرة في محرك البحث المختار.</div>
+  <div class="note">🔐 عمليات البحث تفتح مباشرة في محرك البحث المختار.</div>
 </main>
 
 <div class="voice-modal" id="voiceModal" aria-hidden="true">
@@ -396,7 +396,7 @@ html.prelock body > *:not(.lock-screen){display:none!important}
   <div class="modal-box">
     <h3>الإعدادات والأمان</h3>
     <p class="muted-p">
-      اختر <b>طريقة واحدة فقط</b> لقفل التطبيق: كلمة مرور أو بصمة الإصبع.
+      اختر <b>طريقة واحدة فقط</b> لقفل التطبيق: كلمة مرور أو فتح بالوجه.
       لا يمكن تفعيل الطريقتين معًا، وسيُطلب منك التحقق في كل مرة تفتح فيها التطبيق.
     </p>
 
@@ -422,18 +422,18 @@ html.prelock body > *:not(.lock-screen){display:none!important}
     <!-- البصمة -->
     <div class="sec-card" id="bioCard">
       <div class="sec-head">
-        <span>🖐 بصمة الإصبع</span>
+        <span>🙂 فتح بالوجه</span>
         <span class="badge" id="bioBadge">غير مُفعّلة</span>
       </div>
 
       <div id="bioSetup">
-        <button class="btn primary" id="saveBio" type="button">تسجيل البصمة</button>
-        <div class="sec-note">سيظهر لك مستشعر البصمة الحقيقي في جهازك لتسجيل بصمتك.</div>
+        <button class="btn primary" id="saveBio" type="button">تفعيل فتح الوجه</button>
+        <div class="sec-note">سيطلب النظام التحقق البيومتري المتاح على جهازك. إذا كان جهازك يدعم فتح الوجه فسيظهر التحقق بالوجه.</div>
       </div>
 
       <div id="bioActive" style="display:none">
-        <button class="btn" id="removeBio" type="button">إزالة البصمة</button>
-        <div class="sec-note">✅ البصمة مُفعّلة. سيتم التحقق منها عند كل فتح للتطبيق.</div>
+        <button class="btn" id="removeBio" type="button">إزالة قفل الوجه</button>
+        <div class="sec-note">✅ قفل الوجه مُفعّل. سيُطلب التحقق البيومتري عند كل فتح للتطبيق.</div>
       </div>
     </div>
 
@@ -633,12 +633,12 @@ function bioErrorMessage(err){
     case 'SecurityError':return 'البصمة تحتاج فتح الموقع عبر HTTPS أو localhost.';
     case 'AbortError':return 'تم إلغاء عملية البصمة.';
     case 'TimeoutError':return 'انتهى وقت التحقق من البصمة.';
-    case 'ConstraintError':return 'لا يوجد مستشعر بصمة مناسب في هذا الجهاز.';
-    default:return 'تعذر إكمال عملية البصمة.';
+    case 'ConstraintError':return 'لا توجد وسيلة تحقق بيومترية مناسبة على هذا الجهاز.';
+    default:return 'تعذر إكمال التحقق البيومتري.';
   }
 }
 
-/* ---------- WebAuthn ---------- */
+/* ---------- WebAuthn: يستخدم المصادق البيومتري للنظام ---------- */
 async function registerBiometric(){
   const challenge=new Uint8Array(32);crypto.getRandomValues(challenge);
   const userId=new Uint8Array(16);crypto.getRandomValues(userId);
@@ -693,7 +693,7 @@ function showLockScreen(){
   lockErrBio.textContent='';
 
   if(cfg.type==='password'){
-    lockIcon.textContent='🔒';
+    lockIcon.textContent='🔐';
     lockTitle.textContent='التطبيق مقفل';
     lockHint.textContent='أدخل كلمة المرور للمتابعة';
     lockPassArea.style.display='block';
@@ -701,9 +701,9 @@ function showLockScreen(){
     lockPassInput.value='';
     setTimeout(()=>{try{lockPassInput.focus()}catch(e){}},180);
   }else{
-    lockIcon.textContent='🖐';
+    lockIcon.textContent='🙂';
     lockTitle.textContent='التطبيق مقفل';
-    lockHint.textContent='اضغط الزر ثم ضع بصمتك لفتح التطبيق';
+    lockHint.textContent='اضغط الزر ثم استخدم فتح الوجه لفتح التطبيق';
     lockPassArea.style.display='none';
     lockBioArea.style.display='block';
     if(!bioAutoTried){
@@ -744,7 +744,7 @@ async function tryBiometricUnlock(auto){
   if(!cfg||cfg.type!=='biometric') return;
 
   if(!biometricSupported()){
-    lockErrBio.textContent='⚠️ بصمة الإصبع غير مدعومة في هذا المتصفح.';
+    lockErrBio.textContent='⚠️ التحقق بالوجه/القياسات الحيوية غير مدعوم في هذا المتصفح.';
     return;
   }
   if(!window.isSecureContext||location.protocol==='file:'){
@@ -767,7 +767,7 @@ async function tryBiometricUnlock(auto){
   }finally{
     bioBusy=false;
     lockBioBtn.disabled=false;
-    lockBioBtn.textContent=oldText||'استخدام البصمة';
+    lockBioBtn.textContent=oldText||'استخدام الوجه';
   }
 }
 
@@ -855,7 +855,9 @@ document.getElementById('removePass').onclick=()=>{
   setSettingsMsg('تم إزالة كلمة المرور.','ok');
 };
 
-/* ---------- تسجيل البصمة ---------- */
+/* ---------- تفعيل فتح الوجه ---------- */
+// ملاحظة: WebAuthn يطلب userVerification من نظام الجهاز؛ أندرويد هو الذي يحدد
+// وسيلة التحقق المتاحة (الوجه أو البصمة). لا يمكن لصفحة HTML إجبار النظام على الوجه وحده.
 document.getElementById('saveBio').onclick=async()=>{
   const cfg=getLockConfig();
   if(cfg&&cfg.type==='password'){
@@ -863,11 +865,11 @@ document.getElementById('saveBio').onclick=async()=>{
     return;
   }
   if(!biometricSupported()){
-    setSettingsMsg('⚠️ بصمة الإصبع غير مدعومة في هذا المتصفح.','err');
+    setSettingsMsg('⚠️ التحقق بالوجه/القياسات الحيوية غير مدعوم في هذا المتصفح.','err');
     return;
   }
   if(!window.isSecureContext||location.protocol==='file:'){
-    setSettingsMsg('⚠️ البصمة تعمل فقط عند فتح الموقع عبر HTTPS أو localhost، وليس من ملف محلي.','err');
+    setSettingsMsg('⚠️ التحقق البيومتري يحتاج HTTPS أو دعمًا أصليًا من تطبيق Android.','err');
     return;
   }
 
@@ -893,12 +895,12 @@ document.getElementById('saveBio').onclick=async()=>{
     const credId=await registerBiometric();
     setLockConfig({type:'biometric',credId:credId,created:Date.now()});
     refreshSettingsUI();
-    setSettingsMsg('✅ تم تسجيل البصمة. سيُطلب منك التحقق بالبصمة في كل مرة تفتح التطبيق.','ok');
+    setSettingsMsg('✅ تم تفعيل فتح الوجه. سيُطلب منك التحقق بالبصمة في كل مرة تفتح التطبيق.','ok');
   }catch(err){
     setSettingsMsg('⚠️ '+bioErrorMessage(err),'err');
   }finally{
     btn.disabled=false;
-    btn.textContent=oldText||'تسجيل البصمة';
+    btn.textContent=oldText||'تفعيل فتح الوجه';
     refreshSettingsUI();
   }
 };
@@ -906,10 +908,10 @@ document.getElementById('saveBio').onclick=async()=>{
 document.getElementById('removeBio').onclick=()=>{
   const cfg=getLockConfig();
   if(!cfg||cfg.type!=='biometric') return;
-  if(!confirm('هل تريد إزالة البصمة؟ سيُفتح التطبيق بدون قفل.')) return;
+  if(!confirm('هل تريد إزالة قفل الوجه؟ سيُفتح التطبيق بدون قفل.')) return;
   setLockConfig(null);
   refreshSettingsUI();
-  setSettingsMsg('تم إزالة البصمة.','ok');
+  setSettingsMsg('تم إزالة قفل الوجه.','ok');
 };
 
 /* =========================================================
