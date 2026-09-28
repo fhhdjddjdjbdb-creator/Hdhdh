@@ -291,7 +291,7 @@ html.prelock body > *:not(.lock-screen){display:none!important}
 <!-- ================== شاشة القفل ================== -->
 <div class="lock-screen" id="lockScreen" aria-hidden="true">
   <div class="lock-card" id="lockCard">
-    <div class="lock-icon" id="lockIcon">🔐</div>
+    <div class="lock-icon" id="lockIcon">🔒</div>
     <div class="lock-title" id="lockTitle">التطبيق مقفل</div>
     <div class="lock-hint" id="lockHint">أدخل كلمة المرور للمتابعة</div>
 
@@ -302,9 +302,9 @@ html.prelock body > *:not(.lock-screen){display:none!important}
     </div>
 
     <div id="lockBioArea" style="display:none">
-      <div class="bio-icon">🙂</div>
+      <div class="bio-icon">🖐</div>
       <div class="lock-err" id="lockErrBio"></div>
-      <button class="lock-btn" id="lockBioBtn" type="button">استخدام الوجه</button>
+      <button class="lock-btn" id="lockBioBtn" type="button">استخدام البصمة</button>
     </div>
   </div>
 </div>
@@ -378,7 +378,7 @@ html.prelock body > *:not(.lock-screen){display:none!important}
   </div>
 
   <div class="bottom"><img src="bottom_image.png" alt="الصورة الإضافية"></div>
-  <div class="note">🔐 عمليات البحث تفتح مباشرة في محرك البحث المختار.</div>
+  <div class="note">🔒 عمليات البحث تفتح مباشرة في محرك البحث المختار.</div>
 </main>
 
 <div class="voice-modal" id="voiceModal" aria-hidden="true">
@@ -396,7 +396,7 @@ html.prelock body > *:not(.lock-screen){display:none!important}
   <div class="modal-box">
     <h3>الإعدادات والأمان</h3>
     <p class="muted-p">
-      اختر <b>طريقة واحدة فقط</b> لقفل التطبيق: كلمة مرور أو فتح بالوجه.
+      اختر <b>طريقة واحدة فقط</b> لقفل التطبيق: كلمة مرور أو بصمة الإصبع.
       لا يمكن تفعيل الطريقتين معًا، وسيُطلب منك التحقق في كل مرة تفتح فيها التطبيق.
     </p>
 
@@ -422,18 +422,18 @@ html.prelock body > *:not(.lock-screen){display:none!important}
     <!-- البصمة -->
     <div class="sec-card" id="bioCard">
       <div class="sec-head">
-        <span>🙂 فتح بالوجه</span>
+        <span>🖐 بصمة الإصبع</span>
         <span class="badge" id="bioBadge">غير مُفعّلة</span>
       </div>
 
       <div id="bioSetup">
-        <button class="btn primary" id="saveBio" type="button">تفعيل فتح الوجه</button>
-        <div class="sec-note">سيطلب النظام التحقق البيومتري المتاح على جهازك. إذا كان جهازك يدعم فتح الوجه فسيظهر التحقق بالوجه.</div>
+        <button class="btn primary" id="saveBio" type="button">تسجيل البصمة</button>
+        <div class="sec-note">سيظهر لك مستشعر البصمة الحقيقي في جهازك لتسجيل بصمتك.</div>
       </div>
 
       <div id="bioActive" style="display:none">
-        <button class="btn" id="removeBio" type="button">إزالة قفل الوجه</button>
-        <div class="sec-note">✅ قفل الوجه مُفعّل. سيُطلب التحقق البيومتري عند كل فتح للتطبيق.</div>
+        <button class="btn" id="removeBio" type="button">إزالة البصمة</button>
+        <div class="sec-note">✅ البصمة مُفعّلة. سيتم التحقق منها عند كل فتح للتطبيق.</div>
       </div>
     </div>
 
@@ -633,12 +633,12 @@ function bioErrorMessage(err){
     case 'SecurityError':return 'البصمة تحتاج فتح الموقع عبر HTTPS أو localhost.';
     case 'AbortError':return 'تم إلغاء عملية البصمة.';
     case 'TimeoutError':return 'انتهى وقت التحقق من البصمة.';
-    case 'ConstraintError':return 'لا توجد وسيلة تحقق بيومترية مناسبة على هذا الجهاز.';
-    default:return 'تعذر إكمال التحقق البيومتري.';
+    case 'ConstraintError':return 'لا يوجد مستشعر بصمة مناسب في هذا الجهاز.';
+    default:return 'تعذر إكمال عملية البصمة.';
   }
 }
 
-/* ---------- WebAuthn: يستخدم المصادق البيومتري للنظام ---------- */
+/* ---------- WebAuthn ---------- */
 async function registerBiometric(){
   const challenge=new Uint8Array(32);crypto.getRandomValues(challenge);
   const userId=new Uint8Array(16);crypto.getRandomValues(userId);
@@ -693,7 +693,7 @@ function showLockScreen(){
   lockErrBio.textContent='';
 
   if(cfg.type==='password'){
-    lockIcon.textContent='🔐';
+    lockIcon.textContent='🔒';
     lockTitle.textContent='التطبيق مقفل';
     lockHint.textContent='أدخل كلمة المرور للمتابعة';
     lockPassArea.style.display='block';
@@ -701,9 +701,9 @@ function showLockScreen(){
     lockPassInput.value='';
     setTimeout(()=>{try{lockPassInput.focus()}catch(e){}},180);
   }else{
-    lockIcon.textContent='🙂';
+    lockIcon.textContent='🖐';
     lockTitle.textContent='التطبيق مقفل';
-    lockHint.textContent='اضغط الزر ثم استخدم فتح الوجه لفتح التطبيق';
+    lockHint.textContent='اضغط الزر ثم ضع بصمتك لفتح التطبيق';
     lockPassArea.style.display='none';
     lockBioArea.style.display='block';
     if(!bioAutoTried){
@@ -744,7 +744,7 @@ async function tryBiometricUnlock(auto){
   if(!cfg||cfg.type!=='biometric') return;
 
   if(!biometricSupported()){
-    lockErrBio.textContent='⚠️ التحقق بالوجه/القياسات الحيوية غير مدعوم في هذا المتصفح.';
+    lockErrBio.textContent='⚠️ بصمة الإصبع غير مدعومة في هذا المتصفح.';
     return;
   }
   if(!window.isSecureContext||location.protocol==='file:'){
@@ -767,7 +767,7 @@ async function tryBiometricUnlock(auto){
   }finally{
     bioBusy=false;
     lockBioBtn.disabled=false;
-    lockBioBtn.textContent=oldText||'استخدام الوجه';
+    lockBioBtn.textContent=oldText||'استخدام البصمة';
   }
 }
 
@@ -855,9 +855,7 @@ document.getElementById('removePass').onclick=()=>{
   setSettingsMsg('تم إزالة كلمة المرور.','ok');
 };
 
-/* ---------- تفعيل فتح الوجه ---------- */
-// ملاحظة: WebAuthn يطلب userVerification من نظام الجهاز؛ أندرويد هو الذي يحدد
-// وسيلة التحقق المتاحة (الوجه أو البصمة). لا يمكن لصفحة HTML إجبار النظام على الوجه وحده.
+/* ---------- تسجيل البصمة ---------- */
 document.getElementById('saveBio').onclick=async()=>{
   const cfg=getLockConfig();
   if(cfg&&cfg.type==='password'){
@@ -865,11 +863,11 @@ document.getElementById('saveBio').onclick=async()=>{
     return;
   }
   if(!biometricSupported()){
-    setSettingsMsg('⚠️ التحقق بالوجه/القياسات الحيوية غير مدعوم في هذا المتصفح.','err');
+    setSettingsMsg('⚠️ بصمة الإصبع غير مدعومة في هذا المتصفح.','err');
     return;
   }
   if(!window.isSecureContext||location.protocol==='file:'){
-    setSettingsMsg('⚠️ التحقق البيومتري يحتاج HTTPS أو دعمًا أصليًا من تطبيق Android.','err');
+    setSettingsMsg('⚠️ البصمة تعمل فقط عند فتح الموقع عبر HTTPS أو localhost، وليس من ملف محلي.','err');
     return;
   }
 
@@ -895,12 +893,12 @@ document.getElementById('saveBio').onclick=async()=>{
     const credId=await registerBiometric();
     setLockConfig({type:'biometric',credId:credId,created:Date.now()});
     refreshSettingsUI();
-    setSettingsMsg('✅ تم تفعيل فتح الوجه. سيُطلب منك التحقق بالبصمة في كل مرة تفتح التطبيق.','ok');
+    setSettingsMsg('✅ تم تسجيل البصمة. سيُطلب منك التحقق بالبصمة في كل مرة تفتح التطبيق.','ok');
   }catch(err){
     setSettingsMsg('⚠️ '+bioErrorMessage(err),'err');
   }finally{
     btn.disabled=false;
-    btn.textContent=oldText||'تفعيل فتح الوجه';
+    btn.textContent=oldText||'تسجيل البصمة';
     refreshSettingsUI();
   }
 };
@@ -908,10 +906,10 @@ document.getElementById('saveBio').onclick=async()=>{
 document.getElementById('removeBio').onclick=()=>{
   const cfg=getLockConfig();
   if(!cfg||cfg.type!=='biometric') return;
-  if(!confirm('هل تريد إزالة قفل الوجه؟ سيُفتح التطبيق بدون قفل.')) return;
+  if(!confirm('هل تريد إزالة البصمة؟ سيُفتح التطبيق بدون قفل.')) return;
   setLockConfig(null);
   refreshSettingsUI();
-  setSettingsMsg('تم إزالة قفل الوجه.','ok');
+  setSettingsMsg('تم إزالة البصمة.','ok');
 };
 
 /* =========================================================
@@ -958,8 +956,23 @@ document.getElementById('voiceCancel').onclick=closeVoiceModal;
 
 /* دعم Web + Android WebView
    في المتصفح يستخدم Web Speech API.
-   داخل تطبيق Android يستخدم الجسر الأصلي إذا كان التطبيق يوفره. */
+   داخل تطبيق Android يستخدم الجسر الأصلي إذا كان التطبيق يوفره.
+   ملاحظة: HTML وحده لا يستطيع إنشاء SpeechRecognizer داخل WebView؛
+   يجب أن يعرّض تطبيق Android دالة startListening/startSpeechRecognition/startSpeech. */
 let nativeSpeechActive=false;
+
+/* طبقة توافق مع WebView: تقبل أكثر من اسم شائع للجسر الأصلي
+   إذا كان تطبيق Android يوفره، مع الإبقاء على Web Speech في المتصفح. */
+function getNativeSpeechBridge(){
+  const candidates=[window.AndroidSpeech,window.AndroidBridge,window.Android,window.NativeSpeech];
+  for(const bridge of candidates){
+    if(!bridge) continue;
+    if(typeof bridge.startListening==='function') return {bridge,method:'startListening'};
+    if(typeof bridge.startSpeechRecognition==='function') return {bridge,method:'startSpeechRecognition'};
+    if(typeof bridge.startSpeech==='function') return {bridge,method:'startSpeech'};
+  }
+  return null;
+}
 
 window.onNativeSpeechResult=function(text){
   nativeSpeechActive=false;
@@ -986,10 +999,10 @@ window.onNativeSpeechError=function(message){
 };
 
 async function requestMicrophonePermission(){
-  const hasNativeSpeech=!!(window.AndroidSpeech && typeof window.AndroidSpeech.startListening==='function');
+  const nativeBridge=getNativeSpeechBridge();
 
   /* داخل WebView الجسر الأصلي هو المسؤول عن RECORD_AUDIO. */
-  if(hasNativeSpeech) return 'native';
+  if(nativeBridge) return 'native';
 
   if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
     return 'unsupported';
@@ -1013,7 +1026,8 @@ async function requestMicrophonePermission(){
 
 voiceButton.onclick=async()=>{
   const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
-  const hasNativeSpeech=!!(window.AndroidSpeech && typeof window.AndroidSpeech.startListening==='function');
+  const nativeBridge=getNativeSpeechBridge();
+  const hasNativeSpeech=!!nativeBridge;
 
   clearSilenceTimer();
   voiceClosing=false;
@@ -1033,7 +1047,7 @@ voiceButton.onclick=async()=>{
     nativeSpeechActive=true;
     voiceStatus.textContent='🎙️ جارٍ الاستماع... تحدث الآن';
     try{
-      window.AndroidSpeech.startListening('ar-EG');
+      nativeBridge.bridge[nativeBridge.method]('ar-EG');
     }catch(e){
       nativeSpeechActive=false;
       voiceStatus.textContent='تعذر تشغيل ميكروفون التطبيق.';
@@ -1043,14 +1057,14 @@ voiceButton.onclick=async()=>{
   }
 
   if(permissionState!=='granted' && !SpeechRecognition){
-    voiceButton.disabled=false;
-    voiceButton.style.opacity='1';
+    voiceStatus.textContent='⚠️ لم يتم توفير محرك التعرف الصوتي داخل التطبيق.';
+    setTimeout(closeVoiceModal,2200);
     return;
   }
 
   if(!SpeechRecognition){
-    voiceStatus.textContent='⚠️ هذا المحوّل لا يوفّر التعرف الصوتي داخل WebView.';
-    setTimeout(closeVoiceModal,1800);
+    voiceStatus.textContent='⚠️ WebView لا يوفر التعرف الصوتي. افتح الموقع في Chrome أو استخدم نسخة APK تحتوي على AndroidSpeech.';
+    setTimeout(closeVoiceModal,2600);
     return;
   }
 
