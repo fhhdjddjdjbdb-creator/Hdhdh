@@ -2,897 +2,408 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>بحث خفي ومباشر</title>
-<script>
-/* منع ظهور المحتوى قبل التحقق من القفل */
-try{if(localStorage.getItem('appLockConfig'))document.documentElement.classList.add('prelock')}catch(e){}
-</script>
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>توقف الموقع مؤقتًا</title>
+
 <style>
-*{box-sizing:border-box}
-:root{
-  --bg:#02040d;
-  --panel:#080b1d;
-  --panel2:#0b0f27;
-  --input:#0b0d22;
-  --border:#2934a8;
-  --text:#f8f5ff;
-  --muted:#b9a9df;
-  --accent:#9c12ff;
-  --accent2:#00cfff;
-  --pink:#f100ff;
-  --blue:#00b8ff;
-  --shadow:rgba(38,0,255,.35)
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
 }
-html,body{background:#02040d}
+
+html,body{
+    width:100%;
+    min-height:100%;
+    overflow:hidden !important;
+    position:fixed;
+    inset:0;
+    overscroll-behavior:none;
+    touch-action:pan-y;
+}
+
 body{
-  margin:0;min-height:100vh;padding:18px 0 0;
-  font-family:Tahoma,Arial,sans-serif;background:
-    radial-gradient(circle at 50% 18%,rgba(83,0,255,.18),transparent 28%),
-    radial-gradient(circle at 90% 48%,rgba(0,180,255,.08),transparent 25%),
-    var(--bg);
-  color:var(--text);overflow-x:hidden
-}
-*{transition:background-color .2s,color .2s,border-color .2s,box-shadow .2s,transform .2s}
-
-.top{
-  width:min(94%,900px);margin:auto;display:flex;justify-content:flex-end;
-  align-items:center;direction:ltr
-}
-.icon-btn{
-  width:58px;height:58px;border:1px solid #6039d6;border-radius:50%;
-  background:radial-gradient(circle at 35% 25%,#1a1648,#070918 70%);
-  color:#fff;font-size:29px;cursor:pointer;
-  box-shadow:0 0 12px rgba(103,53,255,.55),inset 0 0 15px rgba(0,200,255,.08)
-}
-.icon-btn:hover{transform:scale(1.04);box-shadow:0 0 20px rgba(174,0,255,.7),inset 0 0 18px rgba(0,200,255,.12)}
-
-.clear{position:absolute;top:50%;transform:translateY(-50%);border:0;background:transparent;color:#d9c9ff;cursor:pointer;width:48px;height:58px;padding:0;display:flex;align-items:center;justify-content:center}.clear{left:60px;display:none}
-.developer-link{color:#00aaff;text-decoration:none;font-weight:800;text-shadow:0 0 8px rgba(0,170,255,.65),0 0 16px rgba(0,110,255,.35)}.developer-link:hover{color:#35c5ff;text-shadow:0 0 10px rgba(0,190,255,.9),0 0 20px rgba(0,110,255,.5)}
-.dev{text-align:center;color:#cdb8f7;font-size:16px;margin:10px 0 14px;text-shadow:0 0 8px rgba(189,122,255,.25)}
-.logo{
-  text-align:center;font-size:clamp(54px,16vw,82px);font-weight:900;
-  line-height:.98;margin:2px 0 10px;letter-spacing:-2px;
-  text-shadow:0 0 18px rgba(65,82,255,.28)
-}
-.logo b:nth-child(1){color:#4285F4}.logo b:nth-child(2){color:#EA4335}
-.logo b:nth-child(3){color:#FBBC05}.logo b:nth-child(4){color:#4285F4}
-.logo b:nth-child(5){color:#34A853}.logo b:nth-child(6){color:#EA4335}
-.sub{
-  text-align:center;color:#d37cff;font-size:18px;margin-bottom:28px;
-  text-shadow:0 0 10px rgba(212,68,255,.45)
-}
-.wrap{width:min(92%,900px);margin:auto}
-.engines{display:none}
-.engine{display:none}
-
-.search-wrap{position:relative}
-.search{
-  width:100%;min-height:70px;border:2px solid transparent;border-radius:38px;
-  background:
-    linear-gradient(#0a0d25,#0a0d25) padding-box,
-    linear-gradient(100deg,#00baff,#694cff 48%,#fa00ff) border-box;
-  color:var(--text);font-size:18px;outline:0;
-  padding:12px 58px 12px 112px;text-align:right;
-  box-shadow:0 0 16px rgba(0,183,255,.28),0 0 25px rgba(202,0,255,.16);
-}
-.search::placeholder{color:#b9afd7}
-.search:focus{box-shadow:0 0 20px rgba(0,190,255,.42),0 0 35px rgba(216,0,255,.24)}
-.search-icon{
-  position:absolute;right:20px;top:50%;transform:translateY(-50%);
-  font-size:30px;color:#d84dff;text-shadow:0 0 10px #c000ff
+    font-family:Tahoma,Arial,sans-serif;
+    color:#fff;
+    background:
+        radial-gradient(circle at 50% 42%, #4a090f 0%, #23080b 25%, #100204 70%);
+    display:flex;
+    justify-content:center;
+    align-items:center;
 }
 
-.actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
-.btn{
-  min-height:58px;border:2px solid transparent;border-radius:32px;
-  background:
-    linear-gradient(#0a0d25,#0a0d25) padding-box,
-    linear-gradient(100deg,#183dff,#2a12ff,#8d00ff) border-box;
-  color:#eee9ff;font-weight:800;cursor:pointer;padding:8px 12px;
-  overflow-wrap:anywhere;font-size:16px;
-  box-shadow:0 0 12px rgba(33,45,255,.16)
-}
-.btn.primary{
-  background:
-    linear-gradient(100deg,#ff8b16,#c500ff 58%,#871cff) padding-box,
-    linear-gradient(100deg,#ff9b24,#ff00e6,#6d3bff) border-box;
-  border-color:transparent;color:#fff;
-  box-shadow:0 0 20px rgba(255,50,205,.24),0 0 15px rgba(255,143,25,.2)
-}
-.btn:hover{transform:translateY(-1px);box-shadow:0 0 20px rgba(55,50,255,.34)}
-.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
-
-.section{
-  margin-top:28px;padding:18px;border:2px solid transparent;border-radius:23px;
-  background:
-    linear-gradient(#080b20,#080b20) padding-box,
-    linear-gradient(120deg,#3538ff,#8b00ff,#00c8ff) border-box;
-  box-shadow:0 0 18px rgba(37,50,255,.22),inset 0 0 22px rgba(64,0,255,.08)
-}
-.section-head{display:flex;justify-content:space-between;align-items:center;font-weight:900;font-size:18px}
-.small-btn{border:0;background:transparent;color:#d04cff;cursor:pointer;font-weight:700}
-.history-item{
-  display:flex;gap:8px;align-items:center;padding:11px 0;
-  border-top:1px solid #242b75;margin-top:8px
-}
-.history-q{flex:1;border:0;background:transparent;color:var(--text);text-align:right;cursor:pointer}
-.quick{
-  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:14px;margin-top:28px
-}
-.quick button{
-  min-height:92px;border:2px solid transparent;border-radius:23px;
-  background:
-    linear-gradient(#090d22,#090d22) padding-box,
-    linear-gradient(135deg,#273cff,#00cfff,#7b00ff) border-box;
-  color:#f1ecff;cursor:pointer;font-weight:800;font-size:17px;
-  box-shadow:0 0 16px rgba(0,125,255,.12)
-}
-.quick button:nth-child(2){
-  background:
-    linear-gradient(#090d22,#090d22) padding-box,
-    linear-gradient(135deg,#00baff,#0f71ff,#05d7ef) border-box
-}
-.quick button:nth-child(3){
-  background:
-    linear-gradient(#0c0a20,#0c0a20) padding-box,
-    linear-gradient(135deg,#ff9d18,#b800ff,#ff2db8) border-box
-}
-.quick span{display:block;font-size:28px;margin-bottom:7px;text-shadow:0 0 12px currentColor}
-.quick button:hover{transform:translateY(-2px);box-shadow:0 0 22px rgba(126,0,255,.28)}
-
-.bottom{
-  width:100%;height:115px;margin-top:22px;border:0;border-radius:0;
-  background:transparent;display:flex;align-items:flex-end;justify-content:center;
-  overflow:hidden;box-shadow:none;position:relative
-}
-.bottom:before{
-  content:"";position:absolute;left:-5%;right:-5%;bottom:18px;height:58px;
-  border-top:2px solid #4b27ff;
-  border-radius:50% 50% 0 0/100% 100% 0 0;
-  box-shadow:0 -4px 13px #3820ff,0 -1px 8px #00bfff
-}
-.bottom:after{
-  content:"⌄⌄";position:absolute;bottom:2px;left:50%;
-  transform:translateX(-50%);font-size:32px;line-height:1;color:#8e16ff;
-  text-shadow:0 0 12px #7a00ff
-}
-.bottom img{display:none}
-.note{text-align:center;color:#897ca8;font-size:11px;margin-top:0}
-
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.76);display:none;align-items:center;justify-content:center;padding:18px;z-index:5}
-.modal-box{
-  width:min(440px,100%);max-height:88vh;overflow:auto;background:#080b20;color:var(--text);
-  border:2px solid #5630d8;border-radius:24px;padding:20px;text-align:right;
-  box-shadow:0 0 35px rgba(86,0,255,.32)
-}
-.modal-box h3{margin:0 0 8px}
-.modal-box .muted-p{color:var(--muted);font-size:13px;margin:0 0 6px;line-height:1.7}
-.modal-box button{border:1px solid #3739a4;border-radius:20px;background:#0c1028;color:var(--text);padding:9px 18px;cursor:pointer}
-.modal-box button.primary{background:#7010d8;border-color:#c82cff;color:#fff}
-.modal-box .close-row{margin-top:14px;display:flex;justify-content:flex-start}
-
-.sec-card{border:1px solid #30378d;border-radius:17px;padding:14px;margin:12px 0;background:#0b0f27;text-align:right}
-.sec-card.disabled{opacity:.5}
-.sec-head{display:flex;justify-content:space-between;align-items:center;font-weight:800;margin-bottom:10px;font-size:15px}
-.badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:12px;background:#0a0d20;border:1px solid #3c439d;color:#aaa4c5}
-.badge.on{background:#7e10db;border-color:#db36ff;color:#fff}
-.sec-note{color:var(--muted);font-size:12px;line-height:1.7;margin:8px 0 0}
-.sec-card .btn{width:100%;margin-top:8px}
-.sec-msg{font-size:13px;min-height:20px;margin-top:10px;line-height:1.7}
-.sec-msg.err{color:#ff5a73}.sec-msg.ok{color:#39e38b}
-
-.lock-input{
-  width:100%;min-height:52px;border:1px solid #343ba0;border-radius:16px;
-  background:#080b20;color:var(--text);padding:10px 16px;font-size:16px;
-  text-align:right;outline:0;margin-bottom:10px;font-family:inherit
-}
-.lock-input:focus{border-color:#c21fff;box-shadow:0 0 12px rgba(185,0,255,.2)}
-
-.lock-screen{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;background:#02040d;padding:20px}
-.lock-screen.show{display:flex}
-html.prelock .lock-screen{display:flex}
-html.prelock body > *:not(.lock-screen){display:none!important}
-.lock-card{
-  width:min(420px,100%);background:#080b20;border:2px solid #6030d8;
-  border-radius:26px;padding:28px 22px;text-align:center;box-shadow:0 0 35px rgba(82,0,255,.32)
-}
-.lock-icon{font-size:46px;line-height:1;margin-bottom:8px}
-.lock-title{font-size:21px;font-weight:800;margin:6px 0}
-.lock-hint{color:var(--muted);font-size:13px;margin:0 0 18px;line-height:1.7}
-.lock-btn{width:100%;min-height:52px;border-radius:16px;border:1px solid #df2bff;background:#7511dc;color:#fff;font-weight:700;font-size:16px;cursor:pointer;font-family:inherit}
-.lock-btn.ghost{background:#0b0f27;border-color:#3a3d92;color:var(--text)}
-.lock-btn:disabled{opacity:.6;cursor:wait}
-.lock-err{color:#ff5b76;font-size:13px;min-height:20px;margin-bottom:8px;line-height:1.7}
-.bio-icon{font-size:56px;margin-bottom:6px}
-.shake{animation:shake .38s}
-@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-9px)}60%{transform:translateX(9px)}}
-
-
-#supportModal{z-index:60}
-.support-box{width:min(520px,100%);height:min(82vh,660px);display:flex;flex-direction:column;padding:0;overflow:hidden;text-align:right}
-.support-head{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid #30378d;background:#0b0f27}
-.support-head h3{margin:0;font-size:16px}
-.support-session{color:var(--muted);font-size:11px;margin-top:3px}
-.support-session b{color:#d93aff;font-family:monospace;letter-spacing:1px}
-.support-status{display:flex;align-items:center;gap:5px;font-size:11px;color:#39e38b;margin-inline-start:auto}
-.support-status .live{width:8px;height:8px;border-radius:50%;background:#39e38b;animation:badgePulse 1.5s infinite}
-.support-close{border:0;background:transparent;color:var(--muted);font-size:26px;cursor:pointer;line-height:1;padding:0 6px}
-.chat-area{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;background:#080b20}
-.chat-bubble{max-width:82%;padding:9px 13px;border-radius:16px;font-size:14px;line-height:1.65;word-wrap:break-word;white-space:pre-wrap}
-.chat-bubble.user{align-self:flex-start;background:#7912df;color:#fff;border-bottom-right-radius:5px}
-.chat-bubble.admin{align-self:flex-end;background:#0d1230;border:1px solid #343a91;color:var(--text);border-bottom-left-radius:5px}
-.chat-bubble .t{display:block;font-size:10px;opacity:.75;margin-top:4px}
-.chat-empty{color:var(--muted);text-align:center;font-size:13px;margin:auto;line-height:1.9;padding:0 20px}
-.chat-input-row{display:flex;gap:8px;padding:10px;border-top:1px solid #30378d;background:#0b0f27}
-.chat-input{flex:1;min-height:44px;max-height:120px;border:1px solid #343a91;border-radius:12px;background:#080b20;color:var(--text);padding:10px 12px;font-size:14px;resize:none;font-family:inherit;outline:0;text-align:right}
-.chat-input:focus{border-color:#bf2cff}
-.chat-send{min-width:82px;border:1px solid #d22cff;border-radius:12px;background:#7411dc;color:#fff;font-weight:700;cursor:pointer;padding:0 14px;font-family:inherit}
-.chat-send:disabled{opacity:.5;cursor:wait}
-.dot-badge{display:inline-block;width:10px;height:10px;border-radius:50%;background:#ff315d;animation:badgePulse 1.5s infinite}
-#settings{position:relative}
-#settings .dot-badge{position:absolute;top:4px;right:4px}
-.sec-card.clickable{cursor:pointer}
-.sec-card.clickable:hover{border-color:#b928ff}
-@keyframes badgePulse{50%{opacity:.35}}
-
-@media(max-width:650px){
-  .actions{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .quick{grid-template-columns:repeat(2,minmax(0,1fr))}
-}
-@media(max-width:420px){
-  .actions{gap:9px}.btn{font-size:13px;min-height:54px}
-  .quick{gap:9px}.quick button{min-height:84px;font-size:14px}
-  .search{font-size:15px;padding-right:50px;min-height:64px}
-  .icon-btn{width:54px;height:54px}
-}
-@media(max-width:330px){
-  .actions,.quick{grid-template-columns:1fr}
+/* توهج الخلفية */
+.glow{
+    position:absolute;
+    width:420px;
+    height:420px;
+    border-radius:50%;
+    background:#e0001b;
+    filter:blur(150px);
+    opacity:.13;
+    pointer-events:none;
 }
 
+/* نقاط الخلفية */
+.particles{
+    position:absolute;
+    inset:0;
+    overflow:hidden;
+    pointer-events:none;
+}
+
+.particles span{
+    position:absolute;
+    width:4px;
+    height:4px;
+    border-radius:50%;
+    background:#ff3348;
+    box-shadow:0 0 15px #ff3348;
+    opacity:.5;
+    animation:float 7s linear infinite;
+}
+
+.particles span:nth-child(1){left:8%;top:85%;animation-delay:0s}
+.particles span:nth-child(2){left:18%;top:25%;animation-delay:1s}
+.particles span:nth-child(3){left:31%;top:72%;animation-delay:2s}
+.particles span:nth-child(4){left:49%;top:12%;animation-delay:3s}
+.particles span:nth-child(5){left:68%;top:78%;animation-delay:1.5s}
+.particles span:nth-child(6){left:82%;top:22%;animation-delay:2.5s}
+.particles span:nth-child(7){left:94%;top:63%;animation-delay:4s}
+
+@keyframes float{
+    0%{
+        transform:translateY(90px) scale(.4);
+        opacity:0;
+    }
+    30%{opacity:.7}
+    70%{opacity:.7}
+    100%{
+        transform:translateY(-180px) scale(1.3);
+        opacity:0;
+    }
+}
+
+/* المحتوى */
+.page{
+    width:100%;
+    height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    position:relative;
+    z-index:2;
+}
+
+/* كلمة قريباً نعود */
+.coming{
+    position:absolute;
+    top:25px;
+    left:50%;
+    transform:translateX(-50%);
+    white-space:nowrap;
+
+    padding:10px 23px;
+    border-radius:30px;
+
+    color:#ff3348;
+    border:1px solid #5a1018;
+    background:rgba(35,8,11,.7);
+    box-shadow:0 0 25px rgba(224,0,27,.12);
+
+    font-size:14px;
+    font-weight:bold;
+    letter-spacing:2px;
+
+    animation:comingPulse 2.5s ease-in-out infinite;
+}
+
+@keyframes comingPulse{
+    0%,100%{
+        opacity:.45;
+        box-shadow:0 0 10px rgba(224,0,27,.08);
+    }
+    50%{
+        opacity:1;
+        box-shadow:0 0 28px rgba(224,0,27,.3);
+    }
+}
+
+/* البطاقة */
+.card{
+    width:min(92vw,520px);
+    padding:34px 25px 27px;
+    text-align:center;
+
+    background:rgba(24,5,7,.86);
+    border:1px solid #5a1018;
+    border-radius:28px;
+
+    box-shadow:
+        0 30px 80px rgba(0,0,0,.55),
+        0 0 45px rgba(224,0,27,.1);
+
+    backdrop-filter:blur(18px);
+}
+
+/* الرسمة */
+.illustration{
+    width:190px;
+    height:145px;
+    margin:0 auto 22px;
+    position:relative;
+}
+
+/* شاشة */
+.monitor{
+    position:absolute;
+    width:125px;
+    height:88px;
+    left:32px;
+    top:15px;
+
+    border-radius:12px;
+    background:linear-gradient(145deg,#3d080d,#180507);
+    border:3px solid #8b000f;
+
+    box-shadow:
+        0 0 25px rgba(224,0,27,.25),
+        inset 0 0 20px rgba(224,0,27,.12);
+}
+
+.monitor::before{
+    content:"";
+    position:absolute;
+    width:55px;
+    height:4px;
+    background:#e0001b;
+    border-radius:10px;
+    left:32px;
+    top:39px;
+    box-shadow:0 0 15px #e0001b;
+}
+
+/* قاعدة الشاشة */
+.stand{
+    position:absolute;
+    width:45px;
+    height:13px;
+    left:72px;
+    top:103px;
+    background:#5a1018;
+    border-radius:4px;
+}
+
+.base{
+    position:absolute;
+    width:80px;
+    height:8px;
+    left:55px;
+    top:116px;
+    border-radius:10px;
+    background:#8b000f;
+}
+
+/* مفتاح الصيانة */
+.wrench{
+    position:absolute;
+    right:10px;
+    top:40px;
+    font-size:44px;
+    transform:rotate(-25deg);
+    filter:drop-shadow(0 0 10px rgba(224,0,27,.45));
+    animation:wrenchMove 3s ease-in-out infinite;
+}
+
+@keyframes wrenchMove{
+    0%,100%{transform:rotate(-25deg) translateY(0)}
+    50%{transform:rotate(-12deg) translateY(-5px)}
+}
+
+/* عنوان */
+h1{
+    font-size:28px;
+    margin-bottom:14px;
+    line-height:1.4;
+}
+
+.description{
+    color:#d9bfc2;
+    font-size:14px;
+    line-height:1.9;
+    margin-bottom:25px;
+}
+
+/* الأزرار */
+.buttons{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+button,
+.contact{
+    width:100%;
+    min-height:54px;
+    border-radius:15px;
+
+    font-family:inherit;
+    font-size:15px;
+    font-weight:bold;
+
+    cursor:pointer;
+    text-decoration:none;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    transition:transform .2s,box-shadow .2s;
+}
+
+.retry{
+    color:#fff;
+    background:#23080b;
+    border:1px solid #5a1018;
+}
+
+.retry:active{
+    transform:scale(.97);
+}
+
+.contact{
+    color:#fff;
+    background:linear-gradient(135deg,#8b000f,#e0001b);
+    border:1px solid #e0001b;
+
+    box-shadow:0 10px 28px rgba(224,0,27,.22);
+}
+
+.contact:active{
+    transform:scale(.97);
+}
+
+/* أسفل البطاقة */
+.footer{
+    margin-top:20px;
+    color:#92777b;
+    font-size:11px;
+}
+
+/* للموبايل */
+@media(max-width:380px){
+    .page{
+        padding:15px;
+    }
+
+    .card{
+        padding:25px 19px 22px;
+    }
+
+    .illustration{
+        transform:scale(.88);
+        margin-top:-5px;
+        margin-bottom:10px;
+    }
+
+    h1{
+        font-size:23px;
+    }
+
+    .description{
+        font-size:13px;
+    }
+
+    .coming{
+        top:18px;
+        font-size:12px;
+    }
+}
+
+/* منع تحديد وسحب العناصر */
+img,
+button,
+a,
+div{
+    -webkit-user-select:none;
+    user-select:none;
+}
 </style>
 </head>
+
 <body>
 
-<!-- ================== شاشة القفل ================== -->
-<div class="lock-screen" id="lockScreen" aria-hidden="true">
-  <div class="lock-card" id="lockCard">
-    <div class="lock-icon" id="lockIcon">🔒</div>
-    <div class="lock-title" id="lockTitle">التطبيق مقفل</div>
-    <div class="lock-hint" id="lockHint">أدخل كلمة المرور للمتابعة</div>
+<div class="glow"></div>
 
-    <div id="lockPassArea">
-      <input type="password" id="lockPassInput" class="lock-input" placeholder="كلمة المرور" autocomplete="off">
-      <div class="lock-err" id="lockErr"></div>
-      <button class="lock-btn" id="lockSubmit" type="button">دخول</button>
-    </div>
-  </div>
+<div class="particles">
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
 </div>
 
-<div class="top">
-  <button class="icon-btn" id="settings" title="الإعدادات والأمان">⚙</button>
-</div>
-<div class="dev">المطور: <a class="developer-link" href="https://t.me/MidoZoneBot" target="_blank" rel="noopener noreferrer">Mohamed Tamer</a></div>
+<div class="page">
 
-<div class="logo"><b>G</b><b>o</b><b>o</b><b>g</b><b>l</b><b>e</b></div>
-<div class="sub">إبحث الآن بشكل خفي ومباشر</div>
-
-<main class="wrap">
-  <form id="form">
-    <div class="search-wrap">
-      <span class="search-icon">⌕</span>
-      <input id="input" class="search" placeholder="إبحث الآن في Google..." autocomplete="off">
-      <button type="button" class="clear" id="clear">×</button>
-    </div>
-    <div class="actions">
-      <button class="btn primary" type="submit">⌕ بحث</button>
-      <button class="btn" type="button" id="open">↗ فتح الرابط</button>
-      <button class="btn" type="button" id="copy">▣ نسخ البحث</button>
-      <button class="btn" type="button" id="clearAll">مسح الكل</button>
-    </div>
-  </form>
-
-  <section class="section">
-    <div class="section-head">
-      <span>◷ آخر عمليات البحث</span>
-      <button class="small-btn" id="clearHistory">مسح الكل</button>
-    </div>
-    <div id="history"></div>
-  </section>
-
-  <div class="quick">
-    <button id="quickHistory"><span>▤</span>إدارة السجل</button>
-    <button id="privacy"><span>♢</span>الخصوصية</button>
-    <button id="quickSettings"><span>⚙</span>الإعدادات</button>
-  </div>
-
-  <div class="bottom"><img src="bottom_image.png" alt="الصورة الإضافية"></div>
-  <div class="note">🔒 عمليات البحث تفتح مباشرة في محرك البحث المختار.</div>
-</main>
-
-<!-- ================== نافذة الإعدادات ================== -->
-<div class="modal" id="modal">
-  <div class="modal-box">
-    <h3>الإعدادات والأمان</h3>
-    <p class="muted-p">
-      استخدم كلمة المرور لقفل التطبيق.
-      سيُطلب منك إدخالها في كل مرة تفتح فيها التطبيق.
-    </p>
-
-    <!-- كلمة المرور -->
-    <div class="sec-card" id="passCard">
-      <div class="sec-head">
-        <span>🔑 كلمة المرور</span>
-        <span class="badge" id="passBadge">غير مُفعّلة</span>
-      </div>
-
-      <div id="passSetup">
-        <input type="password" id="newPass" class="lock-input" placeholder="كلمة المرور الجديدة" autocomplete="new-password">
-        <input type="password" id="newPass2" class="lock-input" placeholder="تأكيد كلمة المرور" autocomplete="new-password">
-        <button class="btn primary" id="savePass" type="button">حفظ كلمة المرور</button>
-      </div>
-
-      <div id="passActive" style="display:none">
-        <button class="btn" id="removePass" type="button">إزالة كلمة المرور</button>
-        <div class="sec-note">✅ كلمة المرور مُفعّلة. سيتم طلبها عند كل فتح للتطبيق.</div>
-      </div>
+    <!-- قريباً نعود -->
+    <div class="coming">
+        ✦ قريبًا نعود ✦
     </div>
 
-    <!-- دعم 24 ساعة -->
-    <div class="sec-card clickable" id="supportCard">
-      <div class="sec-head">
-        <span>💬 دعم 24 ساعة</span>
-        <span class="badge" id="supportBadge">متصل</span>
-      </div>
-      <div class="sec-note">تواصل مع الدعم الفني في أي وقت. اضغط هنا لفتح المحادثة.</div>
-    </div>
+    <main class="card">
 
-    <div class="sec-msg" id="settingsMsg"></div>
+        <!-- رسمة صيانة -->
+        <div class="illustration">
 
-    <div class="close-row">
-      <button id="close" type="button">إغلاق</button>
-    </div>
-  </div>
+            <div class="monitor"></div>
+            <div class="stand"></div>
+            <div class="base"></div>
+
+            <div class="wrench">🔧</div>
+
+        </div>
+
+        <h1>
+            توقف الموقع مؤقتًا
+        </h1>
+
+        <p class="description">
+            الموقع متوقف مؤقتًا لإجراء بعض التحديثات
+            والتحسينات اللازمة.
+            <br>
+            سنعود قريبًا بتجربة أفضل.
+        </p>
+
+        <div class="buttons">
+
+            <button class="retry" onclick="location.reload()">
+                ↻ &nbsp; إعادة المحاولة
+            </button>
+
+            <a
+                class="contact"
+                href="https://t.me/MidoZoneBot"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                ✈ &nbsp; تواصل مع الإدارة
+            </a>
+
+        </div>
+
+        <div class="footer">
+            شكرًا لصبرك وتفهمك ❤️
+        </div>
+
+    </main>
+
 </div>
 
-<!-- ================== نافذة دعم 24 ساعة ================== -->
-<div class="modal" id="supportModal" aria-hidden="true">
-  <div class="modal-box support-box">
-    <div class="support-head">
-      <div>
-        <h3>💬 دعم 24 ساعة</h3>
-        <div class="support-session">رقم جلستك: <b id="sessionIdText">----------</b></div>
-      </div>
-      <div class="support-status"><span class="live"></span>متصل</div>
-      <button class="support-close" id="supportClose" type="button">×</button>
-    </div>
-    <div class="chat-area" id="chatArea"></div>
-    <div class="chat-input-row">
-      <button class="chat-send" id="sendMsg" type="button">إرسال</button>
-      <textarea class="chat-input" id="chatInput" placeholder="اكتب رسالتك هنا..." rows="1"></textarea>
-    </div>
-  </div>
-</div>
-<script>
-/* ============ عناصر أساسية ============ */
-const input=document.getElementById('input');
-const clearBtn=document.getElementById('clear');
-const historyEl=document.getElementById('history');
-const engines={
- google:q=>'https://www.google.com/search?q='+encodeURIComponent(q)
-};
-let engine='google';
-
-/* ============ الثيم ============ */
-function setTheme(theme){
-  document.body.classList.toggle('light',theme==='light');
-  localStorage.setItem('siteTheme',theme);
-  document.getElementById('theme').textContent=theme==='light'?'☀':'☾';
-}
-function toggleTheme(){
-  setTheme(document.body.classList.contains('light')?'dark':'light');
-}
-
-/* ============ محرك البحث ============ */
-function updateEngine(){
-  document.querySelectorAll('.engine').forEach(b=>b.classList.add('active'));
-  input.placeholder='إبحث الآن في Google...';
-}
-
-/* ============ زر المسح ============ */
-function updateClear(){clearBtn.style.display=input.value?'block':'none'}
-
-/* ============ السجل ============ */
-function getHistory(){return JSON.parse(localStorage.getItem('searchHistory')||'[]')}
-function saveHistory(q){
-  let h=getHistory().filter(x=>x!==q);h.unshift(q);
-  localStorage.setItem('searchHistory',JSON.stringify(h.slice(0,5)));renderHistory();
-}
-function escapeHtml(x){const d=document.createElement('div');d.textContent=x;return d.innerHTML}
-function renderHistory(){
-  const h=getHistory();
-  if(!h.length){
-    historyEl.innerHTML='<div style="color:var(--muted);text-align:center;padding:14px">لا توجد عمليات بحث سابقة</div>';
-    return;
-  }
-  historyEl.innerHTML=h.map((q,i)=>`<div class="history-item">
-    <button class="small-btn del" data-i="${i}">×</button>
-    <button class="history-q" data-q="${encodeURIComponent(q)}">⌕ ${escapeHtml(q)}</button>
-  </div>`).join('');
-  document.querySelectorAll('.history-q').forEach(b=>b.onclick=()=>{
-    input.value=decodeURIComponent(b.dataset.q);updateClear();input.focus();
-  });
-  document.querySelectorAll('.del').forEach(b=>b.onclick=()=>{
-    const x=getHistory();x.splice(+b.dataset.i,1);
-    localStorage.setItem('searchHistory',JSON.stringify(x));renderHistory();
-  });
-}
-
-/* ============ أحداث البحث ============ */
-document.querySelectorAll('.engine').forEach(b=>b.onclick=()=>updateEngine());
-document.getElementById('form').onsubmit=e=>{
-  e.preventDefault();const q=input.value.trim();if(!q)return;
-  saveHistory(q);location.href=engines[engine](q);
-};
-clearBtn.onclick=()=>{input.value='';updateClear();input.focus()};
-input.oninput=updateClear;
-
-document.getElementById('copy').onclick=async()=>{
-  const q=input.value.trim();if(!q)return;
-  try{await navigator.clipboard.writeText(q)}catch{input.select();document.execCommand('copy')}
-  alert('تم نسخ البحث');
-};
-document.getElementById('open').onclick=()=>{
-  const q=input.value.trim();if(!q)return;
-  window.open(/^https?:\/\//i.test(q)?q:'https://'+q,'_blank');
-};
-function clearEverything(){input.value='';localStorage.removeItem('searchHistory');renderHistory();updateClear();input.focus()}
-document.getElementById('clearAll').onclick=clearEverything;
-document.getElementById('clearHistory').onclick=()=>{
-  localStorage.removeItem('searchHistory');renderHistory();
-};
-
-/* ============ أزرار سريعة ============ */
-document.getElementById('quickHistory').onclick=()=>{
-  const section=document.querySelector('.section');
-  section.scrollIntoView({behavior:'smooth',block:'center'});
-  section.style.boxShadow='0 0 0 3px var(--accent), 0 8px 28px var(--shadow)';
-  setTimeout(()=>section.style.boxShadow='',900);
-};
-document.getElementById('privacy').onclick=()=>alert('السجل محفوظ محليًا على هذا الجهاز فقط، وكلمة المرور لا تُرسل لأي مكان.');
-/* =========================================================
-   نظام قفل التطبيق: كلمة مرور
-   ========================================================= */
-const LOCK_KEY='appLockConfig';
-const lockScreen=document.getElementById('lockScreen');
-const lockCard=document.getElementById('lockCard');
-const lockIcon=document.getElementById('lockIcon');
-const lockTitle=document.getElementById('lockTitle');
-const lockHint=document.getElementById('lockHint');
-const lockPassArea=document.getElementById('lockPassArea');
-const lockPassInput=document.getElementById('lockPassInput');
-const lockErr=document.getElementById('lockErr');
-const lockSubmit=document.getElementById('lockSubmit');
-
-let unlocked=false;
-
-function getLockConfig(){
-  try{return JSON.parse(localStorage.getItem(LOCK_KEY)||'null')}catch(e){return null}
-}
-function setLockConfig(cfg){
-  if(cfg) localStorage.setItem(LOCK_KEY,JSON.stringify(cfg));
-  else localStorage.removeItem(LOCK_KEY);
-}
-
-/* ---------- أدوات مساعدة ---------- */
-function randomHex(n){
-  const a=new Uint8Array(n);
-  if(window.crypto&&crypto.getRandomValues) crypto.getRandomValues(a);
-  else for(let i=0;i<n;i++) a[i]=Math.floor(Math.random()*256);
-  return Array.from(a).map(b=>b.toString(16).padStart(2,'0')).join('');
-}
-async function hashPassword(password,salt){
-  const data=new TextEncoder().encode(salt+'::'+password+'::app-lock');
-  if(window.crypto&&crypto.subtle&&crypto.subtle.digest){
-    try{
-      const buf=await crypto.subtle.digest('SHA-256',data);
-      return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-    }catch(e){}
-  }
-  let h1=0x811c9dc5,h2=0x01000193;
-  for(let i=0;i<data.length;i++){
-    h1^=data[i];h1=Math.imul(h1,16777619)>>>0;
-    h2=Math.imul(h2^data[i],2246822519)>>>0;
-  }
-  return 'fb'+h1.toString(16)+h2.toString(16);
-}
-
-/* ---------- شاشة القفل ---------- */
-function showLockScreen(){
-  const cfg=getLockConfig();
-  if(!cfg){unlockApp();return;}
-  /* أي إعداد بصمة قديم يُلغى حتى لا يعلق التطبيق بعد إزالة ميزة البصمة. */
-  if(cfg.type!=='password'){
-    setLockConfig(null);
-    unlockApp();
-    return;
-  }
-
-  document.documentElement.classList.add('prelock');
-  lockScreen.classList.add('show');
-  lockScreen.setAttribute('aria-hidden','false');
-  lockErr.textContent='';
-  lockIcon.textContent='🔒';
-  lockTitle.textContent='التطبيق مقفل';
-  lockHint.textContent='أدخل كلمة المرور للمتابعة';
-  lockPassArea.style.display='block';
-  lockPassInput.value='';
-  setTimeout(()=>{try{lockPassInput.focus()}catch(e){}},180);
-}
-function unlockApp(){
-  unlocked=true;
-  document.documentElement.classList.remove('prelock');
-  lockScreen.classList.remove('show');
-  lockScreen.setAttribute('aria-hidden','true');
-}
-
-async function checkPassword(){
-  if(unlocked) return;
-  const cfg=getLockConfig();
-  if(!cfg||cfg.type!=='password') return;
-  const val=lockPassInput.value;
-  if(!val){lockErr.textContent='أدخل كلمة المرور أولًا';return;}
-  const h=await hashPassword(val,cfg.salt);
-  if(h===cfg.hash){
-    lockErr.textContent='';
-    unlockApp();
-  }else{
-    lockErr.textContent='كلمة المرور غير صحيحة';
-    lockPassInput.value='';
-    try{lockPassInput.focus()}catch(e){}
-    lockCard.classList.add('shake');
-    setTimeout(()=>lockCard.classList.remove('shake'),420);
-  }
-}
-
-lockSubmit.onclick=checkPassword;
-lockPassInput.addEventListener('keydown',e=>{
-  if(e.key==='Enter'){e.preventDefault();checkPassword();}
-});
-
-/* ---------- الإعدادات ---------- */
-const modal=document.getElementById('modal');
-const settingsMsg=document.getElementById('settingsMsg');
-
-function setSettingsMsg(text,type){
-  settingsMsg.textContent=text||'';
-  settingsMsg.className='sec-msg'+(type==='err'?' err':(type==='ok'?' ok':''));
-}
-
-function refreshSettingsUI(){
-  const cfg=getLockConfig();
-  const passActive=!!cfg&&cfg.type==='password';
-  const passBadge=document.getElementById('passBadge');
-  passBadge.textContent=passActive?'مُفعّلة':'غير مُفعّلة';
-  passBadge.classList.toggle('on',passActive);
-  document.getElementById('passSetup').style.display=passActive?'none':'block';
-  document.getElementById('passActive').style.display=passActive?'block':'none';
-  document.getElementById('savePass').disabled=false;
-}
-
-function openSettings(){
-  setSettingsMsg('');
-  document.getElementById('newPass').value='';
-  document.getElementById('newPass2').value='';
-  refreshSettingsUI();
-  modal.style.display='flex';
-}
-
-document.getElementById('settings').onclick=openSettings;
-document.getElementById('settings').onclick=openSettings;
-document.getElementById('quickSettings').onclick=openSettings;
-document.getElementById('close').onclick=()=>modal.style.display='none';
-modal.onclick=e=>{if(e.target===modal)modal.style.display='none'};
-
-/* ---------- حفظ كلمة المرور ---------- */
-document.getElementById('savePass').onclick=async()=>{
-  const p1=document.getElementById('newPass').value;
-  const p2=document.getElementById('newPass2').value;
-
-  if(!p1){setSettingsMsg('⚠️ اكتب كلمة المرور أولًا.','err');return;}
-  if(p1.length<4){setSettingsMsg('⚠️ كلمة المرور يجب أن تكون 4 أحرف على الأقل.','err');return;}
-  if(p1!==p2){setSettingsMsg('⚠️ كلمتا المرور غير متطابقتين. أعد كتابتهما.','err');return;}
-
-  const salt=randomHex(16);
-  const hash=await hashPassword(p1,salt);
-  setLockConfig({type:'password',salt:salt,hash:hash,created:Date.now()});
-
-  document.getElementById('newPass').value='';
-  document.getElementById('newPass2').value='';
-  refreshSettingsUI();
-  setSettingsMsg('✅ تم حفظ كلمة المرور. سيُطلب منك إدخالها في كل مرة تفتح التطبيق.','ok');
-};
-
-document.getElementById('removePass').onclick=()=>{
-  const cfg=getLockConfig();
-  if(!cfg||cfg.type!=='password') return;
-  if(!confirm('هل تريد إزالة كلمة المرور؟ سيُفتح التطبيق بدون قفل.')) return;
-  setLockConfig(null);
-  refreshSettingsUI();
-  setSettingsMsg('تم إزالة كلمة المرور.','ok');
-};
-
-/* =========================================================
-   دعم 24 ساعة (Support Chat)
-   ========================================================= */
-const TG_TOKEN='8734259308:AAHGuLdmftH5EKScZQuQYY6Gh_FRqM6L2Fw';
-const TG_ADMIN='7006982228';
-const TG_API='https://api.telegram.org/bot'+TG_TOKEN;
-const SUPPORT_SID_KEY='supportSessionId';
-const SUPPORT_CHAT_KEY='supportChatHistory';
-const SUPPORT_LAST_UPD='supportLastUpdateId';
-
-const supportModal=document.getElementById('supportModal');
-const chatArea=document.getElementById('chatArea');
-const chatInput=document.getElementById('chatInput');
-const sendMsgBtn=document.getElementById('sendMsg');
-const sessionIdText=document.getElementById('sessionIdText');
-const supportBadge=document.getElementById('supportBadge');
-
-let supportUnread=0;
-let supportPolling=false;
-
-/* ---------- Session ID ثابت لكل مستخدم ---------- */
-function getSupportSessionId(){
-  let sid=localStorage.getItem(SUPPORT_SID_KEY);
-  if(!sid){
-    sid=(randomHex(6)||('s'+Date.now().toString(36))).toUpperCase();
-    localStorage.setItem(SUPPORT_SID_KEY,sid);
-  }
-  return sid;
-}
-
-/* ---------- حفظ وقراءة الشات ---------- */
-function getSupportChat(){
-  try{return JSON.parse(localStorage.getItem(SUPPORT_CHAT_KEY)||'[]')}catch(e){return []}
-}
-function saveSupportChat(arr){
-  try{localStorage.setItem(SUPPORT_CHAT_KEY,JSON.stringify(arr.slice(-200)))}catch(e){}
-}
-function fmtTime(ts){
-  const d=new Date(ts||Date.now());
-  return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
-}
-
-/* ---------- إرسال رسالة للبوت ---------- */
-async function sendMessageToSupport(text){
-  const sid=getSupportSessionId();
-  const payload='📩 رسالة جديدة من مستخدم الموقع\n\n🆔 '+sid+'\n\n💬 '+text;
-  const res=await fetch(TG_API+'/sendMessage',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({chat_id:TG_ADMIN,text:payload,disable_web_page_preview:true})
-  });
-  if(!res.ok) throw new Error('send failed');
-  return await res.json();
-}
-
-/* ---------- عرض الشات ---------- */
-function renderSupportChat(){
-  if(!chatArea) return;
-  const h=getSupportChat();
-  if(!h.length){
-    chatArea.innerHTML='<div class="chat-empty">👋 أهلاً بك في دعم 24 ساعة<br>اكتب رسالتك وسيتم الرد عليك في أقرب وقت</div>';
-    return;
-  }
-  chatArea.innerHTML=h.map(m=>{
-    const cls=m.role==='user'?'user':'admin';
-    return '<div class="chat-bubble '+cls+'">'+escapeHtml(m.text)+'<span class="t">'+fmtTime(m.t)+'</span></div>';
-  }).join('');
-  chatArea.scrollTop=chatArea.scrollHeight;
-}
-
-/* ---------- إشعار النقطة الحمراء ---------- */
-function updateSupportBadge(){
-  if(supportBadge){
-    if(supportUnread>0){
-      supportBadge.textContent=supportUnread+' جديد';
-      supportBadge.classList.add('on');
-    }else{
-      supportBadge.textContent='متصل';
-      supportBadge.classList.remove('on');
-    }
-  }
-  const settingsBtn=document.getElementById('settings');
-  if(settingsBtn){
-    let dot=settingsBtn.querySelector('.dot-badge');
-    if(supportUnread>0 && !dot){
-      dot=document.createElement('span');
-      dot.className='dot-badge';
-      settingsBtn.appendChild(dot);
-    }else if(supportUnread===0 && dot){
-      dot.remove();
-    }
-  }
-}
-
-/* ---------- فتح/غلق النافذة ---------- */
-function openSupport(){
-  if(!supportModal) return;
-  const settingsModal=document.getElementById('modal');
-  if(settingsModal) settingsModal.style.display='none';
-  if(sessionIdText) sessionIdText.textContent=getSupportSessionId();
-  renderSupportChat();
-  supportModal.style.display='flex';
-  supportModal.setAttribute('aria-hidden','false');
-  supportUnread=0;
-  updateSupportBadge();
-  setTimeout(()=>{try{chatInput.focus()}catch(e){}},200);
-}
-function closeSupport(){
-  if(!supportModal) return;
-  supportModal.style.display='none';
-  supportModal.setAttribute('aria-hidden','true');
-}
-
-/* ---------- إرسال رسالة من الواجهة ---------- */
-async function handleSendSupport(){
-  const text=(chatInput.value||'').trim();
-  if(!text) return;
-  sendMsgBtn.disabled=true;
-  const old=sendMsgBtn.textContent;
-  sendMsgBtn.textContent='...';
-
-  const h=getSupportChat();
-  h.push({role:'user',text:text,t:Date.now()});
-  saveSupportChat(h);
-  renderSupportChat();
-  chatInput.value='';
-  chatInput.style.height='auto';
-
-  try{
-    await sendMessageToSupport(text);
-  }catch(e){
-    const h2=getSupportChat();
-    h2.push({role:'admin',text:'⚠️ تعذر إرسال الرسالة. تحقق من الإنترنت وحاول مرة أخرى.',t:Date.now()});
-    saveSupportChat(h2);
-    renderSupportChat();
-  }finally{
-    sendMsgBtn.disabled=false;
-    sendMsgBtn.textContent=old||'إرسال';
-  }
-}
-
-/* ---------- استخراج رقم الجلسة (أكثر مرونة) ---------- */
-function extractSidFromOriginal(txt){
-  if(!txt) return null;
-  // 1) 🆔 emoji
-  let m=txt.match(/🆔\s*([A-Za-z0-9]{6,})/);
-  if(m) return m[1];
-  // 2) كلمة ID
-  m=txt.match(/\bID\b\s*:?\s*([A-Za-z0-9]{6,})/i);
-  if(m) return m[1];
-  // 3) بعد "مستخدم الموقع"
-  m=txt.match(/مستخدم\s+الموقع[\s\S]{0,20}?([A-Za-z0-9]{8,})/);
-  if(m) return m[1];
-  return null;
-}
-
-/* ---------- إدارة الـ update_id المُشاهدة ---------- */
-function getSeenUpdateIds(){
-  try{return JSON.parse(localStorage.getItem('tgSeenUpds')||'[]')}catch(e){return []}
-}
-function saveSeenUpdateIds(arr){
-  try{localStorage.setItem('tgSeenUpds',JSON.stringify(arr.slice(-500)))}catch(e){}
-}
-
-/* ---------- سحب الردود من البوت (بدون offset متقدم) ---------- */
-async function pollSupportReplies(){
-  if(supportPolling) return;
-  supportPolling=true;
-  try{
-    const sid=getSupportSessionId();
-    const seen=getSeenUpdateIds();
-
-    // نجيب آخر 50 تحديث فقط، ولا نقدّم offset (عشان كل المستخدمين يشوفوا الردود)
-    const url=TG_API+'/getUpdates?offset=-50&timeout=0&allowed_updates='+encodeURIComponent('["message"]');
-    const res=await fetch(url);
-    const data=await res.json();
-    if(!data||!data.ok||!Array.isArray(data.updates)) return;
-
-    const history=getSupportChat();
-    let changed=false;
-    let hasNew=false;
-    const newSeen=[];
-
-    for(const upd of data.updates){
-      if(seen.includes(upd.update_id)) continue;
-      newSeen.push(upd.update_id);
-
-      const msg=upd.message;
-      if(!msg) continue;
-
-      // لازم تكون الرسالة قادمة من الأدمن (إنت)
-      if(String(msg.chat&&msg.chat.id)!==String(TG_ADMIN)) continue;
-      if(!msg.text) continue;
-
-      let replySid=null, replyText=null;
-
-      // الحالة 1: أمر /reply SID النص
-      const cmd=msg.text.match(/^\/reply\s+(\S+)\s+([\s\S]+)$/i);
-      if(cmd){
-        replySid=String(cmd[1]).trim();
-        replyText=String(cmd[2]).trim();
-      }
-      // الحالة 2: رد عادي (Reply) على رسالة البوت
-      else if(msg.reply_to_message && msg.reply_to_message.text && !msg.text.startsWith('/')){
-        const origSid=extractSidFromOriginal(msg.reply_to_message.text);
-        if(origSid){
-          replySid=origSid;
-          replyText=String(msg.text).trim();
-        }
-      }
-
-      if(!replySid||!replyText) continue;
-      if(String(replySid).toUpperCase()!==String(sid).toUpperCase()) continue;
-
-      const key='adm_'+upd.update_id;
-      if(history.some(x=>x.k===key)) continue;
-
-      history.push({role:'admin',text:replyText,k:key,t:msg.date?msg.date*1000:Date.now()});
-      changed=true;
-      const isOpen=supportModal&&supportModal.style.display==='flex';
-      if(!isOpen){ supportUnread++; hasNew=true; }
-    }
-
-    saveSeenUpdateIds(seen.concat(newSeen));
-
-    if(changed){
-      saveSupportChat(history);
-      renderSupportChat();
-      updateSupportBadge();
-    }
-    if(hasNew){
-      try{ if(navigator.vibrate) navigator.vibrate(120); }catch(e){}
-    }
-  }catch(e){/* تجاهل */}
-  finally{ supportPolling=false; }
-}
-
-/* ---------- ربط الأحداث ---------- */
-if(sendMsgBtn) sendMsgBtn.onclick=handleSendSupport;
-if(chatInput){
-  chatInput.addEventListener('keydown',e=>{
-    if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();handleSendSupport();}
-  });
-  chatInput.addEventListener('input',()=>{
-    chatInput.style.height='auto';
-    chatInput.style.height=Math.min(chatInput.scrollHeight,120)+'px';
-  });
-}
-const supportCloseBtn=document.getElementById('supportClose');
-if(supportCloseBtn) supportCloseBtn.onclick=closeSupport;
-if(supportModal){
-  supportModal.addEventListener('click',e=>{if(e.target===supportModal)closeSupport()});
-}
-const supportCardEl=document.getElementById('supportCard');
-if(supportCardEl) supportCardEl.onclick=openSupport;
-
-/* =========================================================
-   التشغيل النهائي
-   ========================================================= */
-setTheme('dark');
-updateEngine();renderHistory();updateClear();
-refreshSettingsUI();
-getSupportSessionId();
-renderSupportChat();
-updateSupportBadge();
-setTimeout(pollSupportReplies,1500);
-setInterval(()=>{ if(document.visibilityState==='visible') pollSupportReplies(); },8000);
-
-/* فحص القفل عند فتح التطبيق */
-showLockScreen();
-</script>
 </body>
 </html>
