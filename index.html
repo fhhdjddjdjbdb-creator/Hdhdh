@@ -47,6 +47,8 @@ body{
 }
 .icon-btn:hover{transform:scale(1.04);box-shadow:0 0 20px rgba(174,0,255,.7),inset 0 0 18px rgba(0,200,255,.12)}
 
+.clear{position:absolute;top:50%;transform:translateY(-50%);border:0;background:transparent;color:#d9c9ff;cursor:pointer;width:48px;height:58px;padding:0;display:flex;align-items:center;justify-content:center}.clear{left:60px;display:none}
+.developer-link{color:#00aaff;text-decoration:none;font-weight:800;text-shadow:0 0 8px rgba(0,170,255,.65),0 0 16px rgba(0,110,255,.35)}.developer-link:hover{color:#35c5ff;text-shadow:0 0 10px rgba(0,190,255,.9),0 0 20px rgba(0,110,255,.5)}
 .dev{text-align:center;color:#cdb8f7;font-size:16px;margin:10px 0 14px;text-shadow:0 0 8px rgba(189,122,255,.25)}
 .logo{
   text-align:center;font-size:clamp(54px,16vw,82px);font-weight:900;
@@ -80,25 +82,6 @@ body{
   position:absolute;right:20px;top:50%;transform:translateY(-50%);
   font-size:30px;color:#d84dff;text-shadow:0 0 10px #c000ff
 }
-.clear,.voice{
-  position:absolute;top:50%;transform:translateY(-50%);
-  border:0;background:transparent;color:#d9c9ff;cursor:pointer;
-  width:48px;height:58px;padding:0;display:flex;align-items:center;justify-content:center;
-}
-.clear{left:60px;display:none}
-.voice{left:18px;color:#00e8ff}
-.mic-icon{
-  width:27px;height:36px;display:block;overflow:visible;
-  filter:drop-shadow(0 0 5px rgba(0,238,255,.9))
-         drop-shadow(0 0 11px rgba(0,180,255,.55));
-  transition:transform .15s ease,filter .15s ease;
-}
-.voice:hover .mic-icon{
-  transform:scale(1.06);
-  filter:drop-shadow(0 0 7px rgba(0,238,255,1))
-         drop-shadow(0 0 15px rgba(170,80,255,.55));
-}
-.voice:active .mic-icon{transform:scale(.96)}
 
 .actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
 .btn{
@@ -226,22 +209,6 @@ html.prelock body > *:not(.lock-screen){display:none!important}
 .shake{animation:shake .38s}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-9px)}60%{transform:translateX(9px)}}
 
-.voice-modal{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.72);padding:20px}
-.voice-modal.show{display:flex}
-.voice-card{
-  width:min(430px,100%);min-height:310px;border-radius:28px;background:#080b20;color:var(--text);
-  border:2px solid #6030d8;box-shadow:0 0 35px rgba(82,0,255,.35);display:flex;
-  flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:28px
-}
-.voice-mic{width:82px;height:82px;border-radius:50%;border:0;background:#7912df;color:#fff;font-size:34px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 12px rgba(133,0,255,.14);animation:voicePulse 1.4s infinite}
-.voice-title{font-size:28px;font-weight:700;margin:24px 0 8px}
-.voice-status{color:var(--muted);font-size:14px;min-height:22px}
-.voice-bars{display:flex;align-items:center;justify-content:center;gap:5px;height:45px;margin-top:14px}
-.voice-bars i{display:block;width:5px;height:12px;border-radius:5px;background:#b50dff;animation:voiceBars .8s ease-in-out infinite}
-.voice-bars i:nth-child(2){animation-delay:.1s}.voice-bars i:nth-child(3){animation-delay:.2s}.voice-bars i:nth-child(4){animation-delay:.3s}.voice-bars i:nth-child(5){animation-delay:.4s}
-.voice-cancel{margin-top:20px;border:1px solid #3c4197;border-radius:24px;background:#0b0f27;color:var(--text);padding:10px 22px;cursor:pointer}
-@keyframes voicePulse{50%{transform:scale(1.06);box-shadow:0 0 0 20px rgba(133,0,255,.04)}}
-@keyframes voiceBars{0%,100%{height:12px}50%{height:36px}}
 
 #supportModal{z-index:60}
 .support-box{width:min(520px,100%);height:min(82vh,660px);display:flex;flex-direction:column;padding:0;overflow:hidden;text-align:right}
@@ -300,19 +267,13 @@ html.prelock body > *:not(.lock-screen){display:none!important}
       <div class="lock-err" id="lockErr"></div>
       <button class="lock-btn" id="lockSubmit" type="button">دخول</button>
     </div>
-
-    <div id="lockBioArea" style="display:none">
-      <div class="bio-icon">🖐</div>
-      <div class="lock-err" id="lockErrBio"></div>
-      <button class="lock-btn" id="lockBioBtn" type="button">استخدام البصمة</button>
-    </div>
   </div>
 </div>
 
 <div class="top">
   <button class="icon-btn" id="settings" title="الإعدادات والأمان">⚙</button>
 </div>
-<div class="dev">المطور: Mohamed Tamer</div>
+<div class="dev">المطور: <a class="developer-link" href="https://t.me/MidoZoneBot" target="_blank" rel="noopener noreferrer">Mohamed Tamer</a></div>
 
 <div class="logo"><b>G</b><b>o</b><b>o</b><b>g</b><b>l</b><b>e</b></div>
 <div class="sub">إبحث الآن بشكل خفي ومباشر</div>
@@ -323,37 +284,6 @@ html.prelock body > *:not(.lock-screen){display:none!important}
       <span class="search-icon">⌕</span>
       <input id="input" class="search" placeholder="إبحث الآن في Google..." autocomplete="off">
       <button type="button" class="clear" id="clear">×</button>
-      <button type="button" class="voice" id="voice" aria-label="البحث الصوتي">
-  <svg class="mic-icon" viewBox="0 0 48 64" aria-hidden="true">
-    <defs>
-      <linearGradient id="micMetal" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stop-color="#eaffff"/>
-        <stop offset="0.28" stop-color="#8fa7ad"/>
-        <stop offset="0.52" stop-color="#f5ffff"/>
-        <stop offset="0.78" stop-color="#60777d"/>
-        <stop offset="1" stop-color="#dffcff"/>
-      </linearGradient>
-      <filter id="micGlow" x="-80%" y="-60%" width="260%" height="220%">
-        <feGaussianBlur stdDeviation="2.2" result="blur"/>
-        <feMerge>
-          <feMergeNode in="blur"/>
-          <feMergeNode in="SourceGraphic"/>
-        </feMerge>
-      </filter>
-    </defs>
-    <g filter="url(#micGlow)">
-      <rect x="14" y="5" width="20" height="37" rx="10" fill="url(#micMetal)" stroke="#d9ffff" stroke-width="1.2"/>
-      <g stroke="#40575d" stroke-width="1.5" opacity=".9">
-        <path d="M15.5 12h17"/><path d="M15 17h18"/><path d="M15 22h18"/>
-        <path d="M15 27h18"/><path d="M15.5 32h17"/><path d="M16 37h16"/>
-      </g>
-      <path d="M10 28v4c0 9 6.5 15 14 15s14-6 14-15v-4" fill="none" stroke="#bfeff3" stroke-width="2.5" stroke-linecap="round"/>
-      <path d="M24 47v9" stroke="#9fe7ee" stroke-width="2.5" stroke-linecap="round"/>
-      <path d="M17 57h14" stroke="#d8ffff" stroke-width="2.5" stroke-linecap="round"/>
-      <circle cx="20" cy="11" r="2" fill="#ffffff" opacity=".8"/>
-    </g>
-  </svg>
-</button>
     </div>
     <div class="actions">
       <button class="btn primary" type="submit">⌕ بحث</button>
@@ -381,23 +311,13 @@ html.prelock body > *:not(.lock-screen){display:none!important}
   <div class="note">🔒 عمليات البحث تفتح مباشرة في محرك البحث المختار.</div>
 </main>
 
-<div class="voice-modal" id="voiceModal" aria-hidden="true">
-  <div class="voice-card">
-    <div class="voice-mic">🎙</div>
-    <div class="voice-title">جارٍ الاستماع...</div>
-    <div class="voice-status" id="voiceStatus">تحدث الآن، وسأكتب كلامك في مربع البحث</div>
-    <div class="voice-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
-    <button class="voice-cancel" id="voiceCancel" type="button">إلغاء</button>
-  </div>
-</div>
-
 <!-- ================== نافذة الإعدادات ================== -->
 <div class="modal" id="modal">
   <div class="modal-box">
     <h3>الإعدادات والأمان</h3>
     <p class="muted-p">
-      اختر <b>طريقة واحدة فقط</b> لقفل التطبيق: كلمة مرور أو بصمة الإصبع.
-      لا يمكن تفعيل الطريقتين معًا، وسيُطلب منك التحقق في كل مرة تفتح فيها التطبيق.
+      استخدم كلمة المرور لقفل التطبيق.
+      سيُطلب منك إدخالها في كل مرة تفتح فيها التطبيق.
     </p>
 
     <!-- كلمة المرور -->
@@ -416,24 +336,6 @@ html.prelock body > *:not(.lock-screen){display:none!important}
       <div id="passActive" style="display:none">
         <button class="btn" id="removePass" type="button">إزالة كلمة المرور</button>
         <div class="sec-note">✅ كلمة المرور مُفعّلة. سيتم طلبها عند كل فتح للتطبيق.</div>
-      </div>
-    </div>
-
-    <!-- البصمة -->
-    <div class="sec-card" id="bioCard">
-      <div class="sec-head">
-        <span>🖐 بصمة الإصبع</span>
-        <span class="badge" id="bioBadge">غير مُفعّلة</span>
-      </div>
-
-      <div id="bioSetup">
-        <button class="btn primary" id="saveBio" type="button">تسجيل البصمة</button>
-        <div class="sec-note">سيظهر لك مستشعر البصمة الحقيقي في جهازك لتسجيل بصمتك.</div>
-      </div>
-
-      <div id="bioActive" style="display:none">
-        <button class="btn" id="removeBio" type="button">إزالة البصمة</button>
-        <div class="sec-note">✅ البصمة مُفعّلة. سيتم التحقق منها عند كل فتح للتطبيق.</div>
       </div>
     </div>
 
@@ -558,9 +460,9 @@ document.getElementById('quickHistory').onclick=()=>{
   section.style.boxShadow='0 0 0 3px var(--accent), 0 8px 28px var(--shadow)';
   setTimeout(()=>section.style.boxShadow='',900);
 };
-document.getElementById('privacy').onclick=()=>alert('السجل محفوظ محليًا على هذا الجهاز فقط، وكلمة المرور/البصمة لا تُرسل لأي مكان.');
+document.getElementById('privacy').onclick=()=>alert('السجل محفوظ محليًا على هذا الجهاز فقط، وكلمة المرور لا تُرسل لأي مكان.');
 /* =========================================================
-   نظام قفل التطبيق: كلمة مرور أو بصمة (طريقة واحدة فقط)
+   نظام قفل التطبيق: كلمة مرور
    ========================================================= */
 const LOCK_KEY='appLockConfig';
 const lockScreen=document.getElementById('lockScreen');
@@ -569,16 +471,11 @@ const lockIcon=document.getElementById('lockIcon');
 const lockTitle=document.getElementById('lockTitle');
 const lockHint=document.getElementById('lockHint');
 const lockPassArea=document.getElementById('lockPassArea');
-const lockBioArea=document.getElementById('lockBioArea');
 const lockPassInput=document.getElementById('lockPassInput');
 const lockErr=document.getElementById('lockErr');
-const lockErrBio=document.getElementById('lockErrBio');
 const lockSubmit=document.getElementById('lockSubmit');
-const lockBioBtn=document.getElementById('lockBioBtn');
 
 let unlocked=false;
-let bioBusy=false;
-let bioAutoTried=false;
 
 function getLockConfig(){
   try{return JSON.parse(localStorage.getItem(LOCK_KEY)||'null')}catch(e){return null}
@@ -610,107 +507,28 @@ async function hashPassword(password,salt){
   }
   return 'fb'+h1.toString(16)+h2.toString(16);
 }
-function bufToB64url(buf){
-  const bytes=new Uint8Array(buf);
-  let str='';
-  for(let i=0;i<bytes.length;i++) str+=String.fromCharCode(bytes[i]);
-  return btoa(str).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
-}
-function b64urlToBuf(s){
-  s=String(s).replace(/-/g,'+').replace(/_/g,'/');
-  while(s.length%4) s+='=';
-  const bin=atob(s);
-  const bytes=new Uint8Array(bin.length);
-  for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
-  return bytes.buffer;
-}
-function bioErrorMessage(err){
-  const name=(err&&err.name)?err.name:'';
-  switch(name){
-    case 'NotAllowedError':return 'تم إلغاء عملية البصمة أو رفضها. حاول مرة أخرى.';
-    case 'InvalidStateError':return 'هذه البصمة مسجّلة بالفعل على الجهاز.';
-    case 'NotSupportedError':return 'البصمة غير مدعومة على هذا الجهاز أو المتصفح.';
-    case 'SecurityError':return 'البصمة تحتاج فتح الموقع عبر HTTPS أو localhost.';
-    case 'AbortError':return 'تم إلغاء عملية البصمة.';
-    case 'TimeoutError':return 'انتهى وقت التحقق من البصمة.';
-    case 'ConstraintError':return 'لا يوجد مستشعر بصمة مناسب في هذا الجهاز.';
-    default:return 'تعذر إكمال عملية البصمة.';
-  }
-}
-
-/* ---------- WebAuthn ---------- */
-async function registerBiometric(){
-  const challenge=new Uint8Array(32);crypto.getRandomValues(challenge);
-  const userId=new Uint8Array(16);crypto.getRandomValues(userId);
-  const cred=await navigator.credentials.create({
-    publicKey:{
-      challenge:challenge,
-      rp:{name:'Google Search App'},
-      user:{id:userId,name:'user@local',displayName:'مستخدم'},
-      pubKeyCredParams:[
-        {type:'public-key',alg:-7},
-        {type:'public-key',alg:-257},
-        {type:'public-key',alg:-37}
-      ],
-      authenticatorSelection:{
-        authenticatorAttachment:'platform',
-        userVerification:'required',
-        residentKey:'preferred',
-        requireResidentKey:false
-      },
-      timeout:60000,
-      attestation:'none'
-    }
-  });
-  if(!cred||!cred.rawId) throw new Error('failed');
-  return bufToB64url(cred.rawId);
-}
-async function verifyBiometric(credId){
-  const challenge=new Uint8Array(32);crypto.getRandomValues(challenge);
-  const assertion=await navigator.credentials.get({
-    publicKey:{
-      challenge:challenge,
-      allowCredentials:[{type:'public-key',id:b64urlToBuf(credId),transports:['internal']}],
-      userVerification:'required',
-      timeout:60000
-    }
-  });
-  return !!assertion;
-}
-function biometricSupported(){
-  return !!(window.PublicKeyCredential&&navigator.credentials&&navigator.credentials.create&&navigator.credentials.get);
-}
 
 /* ---------- شاشة القفل ---------- */
 function showLockScreen(){
   const cfg=getLockConfig();
   if(!cfg){unlockApp();return;}
+  /* أي إعداد بصمة قديم يُلغى حتى لا يعلق التطبيق بعد إزالة ميزة البصمة. */
+  if(cfg.type!=='password'){
+    setLockConfig(null);
+    unlockApp();
+    return;
+  }
 
   document.documentElement.classList.add('prelock');
   lockScreen.classList.add('show');
   lockScreen.setAttribute('aria-hidden','false');
   lockErr.textContent='';
-  lockErrBio.textContent='';
-
-  if(cfg.type==='password'){
-    lockIcon.textContent='🔒';
-    lockTitle.textContent='التطبيق مقفل';
-    lockHint.textContent='أدخل كلمة المرور للمتابعة';
-    lockPassArea.style.display='block';
-    lockBioArea.style.display='none';
-    lockPassInput.value='';
-    setTimeout(()=>{try{lockPassInput.focus()}catch(e){}},180);
-  }else{
-    lockIcon.textContent='🖐';
-    lockTitle.textContent='التطبيق مقفل';
-    lockHint.textContent='اضغط الزر ثم ضع بصمتك لفتح التطبيق';
-    lockPassArea.style.display='none';
-    lockBioArea.style.display='block';
-    if(!bioAutoTried){
-      bioAutoTried=true;
-      setTimeout(()=>{tryBiometricUnlock(true)},350);
-    }
-  }
+  lockIcon.textContent='🔒';
+  lockTitle.textContent='التطبيق مقفل';
+  lockHint.textContent='أدخل كلمة المرور للمتابعة';
+  lockPassArea.style.display='block';
+  lockPassInput.value='';
+  setTimeout(()=>{try{lockPassInput.focus()}catch(e){}},180);
 }
 function unlockApp(){
   unlocked=true;
@@ -738,41 +556,7 @@ async function checkPassword(){
   }
 }
 
-async function tryBiometricUnlock(auto){
-  if(unlocked||bioBusy) return;
-  const cfg=getLockConfig();
-  if(!cfg||cfg.type!=='biometric') return;
-
-  if(!biometricSupported()){
-    lockErrBio.textContent='⚠️ بصمة الإصبع غير مدعومة في هذا المتصفح.';
-    return;
-  }
-  if(!window.isSecureContext||location.protocol==='file:'){
-    lockErrBio.textContent='⚠️ البصمة تحتاج فتح الموقع عبر HTTPS أو localhost.';
-    return;
-  }
-
-  bioBusy=true;
-  const oldText=lockBioBtn.textContent;
-  lockBioBtn.disabled=true;
-  lockBioBtn.textContent='جارٍ التحقق...';
-  lockErrBio.textContent='';
-
-  try{
-    const ok=await verifyBiometric(cfg.credId);
-    if(ok){unlockApp();return;}
-    lockErrBio.textContent='تعذر التحقق من البصمة.';
-  }catch(err){
-    lockErrBio.textContent=bioErrorMessage(err);
-  }finally{
-    bioBusy=false;
-    lockBioBtn.disabled=false;
-    lockBioBtn.textContent=oldText||'استخدام البصمة';
-  }
-}
-
 lockSubmit.onclick=checkPassword;
-lockBioBtn.onclick=()=>tryBiometricUnlock(false);
 lockPassInput.addEventListener('keydown',e=>{
   if(e.key==='Enter'){e.preventDefault();checkPassword();}
 });
@@ -789,24 +573,12 @@ function setSettingsMsg(text,type){
 function refreshSettingsUI(){
   const cfg=getLockConfig();
   const passActive=!!cfg&&cfg.type==='password';
-  const bioActive=!!cfg&&cfg.type==='biometric';
-
   const passBadge=document.getElementById('passBadge');
-  const bioBadge=document.getElementById('bioBadge');
   passBadge.textContent=passActive?'مُفعّلة':'غير مُفعّلة';
   passBadge.classList.toggle('on',passActive);
-  bioBadge.textContent=bioActive?'مُفعّلة':'غير مُفعّلة';
-  bioBadge.classList.toggle('on',bioActive);
-
   document.getElementById('passSetup').style.display=passActive?'none':'block';
   document.getElementById('passActive').style.display=passActive?'block':'none';
-  document.getElementById('bioSetup').style.display=bioActive?'none':'block';
-  document.getElementById('bioActive').style.display=bioActive?'block':'none';
-
-  document.getElementById('passCard').classList.toggle('disabled',bioActive);
-  document.getElementById('bioCard').classList.toggle('disabled',passActive);
-  document.getElementById('savePass').disabled=bioActive;
-  document.getElementById('saveBio').disabled=passActive;
+  document.getElementById('savePass').disabled=false;
 }
 
 function openSettings(){
@@ -818,17 +590,13 @@ function openSettings(){
 }
 
 document.getElementById('settings').onclick=openSettings;
+document.getElementById('settings').onclick=openSettings;
 document.getElementById('quickSettings').onclick=openSettings;
 document.getElementById('close').onclick=()=>modal.style.display='none';
 modal.onclick=e=>{if(e.target===modal)modal.style.display='none'};
 
 /* ---------- حفظ كلمة المرور ---------- */
 document.getElementById('savePass').onclick=async()=>{
-  const cfg=getLockConfig();
-  if(cfg&&cfg.type==='biometric'){
-    setSettingsMsg('⚠️ لا يمكن تفعيل الطريقتين معًا. أزل البصمة أولًا.','err');
-    return;
-  }
   const p1=document.getElementById('newPass').value;
   const p2=document.getElementById('newPass2').value;
 
@@ -855,299 +623,6 @@ document.getElementById('removePass').onclick=()=>{
   setSettingsMsg('تم إزالة كلمة المرور.','ok');
 };
 
-/* ---------- تسجيل البصمة ---------- */
-document.getElementById('saveBio').onclick=async()=>{
-  const cfg=getLockConfig();
-  if(cfg&&cfg.type==='password'){
-    setSettingsMsg('⚠️ لا يمكن تفعيل الطريقتين معًا. أزل كلمة المرور أولًا.','err');
-    return;
-  }
-  if(!biometricSupported()){
-    setSettingsMsg('⚠️ بصمة الإصبع غير مدعومة في هذا المتصفح.','err');
-    return;
-  }
-  if(!window.isSecureContext||location.protocol==='file:'){
-    setSettingsMsg('⚠️ البصمة تعمل فقط عند فتح الموقع عبر HTTPS أو localhost، وليس من ملف محلي.','err');
-    return;
-  }
-
-  const btn=document.getElementById('saveBio');
-  const oldText=btn.textContent;
-  btn.disabled=true;
-  btn.textContent='جارٍ التسجيل...';
-  setSettingsMsg('');
-
-  try{
-    let available=true;
-    if(window.PublicKeyCredential&&PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable){
-      try{
-        available=await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-      }catch(e){available=true;}
-    }
-    if(!available){
-      setSettingsMsg('⚠️ لا يوجد مستشعر بصمة متاح على هذا الجهاز.','err');
-      btn.disabled=false;btn.textContent=oldText;
-      return;
-    }
-
-    const credId=await registerBiometric();
-    setLockConfig({type:'biometric',credId:credId,created:Date.now()});
-    refreshSettingsUI();
-    setSettingsMsg('✅ تم تسجيل البصمة. سيُطلب منك التحقق بالبصمة في كل مرة تفتح التطبيق.','ok');
-  }catch(err){
-    setSettingsMsg('⚠️ '+bioErrorMessage(err),'err');
-  }finally{
-    btn.disabled=false;
-    btn.textContent=oldText||'تسجيل البصمة';
-    refreshSettingsUI();
-  }
-};
-
-document.getElementById('removeBio').onclick=()=>{
-  const cfg=getLockConfig();
-  if(!cfg||cfg.type!=='biometric') return;
-  if(!confirm('هل تريد إزالة البصمة؟ سيُفتح التطبيق بدون قفل.')) return;
-  setLockConfig(null);
-  refreshSettingsUI();
-  setSettingsMsg('تم إزالة البصمة.','ok');
-};
-
-/* =========================================================
-   التعرف الصوتي
-   ========================================================= */
-const voiceModal=document.getElementById('voiceModal');
-const voiceStatus=document.getElementById('voiceStatus');
-const voiceButton=document.getElementById('voice');
-
-let recognition=null;
-let voiceClosing=false;
-let silenceTimer=null;
-let finalTranscript='';
-
-function clearSilenceTimer(){
-  if(silenceTimer){
-    clearTimeout(silenceTimer);
-    silenceTimer=null;
-  }
-}
-
-function closeVoiceModal(){
-  voiceClosing=true;
-  clearSilenceTimer();
-
-  if(recognition){
-    try{recognition.stop()}catch(e){}
-  }
-
-  voiceModal.classList.remove('show');
-  voiceModal.setAttribute('aria-hidden','true');
-  voiceButton.disabled=false;
-  voiceButton.style.opacity='1';
-}
-
-function finishVoice(){
-  clearSilenceTimer();
-  if(recognition){
-    try{recognition.stop()}catch(e){}
-  }
-}
-
-document.getElementById('voiceCancel').onclick=closeVoiceModal;
-
-/* دعم Web + Android WebView
-   في المتصفح يستخدم Web Speech API.
-   داخل تطبيق Android يستخدم الجسر الأصلي إذا كان التطبيق يوفره.
-   ملاحظة: HTML وحده لا يستطيع إنشاء SpeechRecognizer داخل WebView؛
-   يجب أن يعرّض تطبيق Android دالة startListening/startSpeechRecognition/startSpeech. */
-let nativeSpeechActive=false;
-
-/* طبقة توافق مع WebView: تقبل أكثر من اسم شائع للجسر الأصلي
-   إذا كان تطبيق Android يوفره، مع الإبقاء على Web Speech في المتصفح. */
-function getNativeSpeechBridge(){
-  const candidates=[window.AndroidSpeech,window.AndroidBridge,window.Android,window.NativeSpeech];
-  for(const bridge of candidates){
-    if(!bridge) continue;
-    if(typeof bridge.startListening==='function') return {bridge,method:'startListening'};
-    if(typeof bridge.startSpeechRecognition==='function') return {bridge,method:'startSpeechRecognition'};
-    if(typeof bridge.startSpeech==='function') return {bridge,method:'startSpeech'};
-  }
-  return null;
-}
-
-window.onNativeSpeechResult=function(text){
-  nativeSpeechActive=false;
-  const query=String(text||'').trim();
-  voiceClosing=true;
-  clearSilenceTimer();
-  voiceModal.classList.remove('show');
-  voiceModal.setAttribute('aria-hidden','true');
-  voiceButton.disabled=false;
-  voiceButton.style.opacity='1';
-
-  if(query){
-    input.value=query;
-    updateClear();
-    saveHistory(query);
-    window.location.href=engines.google(query);
-  }
-};
-
-window.onNativeSpeechError=function(message){
-  nativeSpeechActive=false;
-  voiceStatus.textContent=message||'تعذر تشغيل الميكروفون.';
-  setTimeout(closeVoiceModal,1400);
-};
-
-async function requestMicrophonePermission(){
-  const nativeBridge=getNativeSpeechBridge();
-
-  /* داخل WebView الجسر الأصلي هو المسؤول عن RECORD_AUDIO. */
-  if(nativeBridge) return 'native';
-
-  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
-    return 'unsupported';
-  }
-
-  try{
-    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
-    stream.getTracks().forEach(track=>track.stop());
-    return 'granted';
-  }catch(error){
-    if(error && (error.name==='NotAllowedError' || error.name==='PermissionDeniedError')){
-      voiceStatus.textContent='🎙️ تم رفض صلاحية الميكروفون. اسمح بالميكروفون من إعدادات التطبيق ثم جرّب مرة أخرى.';
-    }else if(error && error.name==='NotFoundError'){
-      voiceStatus.textContent='🎙️ لم يتم العثور على ميكروفون في الجهاز.';
-    }else{
-      voiceStatus.textContent='🎙️ تعذر الوصول إلى الميكروفون. تأكد من منح صلاحية الميكروفون.';
-    }
-    return 'denied';
-  }
-}
-
-voiceButton.onclick=async()=>{
-  const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
-  const nativeBridge=getNativeSpeechBridge();
-  const hasNativeSpeech=!!nativeBridge;
-
-  clearSilenceTimer();
-  voiceClosing=false;
-  finalTranscript='';
-  input.value='';
-  updateClear();
-
-  voiceModal.classList.add('show');
-  voiceModal.setAttribute('aria-hidden','false');
-  voiceButton.disabled=true;
-  voiceButton.style.opacity='.55';
-  voiceStatus.textContent='جارٍ تجهيز الميكروفون...';
-
-  const permissionState=await requestMicrophonePermission();
-
-  if(permissionState==='native' && hasNativeSpeech){
-    nativeSpeechActive=true;
-    voiceStatus.textContent='🎙️ جارٍ الاستماع... تحدث الآن';
-    try{
-      nativeBridge.bridge[nativeBridge.method]('ar-EG');
-    }catch(e){
-      nativeSpeechActive=false;
-      voiceStatus.textContent='تعذر تشغيل ميكروفون التطبيق.';
-      setTimeout(closeVoiceModal,1400);
-    }
-    return;
-  }
-
-  if(permissionState!=='granted' && !SpeechRecognition){
-    voiceStatus.textContent='⚠️ لم يتم توفير محرك التعرف الصوتي داخل التطبيق.';
-    setTimeout(closeVoiceModal,2200);
-    return;
-  }
-
-  if(!SpeechRecognition){
-    voiceStatus.textContent='⚠️ WebView لا يوفر التعرف الصوتي. افتح الموقع في Chrome أو استخدم نسخة APK تحتوي على AndroidSpeech.';
-    setTimeout(closeVoiceModal,2600);
-    return;
-  }
-
-  recognition=new SpeechRecognition();
-  recognition.lang='ar-EG';
-  recognition.continuous=false;
-  recognition.interimResults=true;
-  recognition.maxAlternatives=1;
-
-  recognition.onstart=()=>{
-    voiceStatus.textContent='🎙️ جارٍ الاستماع... تحدث الآن';
-  };
-
-  recognition.onresult=(event)=>{
-    let interimTranscript='';
-
-    for(let i=0;i<event.results.length;i++){
-      const result=event.results[i];
-      if(result.isFinal){
-        finalTranscript += result[0].transcript + ' ';
-      }else{
-        interimTranscript += result[0].transcript;
-      }
-    }
-
-    const liveText=(finalTranscript + interimTranscript).trim();
-
-    if(liveText){
-      input.value=liveText;
-      updateClear();
-      voiceStatus.textContent='🎙️ أستمع...';
-
-      clearSilenceTimer();
-      silenceTimer=setTimeout(()=>finishVoice(),1200);
-    }
-  };
-
-  recognition.onerror=(event)=>{
-    clearSilenceTimer();
-
-    if(event.error==='not-allowed'||event.error==='service-not-allowed'){
-      closeVoiceModal();
-      return;
-    }
-
-    if(event.error==='no-speech'){
-      closeVoiceModal();
-      return;
-    }
-
-    if(event.error==='aborted'){
-      closeVoiceModal();
-      return;
-    }
-
-    closeVoiceModal();
-  };
-
-  recognition.onend=()=>{
-    clearSilenceTimer();
-
-    const query=(finalTranscript || input.value || '').trim();
-
-    voiceClosing=true;
-    voiceModal.classList.remove('show');
-    voiceModal.setAttribute('aria-hidden','true');
-    voiceButton.disabled=false;
-    voiceButton.style.opacity='1';
-
-    if(query){
-      input.value=query;
-      updateClear();
-      saveHistory(query);
-      window.location.href=engines.google(query);
-    }
-  };
-
-  try{
-    recognition.start();
-  }catch(e){
-    closeVoiceModal();
-  }
-};
 /* =========================================================
    دعم 24 ساعة (Support Chat)
    ========================================================= */
