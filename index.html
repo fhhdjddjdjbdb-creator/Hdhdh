@@ -2,408 +2,1395 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-<title>توقف الموقع مؤقتًا</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>متصفح خفي</title>
+<script>
+/* منع ظهور المحتوى قبل التحقق من القفل */
+try{if(localStorage.getItem('appLockConfig'))document.documentElement.classList.add('prelock')}catch(e){}
+try{if(localStorage.getItem('incognitoFirstRunSetupComplete')==='done'||sessionStorage.getItem('incognitoFirstRunSetupComplete')==='done')document.documentElement.classList.add('first-run-complete')}catch(e){}
+</script>
 <style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    -webkit-tap-highlight-color:transparent;
+*{box-sizing:border-box}
+:root{
+  --bg:#02040d;
+  --panel:#080b1d;
+  --panel2:#0b0f27;
+  --input:#0b0d22;
+  --border:#2934a8;
+  --text:#f8f5ff;
+  --muted:#b9a9df;
+  --accent:#9c12ff;
+  --accent2:#00cfff;
+  --pink:#f100ff;
+  --blue:#00b8ff;
+  --shadow:rgba(38,0,255,.35)
 }
-
-html,body{
-    width:100%;
-    min-height:100%;
-    overflow:hidden !important;
-    position:fixed;
-    inset:0;
-    overscroll-behavior:none;
-    touch-action:pan-y;
-}
-
+html,body{background:#02040d}
 body{
-    font-family:Tahoma,Arial,sans-serif;
-    color:#fff;
-    background:
-        radial-gradient(circle at 50% 42%, #4a090f 0%, #23080b 25%, #100204 70%);
-    display:flex;
-    justify-content:center;
-    align-items:center;
+  margin:0;min-height:100vh;padding:18px 0 0;
+  font-family:Tahoma,Arial,sans-serif;background:
+    radial-gradient(circle at 50% 18%,rgba(83,0,255,.18),transparent 28%),
+    radial-gradient(circle at 90% 48%,rgba(0,180,255,.08),transparent 25%),
+    var(--bg);
+  color:var(--text);overflow-x:hidden
+}
+*{transition:background-color .2s,color .2s,border-color .2s,box-shadow .2s,transform .2s}
+
+.top{
+  width:min(94%,900px);margin:auto;display:flex;justify-content:flex-end;
+  align-items:center;direction:ltr
+}
+.icon-btn{
+  width:58px;height:58px;border:1px solid #6039d6;border-radius:50%;
+  background:radial-gradient(circle at 35% 25%,#1a1648,#070918 70%);
+  color:#fff;font-size:29px;cursor:pointer;
+  box-shadow:0 0 12px rgba(103,53,255,.55),inset 0 0 15px rgba(0,200,255,.08)
+}
+.icon-btn:hover{transform:scale(1.04);box-shadow:0 0 20px rgba(174,0,255,.7),inset 0 0 18px rgba(0,200,255,.12)}
+
+.clear{position:absolute;top:50%;transform:translateY(-50%);border:0;background:transparent;color:#d9c9ff;cursor:pointer;width:48px;height:58px;padding:0;display:flex;align-items:center;justify-content:center}.clear{left:60px;display:none}
+.developer-link{color:#00aaff;text-decoration:none;font-weight:800;text-shadow:0 0 8px rgba(0,170,255,.65),0 0 16px rgba(0,110,255,.35)}.developer-link:hover{color:#35c5ff;text-shadow:0 0 10px rgba(0,190,255,.9),0 0 20px rgba(0,110,255,.5)}
+.dev{text-align:center;color:#cdb8f7;font-size:16px;margin:10px 0 14px;text-shadow:0 0 8px rgba(189,122,255,.25)}
+.logo{
+  text-align:center;font-size:clamp(54px,16vw,82px);font-weight:900;
+  line-height:.98;margin:2px 0 10px;letter-spacing:-2px;
+  text-shadow:0 0 18px rgba(65,82,255,.28)
+}
+.logo b:nth-child(1){color:#4285F4}.logo b:nth-child(2){color:#EA4335}
+.logo b:nth-child(3){color:#FBBC05}.logo b:nth-child(4){color:#4285F4}
+.logo b:nth-child(5){color:#34A853}.logo b:nth-child(6){color:#EA4335}
+.sub{
+  text-align:center;color:#d37cff;font-size:18px;margin-bottom:28px;
+  text-shadow:0 0 10px rgba(212,68,255,.45)
+}
+.wrap{width:min(92%,900px);margin:auto}
+.engines{display:none}
+.engine{display:none}
+
+.search-wrap{position:relative}
+.search{
+  width:100%;min-height:70px;border:2px solid transparent;border-radius:38px;
+  background:
+    linear-gradient(#0a0d25,#0a0d25) padding-box,
+    linear-gradient(100deg,#00baff,#694cff 48%,#fa00ff) border-box;
+  color:var(--text);font-size:18px;outline:0;
+  padding:12px 58px 12px 112px;text-align:right;
+  box-shadow:0 0 16px rgba(0,183,255,.28),0 0 25px rgba(202,0,255,.16);
+}
+.search::placeholder{color:#b9afd7}
+.search:focus{box-shadow:0 0 20px rgba(0,190,255,.42),0 0 35px rgba(216,0,255,.24)}
+.search-icon{
+  position:absolute;right:20px;top:50%;transform:translateY(-50%);
+  font-size:30px;color:#d84dff;text-shadow:0 0 10px #c000ff
 }
 
-/* توهج الخلفية */
-.glow{
-    position:absolute;
-    width:420px;
-    height:420px;
-    border-radius:50%;
-    background:#e0001b;
-    filter:blur(150px);
-    opacity:.13;
-    pointer-events:none;
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.btn{
+  min-height:58px;border:2px solid transparent;border-radius:32px;
+  background:
+    linear-gradient(#0a0d25,#0a0d25) padding-box,
+    linear-gradient(100deg,#183dff,#2a12ff,#8d00ff) border-box;
+  color:#eee9ff;font-weight:800;cursor:pointer;padding:8px 12px;
+  overflow-wrap:anywhere;font-size:16px;
+  box-shadow:0 0 12px rgba(33,45,255,.16)
+}
+.btn.primary{
+  background:
+    linear-gradient(100deg,#ff8b16,#c500ff 58%,#871cff) padding-box,
+    linear-gradient(100deg,#ff9b24,#ff00e6,#6d3bff) border-box;
+  border-color:transparent;color:#fff;
+  box-shadow:0 0 20px rgba(255,50,205,.24),0 0 15px rgba(255,143,25,.2)
+}
+.btn:hover{transform:translateY(-1px);box-shadow:0 0 20px rgba(55,50,255,.34)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+
+.section{
+  margin-top:28px;padding:18px;border:2px solid transparent;border-radius:23px;
+  background:
+    linear-gradient(#080b20,#080b20) padding-box,
+    linear-gradient(120deg,#3538ff,#8b00ff,#00c8ff) border-box;
+  box-shadow:0 0 18px rgba(37,50,255,.22),inset 0 0 22px rgba(64,0,255,.08)
+}
+.section-head{display:flex;justify-content:space-between;align-items:center;font-weight:900;font-size:18px}
+.small-btn{border:0;background:transparent;color:#d04cff;cursor:pointer;font-weight:700}
+.history-item{
+  display:flex;gap:8px;align-items:center;padding:11px 0;
+  border-top:1px solid #242b75;margin-top:8px
+}
+.history-q{flex:1;border:0;background:transparent;color:var(--text);text-align:right;cursor:pointer}
+.quick{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:14px;margin-top:28px
+}
+.quick button{
+  min-height:92px;border:2px solid transparent;border-radius:23px;
+  background:
+    linear-gradient(#090d22,#090d22) padding-box,
+    linear-gradient(135deg,#273cff,#00cfff,#7b00ff) border-box;
+  color:#f1ecff;cursor:pointer;font-weight:800;font-size:17px;
+  box-shadow:0 0 16px rgba(0,125,255,.12)
+}
+.quick button:nth-child(2){
+  background:
+    linear-gradient(#090d22,#090d22) padding-box,
+    linear-gradient(135deg,#00baff,#0f71ff,#05d7ef) border-box
+}
+.quick button:nth-child(3){
+  background:
+    linear-gradient(#0c0a20,#0c0a20) padding-box,
+    linear-gradient(135deg,#ff9d18,#b800ff,#ff2db8) border-box
+}
+.quick span{display:block;font-size:28px;margin-bottom:7px;text-shadow:0 0 12px currentColor}
+.quick button:hover{transform:translateY(-2px);box-shadow:0 0 22px rgba(126,0,255,.28)}
+
+.bottom{
+  width:100%;height:115px;margin-top:22px;border:0;border-radius:0;
+  background:transparent;display:flex;align-items:flex-end;justify-content:center;
+  overflow:hidden;box-shadow:none;position:relative
+}
+.bottom:before{
+  content:"";position:absolute;left:-5%;right:-5%;bottom:18px;height:58px;
+  border-top:2px solid #4b27ff;
+  border-radius:50% 50% 0 0/100% 100% 0 0;
+  box-shadow:0 -4px 13px #3820ff,0 -1px 8px #00bfff
+}
+.bottom:after{
+  content:"⌄⌄";position:absolute;bottom:2px;left:50%;
+  transform:translateX(-50%);font-size:32px;line-height:1;color:#8e16ff;
+  text-shadow:0 0 12px #7a00ff
+}
+.bottom img{display:none}
+.note{text-align:center;color:#897ca8;font-size:11px;margin-top:0}
+
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.76);display:none;align-items:center;justify-content:center;padding:18px;z-index:5}
+.modal-box{
+  width:min(440px,100%);max-height:88vh;overflow:auto;background:#080b20;color:var(--text);
+  border:2px solid #5630d8;border-radius:24px;padding:20px;text-align:right;
+  box-shadow:0 0 35px rgba(86,0,255,.32)
+}
+.modal-box h3{margin:0 0 8px}
+.modal-box .muted-p{color:var(--muted);font-size:13px;margin:0 0 6px;line-height:1.7}
+.modal-box button{border:1px solid #3739a4;border-radius:20px;background:#0c1028;color:var(--text);padding:9px 18px;cursor:pointer}
+.modal-box button.primary{background:#7010d8;border-color:#c82cff;color:#fff}
+.modal-box .close-row{margin-top:14px;display:flex;justify-content:flex-start}
+
+.sec-card{border:1px solid #30378d;border-radius:17px;padding:14px;margin:12px 0;background:#0b0f27;text-align:right}
+.sec-card.disabled{opacity:.5}
+.sec-head{display:flex;justify-content:space-between;align-items:center;font-weight:800;margin-bottom:10px;font-size:15px}
+.badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:12px;background:#0a0d20;border:1px solid #3c439d;color:#aaa4c5}
+.badge.on{background:#7e10db;border-color:#db36ff;color:#fff}
+.sec-note{color:var(--muted);font-size:12px;line-height:1.7;margin:8px 0 0}
+.sec-card .btn{width:100%;margin-top:8px}
+.sec-msg{font-size:13px;min-height:20px;margin-top:10px;line-height:1.7}
+.sec-msg.err{color:#ff5a73}.sec-msg.ok{color:#39e38b}
+
+.lock-input{
+  width:100%;min-height:52px;border:1px solid #343ba0;border-radius:16px;
+  background:#080b20;color:var(--text);padding:10px 16px;font-size:16px;
+  text-align:right;outline:0;margin-bottom:10px;font-family:inherit
+}
+.lock-input:focus{border-color:#c21fff;box-shadow:0 0 12px rgba(185,0,255,.2)}
+
+.lock-screen{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;background:#02040d;padding:20px}
+.lock-screen.show{display:flex}
+html.prelock .lock-screen.show{display:flex}
+html.prelock body > *:not(.lock-screen):not(.splash-screen){display:none!important}
+.lock-card{
+  width:min(420px,100%);background:#080b20;border:2px solid #6030d8;
+  border-radius:26px;padding:28px 22px;text-align:center;box-shadow:0 0 35px rgba(82,0,255,.32)
+}
+.lock-icon{font-size:46px;line-height:1;margin-bottom:8px}
+.lock-title{font-size:21px;font-weight:800;margin:6px 0}
+.lock-hint{color:var(--muted);font-size:13px;margin:0 0 18px;line-height:1.7}
+.lock-btn{width:100%;min-height:52px;border-radius:16px;border:1px solid #df2bff;background:#7511dc;color:#fff;font-weight:700;font-size:16px;cursor:pointer;font-family:inherit}
+.lock-btn.ghost{background:#0b0f27;border-color:#3a3d92;color:var(--text)}
+.lock-btn:disabled{opacity:.6;cursor:wait}
+.lock-err{color:#ff5b76;font-size:13px;min-height:20px;margin-bottom:8px;line-height:1.7}
+.bio-icon{font-size:56px;margin-bottom:6px}
+.shake{animation:shake .38s}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-9px)}60%{transform:translateX(9px)}}
+
+
+#supportModal{z-index:60}
+.support-box{width:min(520px,100%);height:min(82vh,660px);display:flex;flex-direction:column;padding:0;overflow:hidden;text-align:right}
+.support-head{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid #30378d;background:#0b0f27}
+.support-head h3{margin:0;font-size:16px}
+.support-session{color:var(--muted);font-size:11px;margin-top:3px}
+.support-session b{color:#d93aff;font-family:monospace;letter-spacing:1px}
+.support-status{display:flex;align-items:center;gap:5px;font-size:11px;color:#39e38b;margin-inline-start:auto}
+.support-status .live{width:8px;height:8px;border-radius:50%;background:#39e38b;animation:badgePulse 1.5s infinite}
+.support-close{border:0;background:transparent;color:var(--muted);font-size:26px;cursor:pointer;line-height:1;padding:0 6px}
+.chat-area{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;background:#080b20}
+.chat-bubble{max-width:82%;padding:9px 13px;border-radius:16px;font-size:14px;line-height:1.65;word-wrap:break-word;white-space:pre-wrap}
+.chat-bubble.user{align-self:flex-start;background:#7912df;color:#fff;border-bottom-right-radius:5px}
+.chat-bubble.admin{align-self:flex-end;background:#0d1230;border:1px solid #343a91;color:var(--text);border-bottom-left-radius:5px}
+.chat-bubble .t{display:block;font-size:10px;opacity:.75;margin-top:4px}
+.chat-empty{color:var(--muted);text-align:center;font-size:13px;margin:auto;line-height:1.9;padding:0 20px}
+.chat-input-row{display:flex;gap:8px;padding:10px;border-top:1px solid #30378d;background:#0b0f27}
+.chat-input{flex:1;min-height:44px;max-height:120px;border:1px solid #343a91;border-radius:12px;background:#080b20;color:var(--text);padding:10px 12px;font-size:14px;resize:none;font-family:inherit;outline:0;text-align:right}
+.chat-input:focus{border-color:#bf2cff}
+.chat-send{min-width:82px;border:1px solid #d22cff;border-radius:12px;background:#7411dc;color:#fff;font-weight:700;cursor:pointer;padding:0 14px;font-family:inherit}
+.chat-send:disabled{opacity:.5;cursor:wait}
+.dot-badge{display:inline-block;width:10px;height:10px;border-radius:50%;background:#ff315d;animation:badgePulse 1.5s infinite}
+#settings{position:relative}
+#settings .dot-badge{position:absolute;top:4px;right:4px}
+.sec-card.clickable{cursor:pointer}
+.sec-card.clickable:hover{border-color:#b928ff}
+@keyframes badgePulse{50%{opacity:.35}}
+
+.rating-box{position:relative;overflow:hidden;text-align:center;padding:25px 20px}
+.rating-box::before{content:"";position:absolute;inset:-80px;pointer-events:none;background:radial-gradient(circle at 50% 0,rgba(210,34,64,.22),transparent 62%)}
+.rating-box>*{position:relative}
+.rating-emblem{font-size:34px;line-height:1;color:#ffd36b;text-shadow:0 0 18px rgba(255,184,65,.55);margin-bottom:8px}
+.rating-eyebrow{color:#ff9aa5;font-size:12px;font-weight:800;letter-spacing:.4px;margin-bottom:5px}
+.rating-box h3{font-size:23px;margin:0 0 8px}
+.rating-box .muted-p{margin:0 0 15px}
+.rating-stars{display:flex;justify-content:center;gap:8px;direction:ltr;margin:18px 0 10px}
+.rating-box .rating-star{width:48px;height:48px;display:grid;place-items:center;padding:0;border-radius:14px;border:1px solid #713044;background:#280a12;color:#94636b;font-size:31px;line-height:1;cursor:pointer}
+.rating-box .rating-star:hover,.rating-box .rating-star.active{color:#ffd36b;border-color:#ffc451;background:linear-gradient(145deg,#3a1e18,#291015);text-shadow:0 0 14px rgba(255,196,81,.5);transform:translateY(-2px)}
+.rating-value{min-height:22px;color:#ffd1d5;font-size:13px}
+.rating-status{min-height:24px;margin-top:8px;color:#ff9aa5;font-size:13px;line-height:1.6}
+.rating-status.success{color:#68e6a0}
+.rating-actions{display:flex;gap:10px;margin-top:7px}
+.rating-actions button{flex:1;min-height:46px}
+.rating-actions button.primary{font-weight:800}
+@media(max-width:380px){.rating-stars{gap:5px}.rating-box .rating-star{width:43px;height:43px}}
+
+/* ============ تهيئة أول تشغيل ============ */
+.first-run-screen{position:fixed;inset:0;z-index:110;display:flex;align-items:center;justify-content:center;padding:22px;overflow:hidden;color:#fff0f3;background:radial-gradient(ellipse at 50% 44%,rgba(130,14,42,.24),transparent 42%),linear-gradient(150deg,#080307 0%,#19050c 52%,#030206 100%);isolation:isolate;transition:opacity .35s ease,visibility .35s ease}
+.first-run-screen.is-hidden{opacity:0;visibility:hidden;pointer-events:none}
+html.first-run-complete .first-run-screen{display:none!important}
+.first-run-screen::before{content:"";position:absolute;inset:-10%;z-index:-1;pointer-events:none;background:radial-gradient(circle at 25% 28%,rgba(181,15,49,.16),transparent 22%),radial-gradient(circle at 77% 70%,rgba(255,47,76,.1),transparent 25%);animation:setupFog 8s ease-in-out infinite alternate}
+.first-run-card{position:relative;width:min(100%,440px);padding:clamp(24px,6vw,38px) 25px;text-align:center;border:1px solid rgba(255,95,121,.35);border-radius:27px;background:linear-gradient(150deg,rgba(31,7,17,.9),rgba(9,4,9,.94));box-shadow:0 25px 80px rgba(0,0,0,.58),0 0 44px rgba(160,15,46,.16),inset 0 1px rgba(255,210,218,.07);backdrop-filter:blur(12px);animation:setupRise .6s cubic-bezier(.2,.8,.2,1) both}
+.first-run-symbol{width:78px;height:78px;margin:0 auto 18px;display:grid;place-items:center;border-radius:50%;border:1px solid rgba(255,88,117,.46);background:radial-gradient(circle,rgba(196,30,61,.27),rgba(27,6,14,.75) 68%);box-shadow:0 0 28px rgba(225,26,62,.2),inset 0 0 18px rgba(255,95,121,.12);color:#ffc6cf;font-size:37px;text-shadow:0 0 17px rgba(255,69,99,.7);animation:setupPulse 2.6s ease-in-out infinite}
+.first-run-eyebrow{margin:0 0 9px;color:#df8896;font-size:11px;font-weight:800;letter-spacing:1.7px}
+.first-run-title{margin:0;color:#fff0f3;font-size:clamp(27px,7vw,36px);font-weight:900;text-shadow:0 0 20px rgba(201,32,65,.32)}
+.first-run-copy{margin:13px 0;color:#d1aab1;font-size:14px;line-height:1.9}
+.first-run-note{margin:12px 0 20px;padding:9px 11px;border:1px solid rgba(255,95,121,.16);border-radius:12px;background:rgba(15,5,10,.62);color:#c98c98;font-size:11px;line-height:1.7}
+.first-run-start{width:100%;min-height:48px;border:1px solid rgba(255,100,125,.72);border-radius:14px;background:linear-gradient(100deg,#8e102b,#bd203d,#79102b);color:#fff4f5;font:inherit;font-size:15px;font-weight:900;cursor:pointer;box-shadow:0 8px 25px rgba(157,14,44,.24);transition:filter .2s,transform .2s}
+.first-run-start:hover{filter:brightness(1.14);transform:translateY(-1px)}
+.first-run-start:focus-visible{outline:2px solid #ffd0d7;outline-offset:3px}
+.first-run-progress[hidden]{display:none!important}
+.first-run-progress{margin-top:14px;text-align:right}
+.first-run-track{height:7px;overflow:hidden;border-radius:9px;background:rgba(255,255,255,.09);box-shadow:inset 0 1px 3px rgba(0,0,0,.6)}
+.first-run-bar{display:block;width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,#760d27,#e93a59,#ff9cab);box-shadow:0 0 15px rgba(255,65,95,.56);transition:width .12s linear}
+.first-run-progress-row{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:10px;color:#d8aab2;font-size:12px}
+.first-run-countdown{flex:none;color:#ffb6c1;font-weight:800}
+@keyframes setupFog{from{transform:translate3d(-1.2%,.5%,0)}to{transform:translate3d(1.2%,-.5%,0)}}
+@keyframes setupPulse{0%,100%{transform:scale(.97);box-shadow:0 0 22px rgba(225,26,62,.16)}50%{transform:scale(1.04);box-shadow:0 0 34px rgba(225,26,62,.34)}}
+@keyframes setupRise{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.first-run-screen::before,.first-run-card,.first-run-symbol{animation:none}}
+
+/* ============ شاشة الدخول السرية ============ */
+.splash-screen{
+  position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;
+  overflow:hidden;background:
+    radial-gradient(ellipse at 50% 52%,rgba(92,7,25,.2),transparent 34%),
+    linear-gradient(160deg,#050307 0%,#10070d 48%,#020207 100%);
+  transition:opacity .3s ease,visibility .3s ease;isolation:isolate
+}
+.splash-screen::before,.splash-screen::after{
+  content:"";position:absolute;pointer-events:none;inset:-20%;z-index:-1
+}
+.splash-screen::before{
+  background:radial-gradient(ellipse at 50% 72%,rgba(91,0,20,.2),transparent 48%);
+  animation:hauntFog 7s ease-in-out infinite alternate;will-change:transform
+}
+.splash-screen::after{
+  background:radial-gradient(ellipse at center,transparent 28%,rgba(0,0,0,.35) 72%,#000 100%);
+  box-shadow:inset 0 0 100px 35px #000
+}
+.splash-screen.is-hidden{opacity:0;visibility:hidden;pointer-events:none}
+.splash-content{position:relative;z-index:1;width:min(100%,520px);text-align:center;padding:22px 20px 28px;animation:splashRise .65s ease both}
+.splash-eyebrow{display:inline-block;margin-bottom:8px;padding:7px 13px;border:1px solid rgba(185,35,61,.42);border-radius:999px;background:rgba(22,5,11,.7);color:#d9a2ad;font-size:10px;font-weight:800;letter-spacing:2px;text-shadow:0 0 10px rgba(255,30,63,.35)}
+.splash-art{width:min(62vw,230px);height:min(30vh,230px);min-height:174px;margin:0 auto 8px;animation:artFloat 3s ease-in-out infinite;will-change:transform}
+.splash-art svg{display:block;width:100%;height:100%;overflow:visible}
+.splash-orbit{transform-origin:120px 120px;animation:portalTurn 24s linear infinite}
+.splash-portal{animation:portalPulse 2.8s ease-in-out infinite}
+.splash-core{transform-origin:120px 120px;animation:corePulse 2.2s ease-in-out infinite}
+.splash-title{margin:0;color:#fff1f2;font-size:clamp(29px,8vw,43px);font-weight:900;letter-spacing:.2px;text-shadow:0 0 13px rgba(166,18,42,.72),0 0 34px rgba(98,0,20,.5);animation:titleFlicker 6s linear infinite}
+.splash-subtitle{margin:11px 0 0;color:#c49ba4;font-size:14px;line-height:1.9;letter-spacing:.15px}
+.splash-warning{margin:5px 0 0;color:#773f4b;font-size:10px;letter-spacing:2px}
+.splash-loader{width:150px;height:3px;margin:23px auto 0;border-radius:9px;background:rgba(255,255,255,.09);overflow:hidden}
+ .splash-loader::after{content:"";display:block;width:100%;height:100%;transform:scaleX(0);transform-origin:right;border-radius:inherit;background:linear-gradient(90deg,#9b102b,#ef3b55,#5c071c);animation:splashLoad 5s linear forwards}
+.splash-audio-button{display:flex;align-items:center;justify-content:center;gap:8px;margin:14px auto 0;min-height:42px;padding:8px 18px;border:1px solid rgba(255,92,116,.62);border-radius:999px;background:linear-gradient(145deg,rgba(84,13,31,.88),rgba(25,6,13,.94));color:#ffe4e7;font:inherit;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 0 16px rgba(190,25,53,.27),inset 0 0 12px rgba(255,125,143,.06);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.splash-audio-button:hover{transform:translateY(-2px);border-color:#ff7184;box-shadow:0 0 23px rgba(255,55,82,.48),inset 0 0 14px rgba(255,125,143,.1)}
+.splash-audio-button:focus-visible{outline:2px solid #ff8a9a;outline-offset:3px}
+.splash-audio-button[hidden]{display:none!important}
+@keyframes artFloat{0%,100%{transform:translateY(3px)}50%{transform:translateY(-7px)}}
+@keyframes portalTurn{to{transform:rotate(360deg)}}
+@keyframes portalPulse{0%,100%{opacity:.72}50%{opacity:1}}
+@keyframes corePulse{0%,100%{opacity:.75;transform:scale(.96)}50%{opacity:1;transform:scale(1.04)}}
+@keyframes hauntFog{from{transform:translate3d(-2%,1%,0)}to{transform:translate3d(2%,-1%,0)}}
+@keyframes titleFlicker{0%,18%,20%,58%,60%,100%{opacity:1}19%,59%{opacity:.72}}
+@keyframes splashRise{from{opacity:0;transform:translateY(16px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes splashLoad{to{transform:scaleX(1)}}
+@media(prefers-reduced-motion:reduce){.splash-screen::before,.splash-content,.splash-art,.splash-orbit,.splash-portal,.splash-core,.splash-title,.splash-loader::after{animation:none}}
+
+@media(max-width:650px){
+  .actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .quick{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:420px){
+  .actions{gap:9px}.btn{font-size:13px;min-height:54px}
+  .quick{gap:9px}.quick button{min-height:84px;font-size:14px}
+  .search{font-size:15px;padding-right:50px;min-height:64px}
+  .icon-btn{width:54px;height:54px}
+}
+@media(max-width:330px){
+  .actions,.quick{grid-template-columns:1fr}
 }
 
-/* نقاط الخلفية */
-.particles{
-    position:absolute;
-    inset:0;
-    overflow:hidden;
-    pointer-events:none;
+/* ============ الثيم الأحمر + نقاط خلفية متحركة ============ */
+:root{
+  --bg:#100307;--panel:#1c070c;--panel2:#260910;--input:#21080e;
+  --border:#8f1b31;--text:#fff3f4;--muted:#e0adb3;
+  --accent:#ff3655;--accent2:#ff8a93;--pink:#ff4661;--blue:#ff6575;
+  --shadow:rgba(255,38,69,.3)
 }
-
-.particles span{
-    position:absolute;
-    width:4px;
-    height:4px;
-    border-radius:50%;
-    background:#ff3348;
-    box-shadow:0 0 15px #ff3348;
-    opacity:.5;
-    animation:float 7s linear infinite;
+html,body{background:#100307}
+body{
+  position:relative;isolation:isolate;color:var(--text);
+  background:radial-gradient(circle at 50% 14%,rgba(181,18,45,.2),transparent 33%),radial-gradient(circle at 90% 50%,rgba(112,8,27,.13),transparent 30%),var(--bg)
 }
-
-.particles span:nth-child(1){left:8%;top:85%;animation-delay:0s}
-.particles span:nth-child(2){left:18%;top:25%;animation-delay:1s}
-.particles span:nth-child(3){left:31%;top:72%;animation-delay:2s}
-.particles span:nth-child(4){left:49%;top:12%;animation-delay:3s}
-.particles span:nth-child(5){left:68%;top:78%;animation-delay:1.5s}
-.particles span:nth-child(6){left:82%;top:22%;animation-delay:2.5s}
-.particles span:nth-child(7){left:94%;top:63%;animation-delay:4s}
-
-@keyframes float{
-    0%{
-        transform:translateY(90px) scale(.4);
-        opacity:0;
-    }
-    30%{opacity:.7}
-    70%{opacity:.7}
-    100%{
-        transform:translateY(-180px) scale(1.3);
-        opacity:0;
-    }
+body::before{
+  content:"";position:fixed;inset:-110px;z-index:-1;pointer-events:none;opacity:.58;
+  background-image:radial-gradient(circle,rgba(255,89,111,.58) 1px,transparent 2px),radial-gradient(circle,rgba(255,170,161,.32) 1px,transparent 2px),radial-gradient(circle,rgba(203,35,63,.38) 1.3px,transparent 2.4px);
+  background-size:72px 72px,72px 72px,72px 72px;background-position:0 0,19px 23px,61px 47px;
+  animation:redParticles 22s linear infinite;will-change:transform
 }
-
-/* المحتوى */
-.page{
-    width:100%;
-    height:100%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
-    position:relative;
-    z-index:2;
+@keyframes redParticles{from{transform:translate3d(0,0,0)}to{transform:translate3d(-72px,72px,0)}}
+.top .icon-btn{border-color:#b62b45;background:radial-gradient(circle at 35% 25%,#551522,#19070c 70%);box-shadow:0 0 13px rgba(255,55,82,.3),inset 0 0 15px rgba(255,115,125,.07)}
+.top .icon-btn:hover{box-shadow:0 0 21px rgba(255,49,79,.52),inset 0 0 18px rgba(255,115,125,.12)}
+.clear{color:#ff9ba5}
+.developer-link{color:#ff667a;text-shadow:0 0 8px rgba(255,59,88,.48),0 0 16px rgba(190,15,44,.25)}
+.developer-link:hover{color:#ff9aa4;text-shadow:0 0 10px rgba(255,75,99,.72),0 0 20px rgba(190,15,44,.35)}
+.dev{color:#e9b0b7;text-shadow:0 0 8px rgba(200,37,63,.2)}
+.logo{text-shadow:0 0 18px rgba(255,54,81,.26)}
+.logo b:nth-child(1),.logo b:nth-child(2),.logo b:nth-child(3),.logo b:nth-child(4),.logo b:nth-child(5),.logo b:nth-child(6){color:#ff5269}
+.sub{color:#ff929d;text-shadow:0 0 10px rgba(255,62,89,.35)}
+.search{
+  background:linear-gradient(#21080e,#21080e) padding-box,linear-gradient(100deg,#ff3b58,#ff8992 48%,#c81535) border-box;
+  box-shadow:0 0 16px rgba(255,45,74,.2),0 0 25px rgba(167,8,34,.12)
 }
-
-/* كلمة قريباً نعود */
-.coming{
-    position:absolute;
-    top:25px;
-    left:50%;
-    transform:translateX(-50%);
-    white-space:nowrap;
-
-    padding:10px 23px;
-    border-radius:30px;
-
-    color:#ff3348;
-    border:1px solid #5a1018;
-    background:rgba(35,8,11,.7);
-    box-shadow:0 0 25px rgba(224,0,27,.12);
-
-    font-size:14px;
-    font-weight:bold;
-    letter-spacing:2px;
-
-    animation:comingPulse 2.5s ease-in-out infinite;
+.search::placeholder{color:#cda8ad}
+.search:focus{box-shadow:0 0 20px rgba(255,64,89,.34),0 0 35px rgba(190,15,44,.19)}
+.search-icon{color:#ff6579;text-shadow:0 0 10px #d82143}
+.btn{
+  background:linear-gradient(#21080e,#21080e) padding-box,linear-gradient(100deg,#8f172d,#c51c3b,#ef425a) border-box;
+  color:#fff0f2;box-shadow:0 0 12px rgba(210,29,59,.14)
 }
-
-@keyframes comingPulse{
-    0%,100%{
-        opacity:.45;
-        box-shadow:0 0 10px rgba(224,0,27,.08);
-    }
-    50%{
-        opacity:1;
-        box-shadow:0 0 28px rgba(224,0,27,.3);
-    }
+.btn.primary{background:linear-gradient(100deg,#ff5668,#d91d3e 58%,#9f102b) padding-box,linear-gradient(100deg,#ff8790,#fa3152,#9f102b) border-box;box-shadow:0 0 20px rgba(255,50,79,.22),0 0 15px rgba(190,15,44,.14)}
+.btn:hover{box-shadow:0 0 20px rgba(255,48,78,.28)}
+.section{background:linear-gradient(#1b070d,#1b070d) padding-box,linear-gradient(120deg,#ad1d39,#e53250,#761326) border-box;box-shadow:0 0 18px rgba(196,24,54,.17),inset 0 0 22px rgba(125,8,30,.08)}
+.small-btn{color:#ff7585}
+.history-item{border-top-color:#51202b}
+.quick button,.quick button:nth-child(2),.quick button:nth-child(3){background:linear-gradient(#1c080e,#1c080e) padding-box,linear-gradient(135deg,#8d172d,#ed3a56,#a91634) border-box;color:#fff0f2;box-shadow:0 0 16px rgba(206,30,58,.12)}
+.quick button:nth-child(4){background:linear-gradient(#1c080e,#1c080e) padding-box,linear-gradient(135deg,#a91634,#ffb347,#ed3a56) border-box;box-shadow:0 0 18px rgba(255,126,57,.16)}
+.quick button:hover{box-shadow:0 0 22px rgba(255,46,77,.24)}
+.bottom:before{border-top-color:#be2945;box-shadow:0 -4px 13px #a5203a,0 -1px 8px #f34c65}
+.bottom:after{color:#ff667d;text-shadow:0 0 12px #c52142}
+.note{color:#bd969c}
+.modal{background:rgba(15,0,4,.82)}
+.modal-box{background:#1b070d;border-color:#a5223d;box-shadow:0 0 35px rgba(180,13,42,.24)}
+.modal-box button{border-color:#713044;background:#280a12;color:var(--text)}
+.modal-box button.primary{background:#c51d3d;border-color:#ff596f;color:#fff}
+.sec-card{border-color:#642537;background:#230911}
+.badge{background:#19070c;border-color:#713044;color:#d4adb2}
+.badge.on{background:#b51a39;border-color:#ff526a;color:#fff}
+.sec-card.clickable:hover{border-color:#ff5a70}
+.lock-input{border-color:#713044;background:#19070c}
+.lock-input:focus{border-color:#ff536b;box-shadow:0 0 12px rgba(255,49,78,.2)}
+.lock-screen{background:#100307}
+.lock-card{background:#1b070d;border-color:#a5223d;box-shadow:0 0 35px rgba(180,13,42,.25)}
+.lock-btn{border-color:#ff526a;background:#c51d3d}
+.lock-btn.ghost{background:#280a12;border-color:#713044}
+.lock-err{color:#ff7e8c}
+.support-head,.chat-input-row{background:#230911;border-color:#642537}
+.chat-area,.chat-input{background:#19070c}
+.chat-input{border-color:#713044}
+.chat-input:focus{border-color:#ff536b}
+.chat-bubble.user{background:#b51a39}
+.chat-bubble.admin{background:#240a11;border-color:#713044}
+.chat-send{border-color:#ff526a;background:#c51d3d}
+.support-close{color:#e0adb3}
+@media(prefers-reduced-motion:reduce){body::before,.engine-brand .brand-mark,.engine-brand .brand-word,.engine-mark{animation:none}}
+.engine-settings-card .sec-head{margin-bottom:10px}
+.modal-box .engine-toggle{
+  width:100%;display:flex;align-items:center;gap:12px;margin-top:8px;padding:11px 12px;
+  border:1px solid #8f1b31;border-radius:15px;background:linear-gradient(120deg,#310b14,#1a070c);
+  color:#fff2f3;text-align:right;font-family:inherit
 }
-
-/* البطاقة */
-.card{
-    width:min(92vw,520px);
-    padding:34px 25px 27px;
-    text-align:center;
-
-    background:rgba(24,5,7,.86);
-    border:1px solid #5a1018;
-    border-radius:28px;
-
-    box-shadow:
-        0 30px 80px rgba(0,0,0,.55),
-        0 0 45px rgba(224,0,27,.1);
-
-    backdrop-filter:blur(18px);
+.engine-toggle-icon{width:38px;height:38px;flex:0 0 38px;display:grid;place-items:center;border-radius:12px;background:#50101d;color:#ff8794;font-size:25px}
+.engine-toggle-copy{flex:1;display:flex;flex-direction:column;gap:4px}
+.engine-toggle-copy strong{font-size:14px}
+.engine-toggle-copy small,.engine-option-copy small{color:#d4a8ad;font-size:11px;line-height:1.5}
+.engine-toggle-arrow{color:#ff7485;font-size:22px;transition:transform .2s}
+.engine-toggle[aria-expanded="true"] .engine-toggle-arrow{transform:rotate(180deg)}
+.engine-picker{display:grid;gap:7px;max-height:min(48vh,390px);overflow:auto;margin-top:10px;padding:8px;border:1px solid #602333;border-radius:16px;background:#16060b}
+.engine-picker[hidden]{display:none!important}
+.engine-picker .engine-option{
+  width:100%;min-height:58px;display:flex;align-items:center;gap:11px;padding:8px 10px;
+  border:1px solid transparent;border-radius:12px;background:#21080e;color:#fff1f2;
+  text-align:right;font-family:inherit;cursor:pointer
 }
+.engine-picker .engine-option:hover{border-color:#a72a43;background:#2b0a12}
+.engine-picker .engine-option.selected{border-color:#ff536b;background:#3a0b17;box-shadow:inset 0 0 14px rgba(255,55,83,.1)}
+.engine-mark{width:38px;height:38px;flex:0 0 38px;display:block;object-fit:contain;border-radius:6px;padding:1px;background:transparent}
+.engine-option-copy{flex:1;display:flex;flex-direction:column;gap:2px}
+.engine-option-copy strong{font-size:13px}
+.engine-check{width:22px;text-align:center;color:#ff697d;opacity:0;font-weight:900}
+.engine-option.selected .engine-check{opacity:1}
+.engine-brand{display:flex;align-items:center;justify-content:center;gap:9px;direction:ltr;letter-spacing:-1px;text-shadow:none}
+.brand-mark{width:70px;height:70px;flex:0 0 70px;display:block;object-fit:contain;border-radius:0;background:transparent;box-shadow:none}
+.engine-brand .brand-mark.full-brand-logo{width:clamp(170px,55vw,250px);height:auto;max-height:76px;flex:0 1 auto}
+.brand-word{font-size:clamp(28px,8vw,54px);font-weight:900;line-height:1;letter-spacing:-1.5px}
+.brand-google .brand-word{background:linear-gradient(115deg,#4285f4 5%,#34a853 31%,#fbbc05 52%,#ea4335 76%,#4285f4 96%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.brand-bing .brand-word{color:#65c9f3}
+.brand-duckduckgo .brand-word{color:#f4a064}
+.brand-brave .brand-word{color:#ff8456}
+.brand-ecosia .brand-word{color:#74d59a}
+.brand-yahoo .brand-word{color:#b993ff}
+.engine-brand .brand-mark,.engine-brand .brand-word,.engine-mark{animation:brandBlink 3.2s ease-in-out infinite}
+.engine-brand .brand-word{animation-delay:.32s}
+.engine-option:nth-child(2) .engine-mark{animation-delay:.14s}
+.engine-option:nth-child(3) .engine-mark{animation-delay:.28s}
+.engine-option:nth-child(4) .engine-mark{animation-delay:.42s}
+.engine-option:nth-child(5) .engine-mark{animation-delay:.56s}
+.engine-option:nth-child(6) .engine-mark{animation-delay:.7s}
+@keyframes brandBlink{0%,30%,100%{opacity:1;transform:scale(1)}44%,58%{opacity:0;transform:scale(.92)}72%{opacity:.55;transform:scale(.97)}86%{opacity:1;transform:scale(1)}}
 
-/* الرسمة */
-.illustration{
-    width:190px;
-    height:145px;
-    margin:0 auto 22px;
-    position:relative;
-}
-
-/* شاشة */
-.monitor{
-    position:absolute;
-    width:125px;
-    height:88px;
-    left:32px;
-    top:15px;
-
-    border-radius:12px;
-    background:linear-gradient(145deg,#3d080d,#180507);
-    border:3px solid #8b000f;
-
-    box-shadow:
-        0 0 25px rgba(224,0,27,.25),
-        inset 0 0 20px rgba(224,0,27,.12);
-}
-
-.monitor::before{
-    content:"";
-    position:absolute;
-    width:55px;
-    height:4px;
-    background:#e0001b;
-    border-radius:10px;
-    left:32px;
-    top:39px;
-    box-shadow:0 0 15px #e0001b;
-}
-
-/* قاعدة الشاشة */
-.stand{
-    position:absolute;
-    width:45px;
-    height:13px;
-    left:72px;
-    top:103px;
-    background:#5a1018;
-    border-radius:4px;
-}
-
-.base{
-    position:absolute;
-    width:80px;
-    height:8px;
-    left:55px;
-    top:116px;
-    border-radius:10px;
-    background:#8b000f;
-}
-
-/* مفتاح الصيانة */
-.wrench{
-    position:absolute;
-    right:10px;
-    top:40px;
-    font-size:44px;
-    transform:rotate(-25deg);
-    filter:drop-shadow(0 0 10px rgba(224,0,27,.45));
-    animation:wrenchMove 3s ease-in-out infinite;
-}
-
-@keyframes wrenchMove{
-    0%,100%{transform:rotate(-25deg) translateY(0)}
-    50%{transform:rotate(-12deg) translateY(-5px)}
-}
-
-/* عنوان */
-h1{
-    font-size:28px;
-    margin-bottom:14px;
-    line-height:1.4;
-}
-
-.description{
-    color:#d9bfc2;
-    font-size:14px;
-    line-height:1.9;
-    margin-bottom:25px;
-}
-
-/* الأزرار */
-.buttons{
-    display:flex;
-    flex-direction:column;
-    gap:12px;
-}
-
-button,
-.contact{
-    width:100%;
-    min-height:54px;
-    border-radius:15px;
-
-    font-family:inherit;
-    font-size:15px;
-    font-weight:bold;
-
-    cursor:pointer;
-    text-decoration:none;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    transition:transform .2s,box-shadow .2s;
-}
-
-.retry{
-    color:#fff;
-    background:#23080b;
-    border:1px solid #5a1018;
-}
-
-.retry:active{
-    transform:scale(.97);
-}
-
-.contact{
-    color:#fff;
-    background:linear-gradient(135deg,#8b000f,#e0001b);
-    border:1px solid #e0001b;
-
-    box-shadow:0 10px 28px rgba(224,0,27,.22);
-}
-
-.contact:active{
-    transform:scale(.97);
-}
-
-/* أسفل البطاقة */
-.footer{
-    margin-top:20px;
-    color:#92777b;
-    font-size:11px;
-}
-
-/* للموبايل */
-@media(max-width:380px){
-    .page{
-        padding:15px;
-    }
-
-    .card{
-        padding:25px 19px 22px;
-    }
-
-    .illustration{
-        transform:scale(.88);
-        margin-top:-5px;
-        margin-bottom:10px;
-    }
-
-    h1{
-        font-size:23px;
-    }
-
-    .description{
-        font-size:13px;
-    }
-
-    .coming{
-        top:18px;
-        font-size:12px;
-    }
-}
-
-/* منع تحديد وسحب العناصر */
-img,
-button,
-a,
-div{
-    -webkit-user-select:none;
-    user-select:none;
-}
 </style>
 </head>
-
 <body>
 
-<div class="glow"></div>
+<section class="first-run-screen" id="firstRunScreen" role="dialog" aria-modal="true" aria-labelledby="firstRunTitle" aria-describedby="firstRunDisclosure" aria-hidden="false">
+  <div class="first-run-card">
+    <div class="first-run-symbol" aria-hidden="true">↻</div>
+    <p class="first-run-eyebrow">تهيئة تجريبية · لأول مرة</p>
+    <h1 class="first-run-title" id="firstRunTitle">تحديث التطبيق</h1>
+    <p class="first-run-copy">اضغط لبدء التهيئة التجريبية، ثم تظهر شاشة الدخول السرية.</p>
+    <p class="first-run-note" id="firstRunDisclosure">للتوضيح: هذه محاكاة تهيئة مدتها ٨ ثوانٍ، ولا يتم تنزيل إصدار جديد فعليًا. تظهر مرة واحدة لهذا المتصفح.</p>
+    <button class="first-run-start" id="firstRunStartButton" type="button">↻ تحديث التطبيق</button>
+    <div class="first-run-progress" id="firstRunProgress" hidden>
+      <div class="first-run-track" aria-hidden="true"><span class="first-run-bar" id="firstRunProgressBar"></span></div>
+      <div class="first-run-progress-row"><span id="firstRunStatus" role="status" aria-live="polite">جارٍ التحديث التجريبي…</span><span class="first-run-countdown" id="firstRunCountdown">٨ ثوانٍ</span></div>
+    </div>
+  </div>
+</section>
 
-<div class="particles">
-    <span></span>
-    <span></span>
-    <span></span>
-    <span></span>
-    <span></span>
-    <span></span>
-    <span></span>
+<!-- ================== شاشة الدخول السرية ================== -->
+<div class="splash-screen" id="splashScreen" role="status" aria-label="شاشة الدخول السرية">
+  <div class="splash-content">
+    <div class="splash-eyebrow">ACCESS RESTRICTED · 5 SEC</div>
+    <div class="splash-art" aria-hidden="true">
+      <svg viewBox="0 0 240 240" role="presentation" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="portalLine" x1="32" y1="26" x2="204" y2="214" gradientUnits="userSpaceOnUse"><stop stop-color="#e8a1ae"/><stop offset=".48" stop-color="#a51b3d"/><stop offset="1" stop-color="#42101f"/></linearGradient>
+          <radialGradient id="portalCore"><stop stop-color="#ed5369" stop-opacity=".55"/><stop offset="1" stop-color="#5c0b20" stop-opacity="0"/></radialGradient>
+        </defs>
+        <g class="splash-orbit" fill="none" stroke="url(#portalLine)">
+          <circle cx="120" cy="120" r="101" opacity=".25"/>
+          <circle cx="120" cy="120" r="91" stroke-dasharray="2 8" stroke-linecap="round" opacity=".75"/>
+          <path d="m120 14 7 13-7 13-7-13 7-13Zm0 186 7 13-7 13-7-13 7-13ZM14 120l13-7 13 7-13 7-13-7Zm186 0 13-7 13 7-13 7-13-7Z" opacity=".8"/>
+        </g>
+        <path class="splash-portal" d="M69 197v-78a51 51 0 0 1 102 0v78" fill="none" stroke="url(#portalLine)" stroke-width="2.5"/>
+        <path d="M81 196v-76a39 39 0 0 1 78 0v76" fill="#10070d" fill-opacity=".7" stroke="#6f1a30" stroke-width="1.4"/>
+        <circle class="splash-core" cx="120" cy="124" r="48" fill="url(#portalCore)"/>
+        <path class="splash-core" d="M120 99a15 15 0 0 0-8 27l-5 23h26l-5-23a15 15 0 0 0-8-27Z" fill="#d84a62" fill-opacity=".82"/>
+        <path d="M61 197h118m-104 9h90" stroke="#9b2842" stroke-opacity=".62" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <h1 class="splash-title">شاشة الدخول السرية</h1>
+    <p class="splash-subtitle">البوابة تُفتح... لا تنظر خلفك</p>
+    <p class="splash-warning">تم رصد حركة في الظلام</p>
+    <div class="splash-loader" aria-hidden="true"></div>
+    <button class="splash-audio-button" id="splashAudioButton" type="button" aria-label="تشغيل الصوت"><span aria-hidden="true">🔊</span> تشغيل الصوت</button>
+  </div>
 </div>
 
-<div class="page">
+<audio id="splashGreetingAudio" src="incognito-welcome.wav" preload="auto" autoplay aria-hidden="true"></audio>
 
-    <!-- قريباً نعود -->
-    <div class="coming">
-        ✦ قريبًا نعود ✦
+<!-- ================== شاشة القفل ================== -->
+<div class="lock-screen" id="lockScreen" aria-hidden="true">
+  <div class="lock-card" id="lockCard">
+    <div class="lock-icon" id="lockIcon">🔒</div>
+    <div class="lock-title" id="lockTitle">التطبيق مقفل</div>
+    <div class="lock-hint" id="lockHint">أدخل كلمة المرور للمتابعة</div>
+
+    <div id="lockPassArea">
+      <input type="password" id="lockPassInput" class="lock-input" placeholder="كلمة المرور" autocomplete="off">
+      <div class="lock-err" id="lockErr"></div>
+      <button class="lock-btn" id="lockSubmit" type="button">دخول</button>
+    </div>
+  </div>
+</div>
+
+<div class="top">
+  <button class="icon-btn" id="settings" title="الإعدادات والأمان">⚙</button>
+</div>
+<div class="dev">المطور: <a class="developer-link" href="https://t.me/MidoZoneBot" target="_blank" rel="noopener noreferrer">Mohamed Tamer</a></div>
+
+<div class="logo engine-brand brand-google" id="engineLogo" aria-label="Google"><img class="brand-mark" alt=""><span class="brand-word">Google</span></div>
+<div class="sub">إبحث الآن بشكل خفي ومباشر</div>
+
+<main class="wrap">
+  <form id="form">
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input id="input" class="search" placeholder="إبحث الآن في Google..." autocomplete="off">
+      <button type="button" class="clear" id="clear">×</button>
+    </div>
+    <div class="actions">
+      <button class="btn primary" type="submit">⌕ بحث</button>
+      <button class="btn" type="button" id="open">↗ فتح الرابط</button>
+      <button class="btn" type="button" id="copy">▣ نسخ البحث</button>
+      <button class="btn" type="button" id="clearAll">مسح الكل</button>
+    </div>
+  </form>
+
+  <section class="section">
+    <div class="section-head">
+      <span>◷ آخر عمليات البحث</span>
+      <button class="small-btn" id="clearHistory">مسح الكل</button>
+    </div>
+    <div id="history"></div>
+  </section>
+
+  <div class="quick">
+    <button id="quickHistory"><span>▤</span>إدارة السجل</button>
+    <button id="privacy"><span>♢</span>الخصوصية</button>
+    <button id="quickSettings"><span>⚙</span>الإعدادات</button>
+    <button id="quickRate" type="button" aria-haspopup="dialog" aria-controls="ratingModal"><span>★</span>قيم التطبيق</button>
+  </div>
+
+  <div class="bottom"><img src="bottom_image.png" alt="الصورة الإضافية"></div>
+  <div class="note">🔒 عمليات البحث تفتح مباشرة في محرك البحث المختار.</div>
+</main>
+
+<!-- ================== نافذة الإعدادات ================== -->
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <h3>الإعدادات والأمان</h3>
+    <p class="muted-p">
+      استخدم كلمة المرور لقفل التطبيق.
+      سيُطلب منك إدخالها في كل مرة تفتح فيها التطبيق.
+    </p>
+
+    <!-- كلمة المرور -->
+    <div class="sec-card" id="passCard">
+      <div class="sec-head">
+        <span>🔑 كلمة المرور</span>
+        <span class="badge" id="passBadge">غير مُفعّلة</span>
+      </div>
+
+      <div id="passSetup">
+        <input type="password" id="newPass" class="lock-input" placeholder="كلمة المرور الجديدة" autocomplete="new-password">
+        <input type="password" id="newPass2" class="lock-input" placeholder="تأكيد كلمة المرور" autocomplete="new-password">
+        <button class="btn primary" id="savePass" type="button">حفظ كلمة المرور</button>
+      </div>
+
+      <div id="passActive" style="display:none">
+        <button class="btn" id="removePass" type="button">إزالة كلمة المرور</button>
+        <div class="sec-note">✅ كلمة المرور مُفعّلة. سيتم طلبها عند كل فتح للتطبيق.</div>
+      </div>
     </div>
 
-    <main class="card">
+    <div class="sec-card engine-settings-card">
+      <div class="sec-head"><span>🌐 محرك البحث</span><span class="badge" id="selectedEngineName">Google</span></div>
+      <button class="engine-toggle" id="toggleEnginePicker" type="button" aria-expanded="false" aria-controls="enginePicker">
+        <span class="engine-toggle-icon" aria-hidden="true">⌕</span>
+        <span class="engine-toggle-copy"><strong>محرك بحث متعدد</strong><small>اضغط لاختيار محرك البحث</small></span>
+        <span class="engine-toggle-arrow" aria-hidden="true">⌄</span>
+      </button>
+      <div class="engine-picker" id="enginePicker" role="group" aria-label="اختيار محرك البحث" hidden>
+        <button class="engine-option" type="button" data-engine="google" aria-pressed="false"><img class="engine-mark" alt=""><span class="engine-option-copy"><strong>Google</strong><small>بحث شامل</small></span><span class="engine-check" aria-hidden="true">✓</span></button>
+        <button class="engine-option" type="button" data-engine="bing" aria-pressed="false"><img class="engine-mark" alt=""><span class="engine-option-copy"><strong>Bing</strong><small>بحث ويب وصور</small></span><span class="engine-check" aria-hidden="true">✓</span></button>
+        <button class="engine-option" type="button" data-engine="duckduckgo" aria-pressed="false"><img class="engine-mark" alt=""><span class="engine-option-copy"><strong>DuckDuckGo</strong><small>تركيز أكبر على الخصوصية</small></span><span class="engine-check" aria-hidden="true">✓</span></button>
+        <button class="engine-option" type="button" data-engine="brave" aria-pressed="false"><img class="engine-mark" alt=""><span class="engine-option-copy"><strong>Brave Search</strong><small>محرك مستقل مع تركيز على الخصوصية</small></span><span class="engine-check" aria-hidden="true">✓</span></button>
+        <button class="engine-option" type="button" data-engine="ecosia" aria-pressed="false"><img class="engine-mark" alt=""><span class="engine-option-copy"><strong>Ecosia</strong><small>بحث ويب مع مبادرات بيئية</small></span><span class="engine-check" aria-hidden="true">✓</span></button>
+        <button class="engine-option" type="button" data-engine="yahoo" aria-pressed="false"><img class="engine-mark" alt=""><span class="engine-option-copy"><strong>Yahoo Search</strong><small>بحث عام</small></span><span class="engine-check" aria-hidden="true">✓</span></button>
+      </div>
+    </div>
 
-        <!-- رسمة صيانة -->
-        <div class="illustration">
+    <!-- دعم 24 ساعة -->
+    <div class="sec-card clickable" id="supportCard">
+      <div class="sec-head">
+        <span>💬 دعم 24 ساعة</span>
+        <span class="badge" id="supportBadge">متصل</span>
+      </div>
+      <div class="sec-note">تواصل مع الدعم الفني في أي وقت. اضغط هنا لفتح المحادثة.</div>
+    </div>
 
-            <div class="monitor"></div>
-            <div class="stand"></div>
-            <div class="base"></div>
+    <div class="sec-msg" id="settingsMsg"></div>
 
-            <div class="wrench">🔧</div>
-
-        </div>
-
-        <h1>
-            توقف الموقع مؤقتًا
-        </h1>
-
-        <p class="description">
-            الموقع متوقف مؤقتًا لإجراء بعض التحديثات
-            والتحسينات اللازمة.
-            <br>
-            سنعود قريبًا بتجربة أفضل.
-        </p>
-
-        <div class="buttons">
-
-            <button class="retry" onclick="location.reload()">
-                ↻ &nbsp; إعادة المحاولة
-            </button>
-
-            <a
-                class="contact"
-                href="https://t.me/MidoZoneBot"
-                target="_blank"
-                rel="noopener noreferrer"
-            >
-                ✈ &nbsp; تواصل مع الإدارة
-            </a>
-
-        </div>
-
-        <div class="footer">
-            شكرًا لصبرك وتفهمك ❤️
-        </div>
-
-    </main>
-
+    <div class="close-row">
+      <button id="close" type="button">إغلاق</button>
+    </div>
+  </div>
 </div>
 
+<!-- ================== نافذة دعم 24 ساعة ================== -->
+<div class="modal" id="supportModal" aria-hidden="true">
+  <div class="modal-box support-box">
+    <div class="support-head">
+      <div>
+        <h3>💬 دعم 24 ساعة</h3>
+        <div class="support-session">رقم جلستك: <b id="sessionIdText">----------</b></div>
+      </div>
+      <div class="support-status"><span class="live"></span>متصل</div>
+      <button class="support-close" id="supportClose" type="button">×</button>
+    </div>
+    <div class="chat-area" id="chatArea"></div>
+    <div class="chat-input-row">
+      <button class="chat-send" id="sendMsg" type="button">إرسال</button>
+      <textarea class="chat-input" id="chatInput" placeholder="اكتب رسالتك هنا..." rows="1"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- ================== نافذة تقييم التطبيق ================== -->
+<div class="modal" id="ratingModal" aria-hidden="true">
+  <div class="modal-box rating-box" role="dialog" aria-modal="true" aria-labelledby="ratingTitle">
+    <div class="rating-emblem" aria-hidden="true">★</div>
+    <div class="rating-eyebrow">رأيك يفرق معنا</div>
+    <h3 id="ratingTitle">قيّم التطبيق</h3>
+    <p class="muted-p">اختار عدد النجوم، وسيوصل تقييمك إلى المطوّر عبر البوت.</p>
+    <div class="rating-stars" role="radiogroup" aria-label="اختر تقييمك من نجمة إلى خمس نجوم">
+      <button class="rating-star" type="button" role="radio" aria-checked="false" aria-label="نجمة واحدة" data-rating="1">☆</button>
+      <button class="rating-star" type="button" role="radio" aria-checked="false" aria-label="نجمتان" data-rating="2">☆</button>
+      <button class="rating-star" type="button" role="radio" aria-checked="false" aria-label="ثلاث نجوم" data-rating="3">☆</button>
+      <button class="rating-star" type="button" role="radio" aria-checked="false" aria-label="أربع نجوم" data-rating="4">☆</button>
+      <button class="rating-star" type="button" role="radio" aria-checked="false" aria-label="خمس نجوم" data-rating="5">☆</button>
+    </div>
+    <div class="rating-value" id="ratingValue" aria-live="polite">اضغط على النجوم لاختيار تقييمك</div>
+    <div class="rating-status" id="ratingStatus" role="status" aria-live="polite"></div>
+    <div class="rating-actions">
+      <button class="primary" id="ratingSubmit" type="button">إرسال التقييم</button>
+      <button id="ratingClose" type="button">إغلاق</button>
+    </div>
+  </div>
+</div>
+<script>
+
+/* ---------- شاشة الدخول السرية: خمس ثوانٍ ثم فحص القفل ---------- */
+const splashScreen=document.getElementById('splashScreen');
+function isHistoryTraversal(){
+  try{
+    if(performance.getEntriesByType){
+      const nav=performance.getEntriesByType('navigation')[0];
+      if(nav)return nav.type==='back_forward';
+    }
+    return !!(performance.navigation&&performance.navigation.type===2);
+  }catch(e){return false}
+}
+const splashGreetingAudio=document.getElementById('splashGreetingAudio');
+const splashAudioButton=document.getElementById('splashAudioButton');
+const firstRunScreen=document.getElementById('firstRunScreen');
+const firstRunStartButton=document.getElementById('firstRunStartButton');
+const firstRunProgress=document.getElementById('firstRunProgress');
+const firstRunProgressBar=document.getElementById('firstRunProgressBar');
+const firstRunStatus=document.getElementById('firstRunStatus');
+const firstRunCountdown=document.getElementById('firstRunCountdown');
+const FIRST_RUN_SETUP_KEY='incognitoFirstRunSetupComplete';
+const splashGestureEvents=['pointerdown','touchstart','keydown','click'];
+let splashGreetingStarted=false,splashGreetingPending=false,splashRetryQueued=false;
+let firstRunSetupStarted=false;
+function clearSplashGreetingRetry(){
+  if(splashRetryQueued){
+    splashGestureEvents.forEach(type=>window.removeEventListener(type,retrySplashGreeting));
+    splashRetryQueued=false;
+  }
+}
+function queueSplashGreetingRetry(){
+  if(!splashGreetingAudio||!splashScreen||splashScreen.classList.contains('is-hidden')||splashGreetingStarted)return;
+  if(splashRetryQueued)return;
+  splashRetryQueued=true;
+  splashGestureEvents.forEach(type=>window.addEventListener(type,retrySplashGreeting,{once:true,passive:true}));
+}
+function attemptSplashGreeting(){
+  if(!splashGreetingAudio||!splashScreen||splashScreen.classList.contains('is-hidden')||splashGreetingStarted||splashGreetingPending)return;
+  splashGreetingPending=true;
+  let playPromise;
+  try{splashGreetingAudio.muted=false;splashGreetingAudio.volume=1;playPromise=splashGreetingAudio.play()}catch(e){splashGreetingPending=false;queueSplashGreetingRetry();return}
+  if(playPromise&&typeof playPromise.then==='function'){
+    playPromise.then(()=>{splashGreetingStarted=true;splashGreetingPending=false;clearSplashGreetingRetry()})
+      .catch(()=>{splashGreetingPending=false;queueSplashGreetingRetry()});
+  }else{splashGreetingStarted=true;splashGreetingPending=false;clearSplashGreetingRetry()}
+}
+function retrySplashGreeting(){clearSplashGreetingRetry();attemptSplashGreeting()}
+function playSplashGreetingFromButton(){
+  if(splashAudioButton){splashAudioButton.hidden=true;splashAudioButton.disabled=true}
+  if(!splashGreetingAudio||!splashScreen||splashScreen.classList.contains('is-hidden')||splashGreetingPending||(!splashGreetingAudio.paused&&splashGreetingStarted))return;
+  clearSplashGreetingRetry();
+  try{splashGreetingAudio.currentTime=0}catch(e){}
+  splashGreetingStarted=false;
+  attemptSplashGreeting();
+}
+if(splashAudioButton)splashAudioButton.addEventListener('click',playSplashGreetingFromButton);
+if(splashGreetingAudio)splashGreetingAudio.addEventListener('canplay',attemptSplashGreeting,{once:true});
+function hasCompletedFirstRunSetup(){
+  try{if(localStorage.getItem(FIRST_RUN_SETUP_KEY)==='done')return true}catch(e){}
+  try{return sessionStorage.getItem(FIRST_RUN_SETUP_KEY)==='done'}catch(e){return false}
+}
+function rememberFirstRunSetup(){
+  try{localStorage.setItem(FIRST_RUN_SETUP_KEY,'done');return}catch(e){}
+  try{sessionStorage.setItem(FIRST_RUN_SETUP_KEY,'done')}catch(e){}
+}
+function startSecretSplash(){
+  if(firstRunScreen){firstRunScreen.classList.add('is-hidden');firstRunScreen.setAttribute('aria-hidden','true')}
+  if(splashScreen){splashScreen.classList.remove('is-hidden');splashScreen.setAttribute('aria-hidden','false')}
+  if(splashAudioButton){splashAudioButton.hidden=false;splashAudioButton.disabled=false}
+  queueSplashGreetingRetry();
+  attemptSplashGreeting();
+  window.setTimeout(()=>{
+    clearSplashGreetingRetry();
+    if(splashScreen){splashScreen.classList.add('is-hidden');splashScreen.setAttribute('aria-hidden','true')}
+    showLockScreen();
+  },5000);
+}
+function startFirstRunSetup(){
+  if(firstRunSetupStarted||!firstRunScreen)return;
+  firstRunSetupStarted=true;
+  if(firstRunStartButton){firstRunStartButton.disabled=true;firstRunStartButton.hidden=true}
+  if(firstRunProgress)firstRunProgress.hidden=false;
+  firstRunScreen.setAttribute('aria-busy','true');
+  const duration=8000,start=Date.now();
+  let lastRemaining=-1;
+  const renderProgress=()=>{
+    const elapsed=Math.min(duration,Date.now()-start);
+    const remaining=Math.max(0,Math.ceil((duration-elapsed)/1000));
+    if(firstRunProgressBar)firstRunProgressBar.style.width=`${elapsed/duration*100}%`;
+    if(firstRunCountdown)firstRunCountdown.textContent=remaining?`${remaining.toLocaleString('ar-EG')} ثوانٍ`:'تم';
+    if(firstRunStatus&&remaining!==lastRemaining){firstRunStatus.textContent=remaining?'جارٍ التحديث التجريبي…':'اكتملت التهيئة التجريبية';lastRemaining=remaining}
+  };
+  renderProgress();
+  const progressTimer=window.setInterval(renderProgress,100);
+  window.setTimeout(()=>{
+    window.clearInterval(progressTimer);
+    if(firstRunProgressBar)firstRunProgressBar.style.width='100%';
+    if(firstRunStatus)firstRunStatus.textContent='اكتملت التهيئة التجريبية';
+    if(firstRunCountdown)firstRunCountdown.textContent='تم';
+    firstRunScreen.setAttribute('aria-busy','false');
+    rememberFirstRunSetup();
+    startSecretSplash();
+  },duration);
+}
+if(firstRunStartButton)firstRunStartButton.addEventListener('click',startFirstRunSetup,{once:true});
+if(isHistoryTraversal()){
+  if(firstRunScreen){firstRunScreen.classList.add('is-hidden');firstRunScreen.setAttribute('aria-hidden','true')}
+  if(splashScreen)splashScreen.classList.add('is-hidden');
+  window.setTimeout(showLockScreen,0);
+}else if(hasCompletedFirstRunSetup()){
+  if(firstRunScreen){firstRunScreen.classList.add('is-hidden');firstRunScreen.setAttribute('aria-hidden','true')}
+  startSecretSplash();
+}else{
+  if(firstRunScreen){firstRunScreen.classList.remove('is-hidden');firstRunScreen.setAttribute('aria-hidden','false')}
+  if(splashScreen){splashScreen.classList.add('is-hidden');splashScreen.setAttribute('aria-hidden','true')}
+}
+
+/* ============ عناصر أساسية ============ */
+const input=document.getElementById('input');
+const clearBtn=document.getElementById('clear');
+const historyEl=document.getElementById('history');
+const SEARCH_ENGINE_KEY='appSearchEngine';
+const SEARCH_ENGINES={
+ google:{name:'Google',description:'بحث شامل',word:'Google',icon:'data:image/png;base64,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',logo:'data:image/png;base64,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',url:q=>'https://www.google.com/search?q='+encodeURIComponent(q)},
+ bing:{name:'Bing',description:'بحث ويب وصور',word:'Bing',icon:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAc1JREFUWEftld9ZwjAUxc+NC8QNZAJ1AwoD6AbqABacAJjAUhfADfRdKBvYDWQDswC9fmla/knKrcjHC3ltcvPLueeeEo686Mj34wRwUkCsgO4mTWTzW0DdALgozJuCOAWpgYmC2V8MvRNAdxMNRg/M3coLiKMCxNQBqQTIL8+yKUCXwqIpFAUmCsQQ1QCd5Hnt5YwpzmgAILWXuLbwPYC7BSBxZIbtJyGwPwd0N7lAxl/LQjwwcbu/rbAOx32AeotvToWpBMKrgA4/RoByLyMamWHwUFVQP04SEJpuDw9N3K72TFGsAmDyCeAq3yd4UdGOpKg7M3GrsacCEy4LmLglm5aMv+ucycX1UepwCQBF5xJnr56RQO8CsAZ0gVO/BamJW9d7tmAcAdRxnsLUvLSCShPWNG1Zy98CN+OlqWy3+iYObAb8WjpMegAvR1RRQxrN1UEUrqiQN4xHIPVqZzxPSTslc+4tx0+m1uoLBFGcq+DGUbz8am2WEI5XZpPO+cG3bEwvgiiXy9sysQKrG4totn22P6ZSkRnA71DqLW/LZiQLIHYqIFa92FgX4t8BLEcdiIMAbIPwJePBANYh/L/ygwJI/HMCOClwdAV+ACbgyyFwwhgnAAAAAElFTkSuQmCC',url:q=>'https://www.bing.com/search?q='+encodeURIComponent(q)},
+ duckduckgo:{name:'DuckDuckGo',description:'تركيز أكبر على الخصوصية',word:'DuckDuckGo',icon:'data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjREU1ODMzIiByb2xlPSJpbWciIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+RHVja0R1Y2tHbzwvdGl0bGU+PHBhdGggZD0iTTEyIDBDNS4zNyAwIDAgNS4zNyAwIDEyczUuMzcgMTIgMTIgMTIgMTItNS4zNyAxMi0xMlMxOC42MyAwIDEyIDB6bTAgLjk4NEMxOC4wODMuOTg0IDIzLjAxNiA1LjkxNiAyMy4wMTYgMTJTMTguMDg0IDIzLjAxNiAxMiAyMy4wMTYuOTg0IDE4LjA4NC45ODQgMTJDLjk4NCA1LjkxNyA1LjkxNi45ODQgMTIgLjk4NHptMCAuOTM4QzYuNDM0IDEuOTIyIDEuOTIyIDYuNDM0IDEuOTIyIDEyYzAgNC40MzcgMi44NjcgOC4yMDUgNi44NSA5LjU1LS4yMzctLjgyLS43NzYtMi43NTMtMS42LTYuMDUyLTEuMTg0LTQuNzQxLTIuMDY0LTguNjA2IDIuMzc5LTkuODEzLjA0Ny0uMDExLjA2NC0uMDY0LjAzLS4wOTMtLjUxNC0uNDY3LTEuMzgyLS41NDgtMi4yMzMtLjM4YS4wNi4wNiAwIDAgMS0uMDctLjA1OGMwLS4wMTEgMC0uMDIzLjAxMS0uMDM1LjIwNS0uMjg2LjU3Mi0uNTA3LjgyMi0uNjRhMS44NDMgMS44NDMgMCAwIDAtLjYwNy0uMzM1Yy0uMDU5LS4wMjItLjA1OS0uMTItLjAwNi0uMTQ0LjAwNi0uMDA2LjAxMi0uMDEyLjAyNC0uMDEyIDEuNzQ5LS4yMzMgMy41ODYuMjkyIDQuNDkgMS40NDguMDExLjAxMS4wMjMuMDE3LjAzNS4wMjMgMi45NjguNjM1IDMuNTA5IDQuODM3IDMuMzI4IDUuOTk4YTkuNjA3IDkuNjA3IDAgMCAwIDIuMzQ2LS41NzZjLjc0Ni0uMjg2IDEuMDA4LS4yMjIgMS4xMDEtLjA1My4xLjE5My0uMDE4LjUxMy0uMjguODEtLjQ5Ni41NjctMS4zOTMgMS4wMS0yLjk3NCAxLjEzNy0uNTQ2LjA0NC0xLjAyOS4wMjQtMS40NDUuMDA2LS43ODktLjAzNS0xLjMzOS0uMDU5LTEuNjMzLjM5LS4xOTIuMjk4LS4wNDEuOTk4IDEuNDg3IDEuMjIgMS4wOS4xNTcgMi4wNzguMDQ3IDIuNzk4LS4wMzQuNjQzLS4wNyAxLjA3My0uMTE4IDEuMTcyLjA2OS4yMS40MDItLjk5NiAxLjIwNy0zLjA2NiAxLjIyNC0uMTU4IDAtLjMxNS0uMDA2LS40NjctLjAxMS0xLjI4My0uMDY1LTIuMjI3LS40MTQtMi44MTYtLjczNWEuMDk0LjA5NCAwIDAgMS0uMDM1LS4wMTdjLS4xMDUtLjA1OS0uMzEuMDQ1LS4xODguMjY3LjA3LjEzNC40NDQuNDc4IDEuMDA0Ljc3Ni0uMDU4LjQ2Ni4wODcgMS4xODQuMzM4IDJsLjA4OC0uMDE2Yy4wNDEtLjAwOS4wODctLjAxOS4xMzQtLjAyNS41MDctLjA4Mi43NzUuMDEyLjkyNi4xNzUuNzE3LS41MzYgMS45MTMtMS4yOTQgMi4wMy0xLjE1NC41ODMuNjk0LjY2IDIuMzMyLjUzIDIuOTktLjAwNC4wMTItLjAxNy4wMjQtLjA0LjAzNS0uMjc0LjExNy0xLjc4My0uMjk2LTEuNzgzLS41MTEtLjA1OS0xLjA3NS0uMjYtMS4xNzMtLjQ5My0xLjIyNWgtLjE1NmMuMDA2LjAwNi4wMTIuMDE4LjAxOC4wM2wuMDUyLjEyYy4wOTMuMjU3LjI0IDEuMDYzLjEzIDEuMjYtLjExMi4xOTktLjgzNS4yOTctMS4yODQuMzAzLS40NDMuMDA2LS41NDMtLjE1OC0uNjM3LS40MDgtLjA3LS4yMDQtLjEwMy0uNjc1LS4xMDMtLjk1YS44NTcuODU3IDAgMCAxIC4wMTItLjIxNmMtLjEzNC4wNTgtLjMzMy4xOTMtLjM5Ny4yODEtLjAxNy4yNjItLjAxNy42ODIuMTIzIDEuMTQ5LjA3LjIyMS0xLjUxOCAxLjE2NC0xLjc0Ljk5LS4yMjctLjE4MS0uNjM0LTEuOTUyLS40NTktMi42Ny0uMTg3LjAxNy0uMzM4LjA3NS0uNDIuMTkxLS4zNjcuNTA4LjA5MyAyLjkzMy41ODIgMy4yNDguMjU3LjE2OSAxLjU0LS41NTMgMi4xNzYtMS4wOTUuMTA1LjE0NS4zMDUuMTU4LjU1My4xNTguMzI2LS4wMTIuNzgyLS4wNiAxLjEwMy0uMTU4LjE5Mi40NS40MjMuOTcyLjYxMyAxLjM4OCA0LjQ3LTEuMDMyIDcuODAzLTUuMDM3IDcuODAzLTkuODIgMC01LjU2Ni00LjUxMi0xMC4wNzgtMTAuMDc4LTEwLjA3OHptMS43OTEgNS42NDZjLS40MiAwLS42NzguMTQ2LS43OTUuMzMyLS4wMjMuMDQ3LjA0Ny4wOTQuMDk0LjA3LjE0LS4wNzUuMzU3LS4xNjEuNzAxLS4xNTYuMzI4LjAwNi41MTYuMDkuNjcuMTU5bC4wMjMuMDFjLjA0MS4wMTcuMDg4LS4wMy4wNTktLjA2NS0uMTM0LS4xOC0uMzMyLS4zNS0uNzUyLS4zNXptLTUuMDc4LjE5OGExLjI0IDEuMjQgMCAwIDAtLjUyMi4wODJjLS40NTQuMTY5LS42Ny41MjYtLjY3Ljc2IDAgLjA1MS4xMTIuMDU3LjE0MS4wMTEuMDgxLS4xMjMuMjEtLjMxLjYxNy0uNDc4LjQwOC0uMTcuNzMtLjE0Ni45NTEtLjA5NC4wNDcuMDEyLjA4My0uMDQxLjA0MS0uMDdhLjk4OS45ODkgMCAwIDAtLjU1OC0uMjExem01LjQzNCAxLjQyM2EuNjUxLjY1MSAwIDAgMC0uNjU1LjY0Ny42NTIuNjUyIDAgMCAwIDEuMzA3IDAgLjY0Ni42NDYgMCAwIDAtLjY1Mi0uNjQ3em0uMjgzLjI2MmguMDA4YS4xNy4xNyAwIDAgMSAuMTcuMTdjMCAuMDkzLS4wNzcuMTctLjE3LjE3YS4xNy4xNyAwIDAgMS0uMTctLjE3YzAtLjA5LjA3Mi0uMTY1LjE2Mi0uMTd6bS01LjM1OC4wNzZhLjc1Mi43NTIgMCAwIDAtLjc1OC43NThjMCAuNDIuMzM4Ljc1OC43NTguNzU4cy43NTgtLjMzNy43NTgtLjc1OGEuNzU2Ljc1NiAwIDAgMC0uNzU4LS43NTh6bS4zMjguMzAzaC4wMWMuMTEyIDAgLjIuMDg5LjIuMiAwIC4xMS0uMDg4LjE5Ny0uMi4xOTdhLjE5NS4xOTUgMCAwIDEtLjE5Ny0uMTk4YzAtLjEwNy4wODItLjE5NC4xODctLjE5OXoiLz48L3N2Zz4=',url:q=>'https://duckduckgo.com/?q='+encodeURIComponent(q)},
+ brave:{name:'Brave Search',description:'محرك مستقل مع تركيز على الخصوصية',word:'Brave Search',icon:'data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjRkI1NDJCIiByb2xlPSJpbWciIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+QnJhdmU8L3RpdGxlPjxwYXRoIGQ9Ik0xNS42OCAwbDIuMDk2IDIuMzhzMS44NC0uNTEyIDIuNzA5LjM1OGMuODY4Ljg3IDEuNTg0IDEuNjM4IDEuNTg0IDEuNjM4bC0uNTYyIDEuMzgxLjcxNSAyLjA0N3MtMi4xMDQgNy45OC0yLjM1IDguOTU1Yy0uNDg2IDEuOTE5LS44MTggMi42Ni0yLjE5OCAzLjYzMy0xLjM4Ljk3Mi0zLjg4NCAyLjY2LTQuMjkzIDIuOTE2LS40MDkuMjU2LS45Mi42OTItMS4zOC42OTItLjQ2IDAtLjk3LS40MzYtMS4zOC0uNjkyYTE4NS43OTYgMTg1Ljc5NiAwIDAxLTQuMjkzLTIuOTE2Yy0xLjM4LS45NzMtMS43MTItMS43MTQtMi4xOTctMy42MzMtLjI0Ny0uOTc1LTIuMzUxLTguOTU1LTIuMzUxLTguOTU1bC43MTUtMi4wNDctLjU2Mi0xLjM4MXMuNzE2LS43NjggMS41ODUtMS42MzhjLjg2OC0uODcgMi43MDgtLjM1OCAyLjcwOC0uMzU4TDguMzIxIDBoNy4zNnptLTMuNjc5IDE0LjkzNmMtLjE0IDAtMS4wMzguMzE3LTEuNzU4LjY5LS43Mi4zNzMtMS4yNDIuNjM3LTEuNDA5Ljc0Mi0uMTY3LjEwNC0uMDY1LjMwMS4wODcuNDA5LjE1Mi4xMDcgMi4xOTQgMS42OSAyLjM5MyAxLjg2Ni4xOTguMTc1LjQ4OS40NjQuNjg3LjQ2NC4xOTggMCAuNDktLjI5LjY4OC0uNDY0LjE5OC0uMTc1IDIuMjQtMS43NTkgMi4zOTItMS44NjYuMTUyLS4xMDguMjU0LS4zMDUuMDg3LS40MS0uMTY3LS4xMDQtLjY4OS0uMzY4LTEuNDEtLjc0MS0uNzItLjM3My0xLjYxNy0uNjktMS43NTctLjY5em0wLTExLjI3OHMtLjQwOS4wMDEtMS4wMjIuMjA2LTEuMjc4LjQ2LTEuNTg0LjQ2Yy0uMzA3IDAtMi41ODEtLjQzNC0yLjU4MS0uNDM0UzQuMTE5IDcuMTUyIDQuMTE5IDcuODQ5YzAgLjY5Ny4zMzkuODgxLjY4IDEuMjQzbDIuMDIgMi4xNDljLjE5Mi4yMDMuNTkuNTExLjM1NiAxLjA2Ni0uMjM1LjU1NS0uNTggMS4yNi0uMTk2IDEuOTc3LjM4NC43MTYgMS4wNDIgMS4xOTQgMS40NjQgMS4xMTUuNDIxLS4wOCAxLjQxMi0uNTk4IDEuNzc2LS44MzQuMzY0LS4yMzcgMS41MTgtMS4xOSAxLjUxOC0xLjU1NCAwLS4zNjUtMS4xOTMtMS4wMi0xLjQxMy0xLjE2OC0uMjItLjE1LTEuMjI2LS43MjUtMS4yNDctLjk1LS4wMi0uMjI3LS4wMTItLjI5My4yODQtLjg1MS4yOTctLjU1OS44MzEtMS4zMDQuNzQyLTEuOC0uMDg5LS40OTUtLjk1LS43NTMtMS41NjUtLjk4Ni0uNjE1LS4yMzItMS43OTktLjY3MS0xLjk0Ny0uNzQtLjE0OC0uMDY4LS4xMS0uMTMzLjMzOS0uMTc1LjQ0OC0uMDQzIDEuNzE5LS4yMTIgMi4yOTItLjA1Mi41NzMuMTYgMS41NTIuNDAzIDEuNjMyLjUzMi4wNzkuMTMuMTQ5LjEzNC4wNjcuNTc5LS4wODEuNDQ1LS41IDIuNTgxLS41NDEgMi45Ni0uMDQuMzgtLjEyLjYzLjI4OC43MjQuNDA5LjA5NCAxLjA5Ny4yNTYgMS4zMzMuMjU2cy45MjQtLjE2MiAxLjMzMy0uMjU2Yy40MDgtLjA5My4zMjktLjM0NC4yODgtLjcyMy0uMDQtLjM4LS40Ni0yLjUxNi0uNTQxLTIuOTYxLS4wODItLjQ0NS0uMDEyLS40NS4wNjctLjU3OS4wOC0uMTI5IDEuMDU5LS4zNzIgMS42MzItLjUzMi41NzMtLjE2IDEuODQ1LjAwOSAyLjI5Mi4wNTIuNDQ5LjA0Mi40ODcuMTA3LjMzOS4xNzUtLjE0OC4wNjktMS4zMzIuNTA4LTEuOTQ3Ljc0LS42MTUuMjMzLTEuNDc2LjQ5LTEuNTY1Ljk4Ni0uMDkuNDk2LjQ0NSAxLjI0MS43NDIgMS44LjI5Ny41NTguMzA0LjYyNC4yODQuODUtLjAyLjIyNi0xLjAyNi44MDItMS4yNDcuOTUtLjIyLjE1LTEuNDEzLjgwNC0xLjQxMyAxLjE2OSAwIC4zNjQgMS4xNTQgMS4zMTcgMS41MTggMS41NTQuMzY0LjIzNiAxLjM1NS43NTUgMS43NzYuODM0LjQyMi4wNzkgMS4wOC0uNCAxLjQ2NC0xLjExNS4zODQtLjcxNi4wMzktMS40MjItLjE5NS0xLjk3Ny0uMjM1LS41NTUuMTYzLS44NjMuMzU1LTEuMDY2bDIuMDItMi4xNDljLjM0MS0uMzYyLjY4LS41NDYuNjgtMS4yNDMgMC0uNjk3LTIuNjk1LTMuOTYtMi42OTUtMy45NnMtMi4yNzQuNDM2LTIuNTguNDM2Yy0uMzA3IDAtLjk3Mi0uMjU2LTEuNTg1LS40NjEtLjYxMy0uMjA1LTEuMDIyLS4yMDYtMS4wMjItLjIwNnoiLz48L3N2Zz4=',url:q=>'https://search.brave.com/search?q='+encodeURIComponent(q)},
+ ecosia:{name:'Ecosia',description:'بحث ويب مع مبادرات بيئية',word:'Ecosia',icon:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAxOTYuNSA3Mi44MDMgNjkuNTU4Ij48cGF0aCBkPSJNNTkuODMgMjQ4LjU1N2MtMi40Ni0xLjY0LTMuNy0uODItMy43LS44MnMuMDUgMS44OTcgMS44OTcgMy40ODcgNC4zMDYgMS4zODQgNC4zMDYgMS4zODQtLjA1LTIuNC0yLjUxMi00LjA1em0tMzYuOCA5LjUzNmMtMS43NDMgMi45NzQtLjk3NCA1LjQ4Ni0uOTc0IDUuNDg2czIgLjU2NCA0LjUxMi0yLjcxNyAxLjQ4Ny02LjUgMS40ODctNi41LTMuMjguNzctNS4wMjUgMy43NDN6bS03Ljc0Mi03LjQ4NmMtMS44NDYgMS42LTEuODk3IDMuNDg3LTEuODk3IDMuNDg3czEuMjMuODIgMy43LS44MiAyLjUxMi00LjA1IDIuNTEyLTQuMDUtMi40LS4yNTYtNC4zMDYgMS4zODR6bTIyLjc2NCA2LjU2M3MtMiAxLjUzOC0yLjI1NiA0LjgyIDEuOTQ4IDUuNyAxLjk0OCA1LjcgMi41NjQtMS45NDggMi4zNTgtNS44OTZjLS4xNTQtNC0yLjA1LTQuNjE0LTIuMDUtNC42MTR6bTEzLjM4Mi0uMDVzLS41NjQgMS43OTQuNjY2IDMuODk2IDMuNjQgMi42NjYgMy42NCAyLjY2Ni43MTgtMi4zMDctMS4wNzctNC42MTRjLTEuODQ2LTIuMzU4LTMuMjMtMS45NDgtMy4yMy0xLjk0OHptOC40MDgtNDUuMzc0YzIuNDYtMS42NCAyLjUxMi00LjA1IDIuNTEyLTQuMDVzLTIuNC0uMjU2LTQuMzA3IDEuMzg0Yy0xLjg0NiAxLjYtMS44OTcgMy40ODYtMS44OTcgMy40ODZzMS4yMy44MiAzLjctLjgyem0tNDMuMTcgMy4yM3MtLjA1LTIuNC0yLjUxMi00LjA1LTMuNy0uODItMy43LS44Mi4wNSAxLjg5NyAxLjg5NyAzLjQ4N2MxLjg0NSAxLjY0IDQuMzA2IDEuMzg0IDQuMzA2IDEuMzg0em04LjE1Mi04Ljkycy43MTgtMi4zMDctMS4wNzctNC42MTVjLTEuNzk0LTIuMzU4LTMuMjMtMS45NDgtMy4yMy0xLjk0OHMtLjU2NCAxLjc5NC42NjYgMy44OTZjMS4yODIgMi4xNTQgMy42NCAyLjY2NiAzLjY0IDIuNjY2em0yNy43ODgtMi44N2MyLjUxMi0zLjIzIDEuNDg3LTYuNCAxLjQ4Ny02LjRzLTMuMjguNzctNS4wMjQgMy43LS45MjMgNS40MzUtLjkyMyA1LjQzNSAxLjk0OC41NjQgNC40Ni0yLjcxN3ptLTE1LjAyMi0yLjg3Yy4xNTQtMy42NC0yLjIwNS01LjQzNS0yLjIwNS01LjQzNXMtMiAyLjIwNS0xLjc5NCA1LjIzYy4yNTYgMy4wMjUgMi4xMDIgNC40IDIuMTAyIDQuNHMxLjc0My0uNTY0IDEuODk3LTQuMjA0eiIgZmlsbD0iIzM2YWNiOCIvPjxwYXRoIGQ9Ik0zOC4yNDcgMjExLjM4NmMtMTAuNSAwLTE5LjAyIDguNS0xOS4wMiAxOS4wMnM4LjUgMTkuMDIgMTkuMDIgMTkuMDIgMTkuMDItOC41IDE5LjAyLTE5LjAyLTguNS0xOS4wMi0xOS4wMi0xOS4wMnptMCAzNS44MzhjLTkuMjggMC0xNi43NjUtNy41MzctMTYuNzY1LTE2LjgxNnM3LjQ4Ni0xNi44MTYgMTYuNzY1LTE2LjgxNiAxNi43NjUgNy41MzcgMTYuNzY1IDE2LjgxNi03LjQ4NiAxNi44MTYtMTYuNzY1IDE2LjgxNnoiIGZpbGw9IiNkYzdlNTgiLz48cGF0aCBkPSJNMzguNDUyIDIxNi42MTZjLTcuNzQyIDAtMTMuOTQ1IDYuMzA2LTEzLjk0NSAxMy45NDUgMCA3Ljc0MiA2LjIwNCAxMy45NDUgMTMuOTQ1IDEzLjk0NSA3LjcgMCAxMy44OTQtNi4yNTUgMTMuODk0LTEzLjk0NXMtNi4yMDQtMTMuOTQ1LTEzLjg5NC0xMy45NDV6IiBmaWxsPSIjMzZhY2I4Ii8+PHBhdGggZD0iTTUyLjA0IDIzMy4zM2MwIC4xMDIgMCAuMjA1LjA1LjMwOC4wNS0uMTU0LjA1LS4zMDguMTAyLS41MTMtLjEwMi4wNS0uMTAyLjE1My0uMTUzLjIwNXptLTkuNTg4IDIuNTYzYy0uNDYuMzA4LS43Ny42MTYtLjg3MiAxLjM4NC4xMDMuMTU0LjE1NC4yNTcuMzYuMzYuNTY0LS4yMDUgMS4xOC0xLjEyOC43Ny0xLjctLjEwMy0uMDUyLS4xNTQtLjA1Mi0uMjU2LS4wNTJ6bS02LjY2NS0xNy42ODhjLS4yNTYtLjEwMi0uNTY0LS4xNTQtLjgyLS4yNTYtLjY2Ni4xNTQtMS40ODcgMC0yLjI1Ni0uMTU0LS41NjQuMjU2LTEuMTI4LjU2NC0xLjY0Ljg3MmExLjE3IDEuMTcgMCAwIDEgLjI1Ni40Yy0uMTAyLjM2LS40Ni43MTgtLjMwNyAxLjEyOC4wNTIuMjU2LjE1NC4zNi4zNi41MTMuNjY3LjA1IDEuMDI2LS4zNiAxLjUzOC0uNTEzbDEuNi0uMjU2Yy42MTUtLjE1NCAxLjY5Mi0xLjAyNSAxLjI4Mi0xLjc0M3ptLTguMTUyIDEyLjgxN2wtLjc3LTEuMTI4Yy0uNjY2LS42NjYtMS4zMzMtMS4yMy0yLjIwNS0xLjQzNS0uMTAzLjY2Ni0uMTU0IDEuMzg0LS4xNTQgMi4xMDIgMCAyLjM1OC41NjQgNC42MTQgMS42NCA2LjU2My4xNTQtLjE1NC4zMDgtLjI1Ni40NjItLjRsLjY2Ni0xLjA3N2MuMzYtLjM2LjkyMy0uNDYyIDEuMjMtLjg3MmwuMzYtLjk3NGMuMjA1LS40LjcxOC0uNzE4LjYxNS0xLjI4Mi0uMjU2LS44Mi0xLjI4Mi0uOTIzLTEuODQ2LTEuNDg3em0uMzA4LTguNjEzYy40NjItLjIwNS43MTguMzYgMS4wNzctLjA1LjQ2Mi0uNDYyLS4xNTQtMS4yMy0uMTU0LTEuNzQzIDAtLjEwMy4wNS0uMjU2LjEwMy0uMzYtLjkyMy44Mi0xLjY5MiAxLjc5NC0yLjM2IDIuODIuMjA2LS4wNS40LS4wNS41NjUtLjEwMy4zMDctLjE1NC41MTItLjM2Ljc3LS41NjR6bTIwLjU2LTEuNTM4Yy0uMzA4IDAtLjYxNSAwLS45MjMuMDUybC00LjM1OC40NjJjLTEuMzg0IDAtMi4xMDItMS4xMjgtMy40MzUtLjgyLS41MTIuMTAzLTEuNDg3LjY2Ni0xLjc0MyAxLjA3Ny0uMzYuNTY1LjEwMi45MjMtLjU2NCAxLjIzLS40NjItLjEwMy0uNjE1LS40NjItMS4wMjUtLjY2NmEuOTQuOTQgMCAwIDAtLjcxOC40MWMtLjA1LjYxNS40LjcxOC40IDEuMzMzLS4yNTYuMzYtLjg3Mi40LTEuMDI1LjgyLS4yMDUuNDYgMCAuOTc0LS4zMDggMS4zMzNsLTEuMzMzIDEuMjgyYy0uODcyIDEuMDc3LS40NjIgMi44Mi4yMDUgMy40ODYuNjE1LjYxNSAxLjUzOC4xMDMgMi4zNi40NjIuNjE1LjI1Ni43MTggMS40MzUuODcgMiAuMzA4LjkyMy0uMjU2IDEuMzMzLS4yNTYgMi4yMDRzLjMwNyAzLjM4NCAxLjUzOCAzLjMzMmMxLjM4NC0uMDUgMS43LTEuNDM1IDIuNDYtMi4zNTguMjU2LS4zMDguNjY2LS40NjIuODcyLS45MjNsLjA1LTEuNDM1Yy4zMDgtLjgyIDEuMjgyLTEuMDc3IDEuNzk1LTEuNjkyLjUxMy0uNTY0LjA1LTEuMDI2LjMwOC0xLjQ4NyAwIDAgLjA1IDAgLjA1LS4wNWwxLjI4Mi0uNzE4LjYxNS0uNzE4LjQ2Mi0uMTU0YzEuNi44MiAxLjAyNSAyLjQ2IDIuMTUzIDMuMzMyLjEwMi0uMDUuMTU0LS4xMDIuMjU2LS4xNTQuMTU0LS4yMDUuMDUtLjQuMTU0LS43MTguMjA1LS42MTYuOTIzLTEuMjMgMS42OTItMS4wNzcuMzYuNDYuOTc0IDEuMDc3IDEuMDc3IDEuNzQzLjEwMy42MTUtLjMwNy45NzQtLjMwNyAxLjQ4NyAwIC4zNi4yMDUuODIuNTEyIDEuMjgyYTguNjMgOC42MyAwIDAgMCAuNDYyLTEuNjRjMC0uMTAzIDAtLjIwNS0uMDUtLjMwOC4wNS0uMDUuMDUtLjEwMi4xMDItLjIwNWExNC4wMiAxNC4wMiAwIDAgMCAuMjU2LTIuNTY0YzAtMy43LTEuNDg3LTcuMTI3LTMuODk3LTkuNjR6bS03LjY0IDYuNGMtLjMwOC4wNS0uNjE1LS4xNTQtLjgyLS4yNTYtLjM2LS4wNS0uNzctLjA1LTEuMTI4LS4xMDItLjA1IDAtMS44NDYtMS40MzUtMS44OTctMS41MzguMTAzLS4yNTYuMjA1LS4yNTYuMzYtLjM2LjY2Ni4xNTQuODIuNTY0IDEuMjgyLjc3bC43MTguMTU0Yy4yNTYuMjA1LjUxMy4zNi43Ny41NjQuMzA4LjE1NC43MTguMTU0Ljk3NC4yMDUgMCAuMDUuMDUuMTAzLjA1LjE1NHYuMjU2Yy0uMTU0LjA1LS4yMDUuMTAyLS4zMDcuMTU0em0tMi0uMzZsLTEuODk3LTEuNTM4Yy4xMDMuMTAzIDEuODQ2IDEuNTM4IDEuODk3IDEuNTM4eiIgZmlsbD0iI2Q0ZGIzNCIvPjwvc3ZnPg==',url:q=>'https://www.ecosia.org/search?q='+encodeURIComponent(q)},
+ yahoo:{name:'Yahoo Search',description:'بحث عام',word:'Yahoo Search',icon:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACqklEQVR42u1XX0hTURj/ne2uTed02kq2GkQYKSmGFCIVaVhKQfkU9lQ9KJKIUOCLDwb1UpBof4j+jAotSIooKHAzWtr6Y1ZgfwjbKAk1bbtz023tbvfeHoR7OZNCbc6HduA+fL9zOOf3fec7v++75BAZFLGEQ4ElHkkCSQLMYm28ukCDultmCuvv8uHBiYnEENjdZMCqDRoK+2gbScwV6E0MNu/XU9jwuxBcL4OJIVDeYACjIhTW3epOTBIuSyUorc2iMO9oBP23J+eehM2Otcgp0Up2r4XFtRr6/va1rERVS7Zku14FcbLEhW2Hs6DNVFJre855wEfn8Qxjw1V8QI+UDHmpQglsr6G9tLa5QQiws3E5hYcDAuyX2PnpwJt7fri/cZKtTlVg68FMyS6qSkemSSWHeCSCgTs+bNybjuwcNbXXs+teBCf5+REQBcDaTkehrE72eMcR2svHFzwQeKDiqIHCBUGEtc29MCXss3gR8svMjbka5JZqYcxVI68sTcK5kAD7ZRYqDYHeyGDcGZa+PosXEy5uYUr4a1rA0yssKo+toDz3jUWodS86JxFgZ4geL3IiyomIcnNvMcjfGpIsswqnXeuhZGbeNB8VwYUEpOjkLG/OH4J/PIraTjPyd6VB4IEnFz242Tj278WI/R7BwF2fZCsZQh3+wTaF0U9hVJ8xoqBCB0IIlAxBeYMBxdUZ8amGf1IwALC1ewAAazalzJoz5anjQ+Dr6xC+OAKz8B9DYQw+mgIAfLbT86Io4n33dPzKcXerG+u2aGnvz8qR6WoaAyFA4R4dAiyPh6d+wvk8GD8CsVkd9PFw3JC1nQuK6KgfRUf9InVEsQLTe5VFOCAkpiUzF2oo4RF4ET3nPYnrCStjvH973w/PcCRuBEjyzyhJ4L8n8BuujvYhKBNyTgAAAABJRU5ErkJggg==',url:q=>'https://search.yahoo.com/search?p='+encodeURIComponent(q)}
+};
+function getSavedSearchEngine(){
+  try{const saved=localStorage.getItem(SEARCH_ENGINE_KEY);return Object.prototype.hasOwnProperty.call(SEARCH_ENGINES,saved)?saved:'google'}catch(e){return 'google'}
+}
+let engine=getSavedSearchEngine();
+
+/* ============ الثيم ============ */
+function setTheme(theme){
+  document.body.classList.toggle('light',theme==='light');
+  localStorage.setItem('siteTheme',theme);
+  document.getElementById('theme').textContent=theme==='light'?'☀':'☾';
+}
+function toggleTheme(){
+  setTheme(document.body.classList.contains('light')?'dark':'light');
+}
+
+/* ============ محرك البحث ============ */
+function updateEngine(){
+  const selected=SEARCH_ENGINES[engine]||SEARCH_ENGINES.google;
+  const logo=document.getElementById('engineLogo');
+  logo.className='logo engine-brand brand-'+engine;
+  logo.innerHTML=selected.logo?'<img class="brand-mark full-brand-logo" src="'+selected.logo+'" alt="">':'<img class="brand-mark" src="'+selected.icon+'" alt=""><span class="brand-word">'+selected.word+'</span>';
+  logo.setAttribute('aria-label',selected.name);
+  input.placeholder='إبحث الآن في '+selected.name+'...';
+  document.getElementById('selectedEngineName').textContent=selected.name;
+  document.querySelectorAll('.engine-option').forEach(button=>{
+    const provider=SEARCH_ENGINES[button.dataset.engine];
+    const icon=button.querySelector('.engine-mark');
+    if(provider&&icon)icon.src=provider.icon;
+    const isSelected=button.dataset.engine===engine;
+    button.classList.toggle('selected',isSelected);
+    button.setAttribute('aria-pressed',String(isSelected));
+  });
+}
+function selectSearchEngine(key){
+  if(!Object.prototype.hasOwnProperty.call(SEARCH_ENGINES,key))return;
+  engine=key;
+  try{localStorage.setItem(SEARCH_ENGINE_KEY,key)}catch(e){}
+  updateEngine();
+}
+const enginePickerToggle=document.getElementById('toggleEnginePicker');
+const enginePicker=document.getElementById('enginePicker');
+enginePickerToggle.onclick=()=>{
+  const open=enginePickerToggle.getAttribute('aria-expanded')==='true';
+  enginePicker.hidden=open;
+  enginePickerToggle.setAttribute('aria-expanded',String(!open));
+};
+document.querySelectorAll('.engine-option').forEach(button=>button.onclick=()=>selectSearchEngine(button.dataset.engine));
+
+/* ============ زر المسح ============ */
+function updateClear(){clearBtn.style.display=input.value?'block':'none'}
+
+/* ============ السجل ============ */
+function getHistory(){return JSON.parse(localStorage.getItem('searchHistory')||'[]')}
+function saveHistory(q){
+  let h=getHistory().filter(x=>x!==q);h.unshift(q);
+  localStorage.setItem('searchHistory',JSON.stringify(h.slice(0,5)));renderHistory();
+}
+function escapeHtml(x){const d=document.createElement('div');d.textContent=x;return d.innerHTML}
+function renderHistory(){
+  const h=getHistory();
+  if(!h.length){
+    historyEl.innerHTML='<div style="color:var(--muted);text-align:center;padding:14px">لا توجد عمليات بحث سابقة</div>';
+    return;
+  }
+  historyEl.innerHTML=h.map((q,i)=>`<div class="history-item">
+    <button class="small-btn del" data-i="${i}">×</button>
+    <button class="history-q" data-q="${encodeURIComponent(q)}">⌕ ${escapeHtml(q)}</button>
+  </div>`).join('');
+  document.querySelectorAll('.history-q').forEach(b=>b.onclick=()=>{
+    input.value=decodeURIComponent(b.dataset.q);updateClear();input.focus();
+  });
+  document.querySelectorAll('.del').forEach(b=>b.onclick=()=>{
+    const x=getHistory();x.splice(+b.dataset.i,1);
+    localStorage.setItem('searchHistory',JSON.stringify(x));renderHistory();
+  });
+}
+
+/* ============ أحداث البحث ============ */
+document.getElementById('form').onsubmit=e=>{
+  e.preventDefault();const q=input.value.trim();if(!q)return;
+  saveHistory(q);location.href=SEARCH_ENGINES[engine].url(q);
+};
+clearBtn.onclick=()=>{input.value='';updateClear();input.focus()};
+input.oninput=updateClear;
+
+document.getElementById('copy').onclick=async()=>{
+  const q=input.value.trim();if(!q)return;
+  try{await navigator.clipboard.writeText(q)}catch{input.select();document.execCommand('copy')}
+  alert('تم نسخ البحث');
+};
+document.getElementById('open').onclick=()=>{
+  const q=input.value.trim();if(!q)return;
+  window.open(/^https?:\/\//i.test(q)?q:'https://'+q,'_blank');
+};
+function clearEverything(){input.value='';localStorage.removeItem('searchHistory');renderHistory();updateClear();input.focus()}
+document.getElementById('clearAll').onclick=clearEverything;
+document.getElementById('clearHistory').onclick=()=>{
+  localStorage.removeItem('searchHistory');renderHistory();
+};
+
+/* ============ أزرار سريعة ============ */
+document.getElementById('quickHistory').onclick=()=>{
+  const section=document.querySelector('.section');
+  section.scrollIntoView({behavior:'smooth',block:'center'});
+  section.style.boxShadow='0 0 0 3px var(--accent), 0 8px 28px var(--shadow)';
+  setTimeout(()=>section.style.boxShadow='',900);
+};
+document.getElementById('privacy').onclick=()=>alert('السجل محفوظ محليًا على هذا الجهاز فقط، وكلمة المرور لا تُرسل لأي مكان.');
+/* =========================================================
+   نظام قفل التطبيق: كلمة مرور
+   ========================================================= */
+const LOCK_KEY='appLockConfig';
+const lockScreen=document.getElementById('lockScreen');
+const lockCard=document.getElementById('lockCard');
+const lockIcon=document.getElementById('lockIcon');
+const lockTitle=document.getElementById('lockTitle');
+const lockHint=document.getElementById('lockHint');
+const lockPassArea=document.getElementById('lockPassArea');
+const lockPassInput=document.getElementById('lockPassInput');
+const lockErr=document.getElementById('lockErr');
+const lockSubmit=document.getElementById('lockSubmit');
+
+let unlocked=false;
+
+function getLockConfig(){
+  try{return JSON.parse(localStorage.getItem(LOCK_KEY)||'null')}catch(e){return null}
+}
+function setLockConfig(cfg){
+  if(cfg) localStorage.setItem(LOCK_KEY,JSON.stringify(cfg));
+  else localStorage.removeItem(LOCK_KEY);
+}
+
+/* ---------- أدوات مساعدة ---------- */
+function randomHex(n){
+  const a=new Uint8Array(n);
+  if(window.crypto&&crypto.getRandomValues) crypto.getRandomValues(a);
+  else for(let i=0;i<n;i++) a[i]=Math.floor(Math.random()*256);
+  return Array.from(a).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+async function hashPassword(password,salt){
+  const data=new TextEncoder().encode(salt+'::'+password+'::app-lock');
+  if(window.crypto&&crypto.subtle&&crypto.subtle.digest){
+    try{
+      const buf=await crypto.subtle.digest('SHA-256',data);
+      return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+    }catch(e){}
+  }
+  let h1=0x811c9dc5,h2=0x01000193;
+  for(let i=0;i<data.length;i++){
+    h1^=data[i];h1=Math.imul(h1,16777619)>>>0;
+    h2=Math.imul(h2^data[i],2246822519)>>>0;
+  }
+  return 'fb'+h1.toString(16)+h2.toString(16);
+}
+
+/* ---------- شاشة القفل ---------- */
+function showLockScreen(){
+  const cfg=getLockConfig();
+  if(!cfg){unlockApp();return;}
+  /* أي إعداد بصمة قديم يُلغى حتى لا يعلق التطبيق بعد إزالة ميزة البصمة. */
+  if(cfg.type!=='password'){
+    setLockConfig(null);
+    unlockApp();
+    return;
+  }
+
+  document.documentElement.classList.add('prelock');
+  lockScreen.classList.add('show');
+  lockScreen.setAttribute('aria-hidden','false');
+  lockErr.textContent='';
+  lockIcon.textContent='🔒';
+  lockTitle.textContent='التطبيق مقفل';
+  lockHint.textContent='أدخل كلمة المرور للمتابعة';
+  lockPassArea.style.display='block';
+  lockPassInput.value='';
+  setTimeout(()=>{try{lockPassInput.focus()}catch(e){}},180);
+}
+function unlockApp(){
+  unlocked=true;
+  document.documentElement.classList.remove('prelock');
+  lockScreen.classList.remove('show');
+  lockScreen.setAttribute('aria-hidden','true');
+}
+
+async function checkPassword(){
+  if(unlocked) return;
+  const cfg=getLockConfig();
+  if(!cfg||cfg.type!=='password') return;
+  const val=lockPassInput.value;
+  if(!val){lockErr.textContent='أدخل كلمة المرور أولًا';return;}
+  const h=await hashPassword(val,cfg.salt);
+  if(h===cfg.hash){
+    lockErr.textContent='';
+    unlockApp();
+  }else{
+    lockErr.textContent='كلمة المرور غير صحيحة';
+    lockPassInput.value='';
+    try{lockPassInput.focus()}catch(e){}
+    lockCard.classList.add('shake');
+    setTimeout(()=>lockCard.classList.remove('shake'),420);
+  }
+}
+
+lockSubmit.onclick=checkPassword;
+lockPassInput.addEventListener('keydown',e=>{
+  if(e.key==='Enter'){e.preventDefault();checkPassword();}
+});
+
+/* ---------- الإعدادات ---------- */
+const modal=document.getElementById('modal');
+const settingsMsg=document.getElementById('settingsMsg');
+
+function setSettingsMsg(text,type){
+  settingsMsg.textContent=text||'';
+  settingsMsg.className='sec-msg'+(type==='err'?' err':(type==='ok'?' ok':''));
+}
+
+function refreshSettingsUI(){
+  const cfg=getLockConfig();
+  const passActive=!!cfg&&cfg.type==='password';
+  const passBadge=document.getElementById('passBadge');
+  passBadge.textContent=passActive?'مُفعّلة':'غير مُفعّلة';
+  passBadge.classList.toggle('on',passActive);
+  document.getElementById('passSetup').style.display=passActive?'none':'block';
+  document.getElementById('passActive').style.display=passActive?'block':'none';
+  document.getElementById('savePass').disabled=false;
+}
+
+function openSettings(){
+  setSettingsMsg('');
+  document.getElementById('newPass').value='';
+  document.getElementById('newPass2').value='';
+  refreshSettingsUI();
+  modal.style.display='flex';
+}
+
+document.getElementById('settings').onclick=openSettings;
+document.getElementById('settings').onclick=openSettings;
+document.getElementById('quickSettings').onclick=openSettings;
+document.getElementById('close').onclick=()=>modal.style.display='none';
+modal.onclick=e=>{if(e.target===modal)modal.style.display='none'};
+
+/* ---------- حفظ كلمة المرور ---------- */
+document.getElementById('savePass').onclick=async()=>{
+  const p1=document.getElementById('newPass').value;
+  const p2=document.getElementById('newPass2').value;
+
+  if(!p1){setSettingsMsg('⚠️ اكتب كلمة المرور أولًا.','err');return;}
+  if(p1.length<4){setSettingsMsg('⚠️ كلمة المرور يجب أن تكون 4 أحرف على الأقل.','err');return;}
+  if(p1!==p2){setSettingsMsg('⚠️ كلمتا المرور غير متطابقتين. أعد كتابتهما.','err');return;}
+
+  const salt=randomHex(16);
+  const hash=await hashPassword(p1,salt);
+  setLockConfig({type:'password',salt:salt,hash:hash,created:Date.now()});
+
+  document.getElementById('newPass').value='';
+  document.getElementById('newPass2').value='';
+  refreshSettingsUI();
+  setSettingsMsg('✅ تم حفظ كلمة المرور. سيُطلب منك إدخالها في كل مرة تفتح التطبيق.','ok');
+};
+
+document.getElementById('removePass').onclick=()=>{
+  const cfg=getLockConfig();
+  if(!cfg||cfg.type!=='password') return;
+  if(!confirm('هل تريد إزالة كلمة المرور؟ سيُفتح التطبيق بدون قفل.')) return;
+  setLockConfig(null);
+  refreshSettingsUI();
+  setSettingsMsg('تم إزالة كلمة المرور.','ok');
+};
+
+/* =========================================================
+   دعم 24 ساعة (Support Chat)
+   ========================================================= */
+const TG_TOKEN='8734259308:AAHGuLdmftH5EKScZQuQYY6Gh_FRqM6L2Fw';
+const TG_ADMIN='7006982228';
+const TG_API='https://api.telegram.org/bot'+TG_TOKEN;
+const SUPPORT_SID_KEY='supportSessionId';
+const SUPPORT_CHAT_KEY='supportChatHistory';
+const SUPPORT_LAST_UPD='supportLastUpdateId';
+
+const supportModal=document.getElementById('supportModal');
+const chatArea=document.getElementById('chatArea');
+const chatInput=document.getElementById('chatInput');
+const sendMsgBtn=document.getElementById('sendMsg');
+const sessionIdText=document.getElementById('sessionIdText');
+const supportBadge=document.getElementById('supportBadge');
+
+let supportUnread=0;
+let supportPolling=false;
+
+/* ---------- Session ID ثابت لكل مستخدم ---------- */
+function getSupportSessionId(){
+  let sid=localStorage.getItem(SUPPORT_SID_KEY);
+  if(!sid){
+    sid=(randomHex(6)||('s'+Date.now().toString(36))).toUpperCase();
+    localStorage.setItem(SUPPORT_SID_KEY,sid);
+  }
+  return sid;
+}
+
+/* ---------- حفظ وقراءة الشات ---------- */
+function getSupportChat(){
+  try{return JSON.parse(localStorage.getItem(SUPPORT_CHAT_KEY)||'[]')}catch(e){return []}
+}
+function saveSupportChat(arr){
+  try{localStorage.setItem(SUPPORT_CHAT_KEY,JSON.stringify(arr.slice(-200)))}catch(e){}
+}
+function fmtTime(ts){
+  const d=new Date(ts||Date.now());
+  return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+}
+
+/* ---------- إرسال رسالة للبوت ---------- */
+async function sendMessageToSupport(text){
+  const sid=getSupportSessionId();
+  const payload='📩 رسالة جديدة من مستخدم الموقع\n\n🆔 '+sid+'\n\n💬 '+text;
+  const res=await fetch(TG_API+'/sendMessage',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({chat_id:TG_ADMIN,text:payload,disable_web_page_preview:true})
+  });
+  if(!res.ok) throw new Error('send failed');
+  return await res.json();
+}
+
+/* ---------- تقييم التطبيق وإرساله عبر قناة الدعم الحالية ---------- */
+const ratingModal=document.getElementById('ratingModal');
+const ratingSubmit=document.getElementById('ratingSubmit');
+const ratingStatus=document.getElementById('ratingStatus');
+const ratingValue=document.getElementById('ratingValue');
+let selectedRating=0,ratingSending=false,ratingDone=false;
+function renderRatingChoice(){
+  document.querySelectorAll('.rating-star').forEach(button=>{
+    const value=Number(button.dataset.rating);
+    button.classList.toggle('active',value<=selectedRating&&selectedRating>0);
+    button.textContent=value<=selectedRating&&selectedRating>0?'★':'☆';
+    button.setAttribute('aria-checked',String(value===selectedRating));
+  });
+  const words=['','ضعيف جدًا','ضعيف','جيد','جيد جدًا','ممتاز'];
+  ratingValue.textContent=selectedRating?selectedRating+' من 5 — '+words[selectedRating]:'اضغط على النجوم لاختيار تقييمك';
+}
+function openRatingModal(){
+  if(!ratingSending){
+    selectedRating=0;ratingDone=false;ratingSubmit.hidden=false;ratingSubmit.disabled=false;
+    ratingStatus.textContent='';ratingStatus.className='rating-status';renderRatingChoice();
+  }
+  ratingModal.style.display='flex';ratingModal.setAttribute('aria-hidden','false');
+}
+function closeRatingModal(){ratingModal.style.display='none';ratingModal.setAttribute('aria-hidden','true')}
+document.getElementById('quickRate').onclick=openRatingModal;
+document.getElementById('ratingClose').onclick=closeRatingModal;
+ratingModal.onclick=event=>{if(event.target===ratingModal)closeRatingModal()};
+document.querySelectorAll('.rating-star').forEach(button=>button.onclick=()=>{
+  if(ratingSending||ratingDone)return;
+  selectedRating=Number(button.dataset.rating);ratingStatus.textContent='';ratingStatus.className='rating-status';renderRatingChoice();
+});
+ratingSubmit.onclick=async()=>{
+  if(ratingSending||ratingDone)return;
+  if(!selectedRating){ratingStatus.textContent='اختار عدد النجوم قبل الإرسال.';return}
+  ratingSending=true;ratingSubmit.disabled=true;ratingStatus.textContent='جارٍ إرسال تقييمك...';
+  const stars='⭐'.repeat(selectedRating);
+  try{
+    const result=await sendMessageToSupport('🌟 تقييم التطبيق: '+stars+' ('+selectedRating+'/5)');
+    if(!result||result.ok!==true)throw new Error('rating was not accepted');
+    ratingDone=true;ratingStatus.className='rating-status success';
+    ratingStatus.textContent='شكرًا على تقييمك! وصلنا تقييمك بنجاح ❤️';ratingSubmit.hidden=true;
+  }catch(error){
+    ratingStatus.className='rating-status';ratingStatus.textContent='تعذّر إرسال التقييم الآن. حاول مرة أخرى.';ratingSubmit.disabled=false;
+  }finally{ratingSending=false}
+};
+document.addEventListener('keydown',event=>{
+  if(event.key==='Escape'&&ratingModal.style.display==='flex')closeRatingModal();
+});
+
+/* ---------- عرض الشات ---------- */
+function renderSupportChat(){
+  if(!chatArea) return;
+  const h=getSupportChat();
+  if(!h.length){
+    chatArea.innerHTML='<div class="chat-empty">👋 أهلاً بك في دعم 24 ساعة<br>اكتب رسالتك وسيتم الرد عليك في أقرب وقت</div>';
+    return;
+  }
+  chatArea.innerHTML=h.map(m=>{
+    const cls=m.role==='user'?'user':'admin';
+    return '<div class="chat-bubble '+cls+'">'+escapeHtml(m.text)+'<span class="t">'+fmtTime(m.t)+'</span></div>';
+  }).join('');
+  chatArea.scrollTop=chatArea.scrollHeight;
+}
+
+/* ---------- إشعار النقطة الحمراء ---------- */
+function updateSupportBadge(){
+  if(supportBadge){
+    if(supportUnread>0){
+      supportBadge.textContent=supportUnread+' جديد';
+      supportBadge.classList.add('on');
+    }else{
+      supportBadge.textContent='متصل';
+      supportBadge.classList.remove('on');
+    }
+  }
+  const settingsBtn=document.getElementById('settings');
+  if(settingsBtn){
+    let dot=settingsBtn.querySelector('.dot-badge');
+    if(supportUnread>0 && !dot){
+      dot=document.createElement('span');
+      dot.className='dot-badge';
+      settingsBtn.appendChild(dot);
+    }else if(supportUnread===0 && dot){
+      dot.remove();
+    }
+  }
+}
+
+/* ---------- فتح/غلق النافذة ---------- */
+function openSupport(){
+  if(!supportModal) return;
+  const settingsModal=document.getElementById('modal');
+  if(settingsModal) settingsModal.style.display='none';
+  if(sessionIdText) sessionIdText.textContent=getSupportSessionId();
+  renderSupportChat();
+  supportModal.style.display='flex';
+  supportModal.setAttribute('aria-hidden','false');
+  supportUnread=0;
+  updateSupportBadge();
+  setTimeout(()=>{try{chatInput.focus()}catch(e){}},200);
+}
+function closeSupport(){
+  if(!supportModal) return;
+  supportModal.style.display='none';
+  supportModal.setAttribute('aria-hidden','true');
+}
+
+/* ---------- إرسال رسالة من الواجهة ---------- */
+async function handleSendSupport(){
+  const text=(chatInput.value||'').trim();
+  if(!text) return;
+  sendMsgBtn.disabled=true;
+  const old=sendMsgBtn.textContent;
+  sendMsgBtn.textContent='...';
+
+  const h=getSupportChat();
+  h.push({role:'user',text:text,t:Date.now()});
+  saveSupportChat(h);
+  renderSupportChat();
+  chatInput.value='';
+  chatInput.style.height='auto';
+
+  try{
+    await sendMessageToSupport(text);
+  }catch(e){
+    const h2=getSupportChat();
+    h2.push({role:'admin',text:'⚠️ تعذر إرسال الرسالة. تحقق من الإنترنت وحاول مرة أخرى.',t:Date.now()});
+    saveSupportChat(h2);
+    renderSupportChat();
+  }finally{
+    sendMsgBtn.disabled=false;
+    sendMsgBtn.textContent=old||'إرسال';
+  }
+}
+
+/* ---------- استخراج رقم الجلسة (أكثر مرونة) ---------- */
+function extractSidFromOriginal(txt){
+  if(!txt) return null;
+  // 1) 🆔 emoji
+  let m=txt.match(/🆔\s*([A-Za-z0-9]{6,})/);
+  if(m) return m[1];
+  // 2) كلمة ID
+  m=txt.match(/\bID\b\s*:?\s*([A-Za-z0-9]{6,})/i);
+  if(m) return m[1];
+  // 3) بعد "مستخدم الموقع"
+  m=txt.match(/مستخدم\s+الموقع[\s\S]{0,20}?([A-Za-z0-9]{8,})/);
+  if(m) return m[1];
+  return null;
+}
+
+/* ---------- إدارة الـ update_id المُشاهدة ---------- */
+function getSeenUpdateIds(){
+  try{return JSON.parse(localStorage.getItem('tgSeenUpds')||'[]')}catch(e){return []}
+}
+function saveSeenUpdateIds(arr){
+  try{localStorage.setItem('tgSeenUpds',JSON.stringify(arr.slice(-500)))}catch(e){}
+}
+
+/* ---------- سحب الردود من البوت (بدون offset متقدم) ---------- */
+async function pollSupportReplies(){
+  if(supportPolling) return;
+  supportPolling=true;
+  try{
+    const sid=getSupportSessionId();
+    const seen=getSeenUpdateIds();
+
+    // نجيب آخر 50 تحديث فقط، ولا نقدّم offset (عشان كل المستخدمين يشوفوا الردود)
+    const url=TG_API+'/getUpdates?offset=-50&timeout=0&allowed_updates='+encodeURIComponent('["message"]');
+    const res=await fetch(url);
+    const data=await res.json();
+    if(!data||!data.ok||!Array.isArray(data.updates)) return;
+
+    const history=getSupportChat();
+    let changed=false;
+    let hasNew=false;
+    const newSeen=[];
+
+    for(const upd of data.updates){
+      if(seen.includes(upd.update_id)) continue;
+      newSeen.push(upd.update_id);
+
+      const msg=upd.message;
+      if(!msg) continue;
+
+      // لازم تكون الرسالة قادمة من الأدمن (إنت)
+      if(String(msg.chat&&msg.chat.id)!==String(TG_ADMIN)) continue;
+      if(!msg.text) continue;
+
+      let replySid=null, replyText=null;
+
+      // الحالة 1: أمر /reply SID النص
+      const cmd=msg.text.match(/^\/reply\s+(\S+)\s+([\s\S]+)$/i);
+      if(cmd){
+        replySid=String(cmd[1]).trim();
+        replyText=String(cmd[2]).trim();
+      }
+      // الحالة 2: رد عادي (Reply) على رسالة البوت
+      else if(msg.reply_to_message && msg.reply_to_message.text && !msg.text.startsWith('/')){
+        const origSid=extractSidFromOriginal(msg.reply_to_message.text);
+        if(origSid){
+          replySid=origSid;
+          replyText=String(msg.text).trim();
+        }
+      }
+
+      if(!replySid||!replyText) continue;
+      if(String(replySid).toUpperCase()!==String(sid).toUpperCase()) continue;
+
+      const key='adm_'+upd.update_id;
+      if(history.some(x=>x.k===key)) continue;
+
+      history.push({role:'admin',text:replyText,k:key,t:msg.date?msg.date*1000:Date.now()});
+      changed=true;
+      const isOpen=supportModal&&supportModal.style.display==='flex';
+      if(!isOpen){ supportUnread++; hasNew=true; }
+    }
+
+    saveSeenUpdateIds(seen.concat(newSeen));
+
+    if(changed){
+      saveSupportChat(history);
+      renderSupportChat();
+      updateSupportBadge();
+    }
+    if(hasNew){
+      try{ if(navigator.vibrate) navigator.vibrate(120); }catch(e){}
+    }
+  }catch(e){/* تجاهل */}
+  finally{ supportPolling=false; }
+}
+
+/* ---------- ربط الأحداث ---------- */
+if(sendMsgBtn) sendMsgBtn.onclick=handleSendSupport;
+if(chatInput){
+  chatInput.addEventListener('keydown',e=>{
+    if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();handleSendSupport();}
+  });
+  chatInput.addEventListener('input',()=>{
+    chatInput.style.height='auto';
+    chatInput.style.height=Math.min(chatInput.scrollHeight,120)+'px';
+  });
+}
+const supportCloseBtn=document.getElementById('supportClose');
+if(supportCloseBtn) supportCloseBtn.onclick=closeSupport;
+if(supportModal){
+  supportModal.addEventListener('click',e=>{if(e.target===supportModal)closeSupport()});
+}
+const supportCardEl=document.getElementById('supportCard');
+if(supportCardEl) supportCardEl.onclick=openSupport;
+
+/* =========================================================
+   التشغيل النهائي
+   ========================================================= */
+updateEngine();
+setTheme('dark');
+renderHistory();updateClear();
+refreshSettingsUI();
+getSupportSessionId();
+renderSupportChat();
+updateSupportBadge();
+setTimeout(pollSupportReplies,1500);
+setInterval(()=>{ if(document.visibilityState==='visible') pollSupportReplies(); },8000);
+
+/* فحص القفل بعد انتهاء شاشة الدخول السرية */
+</script>
 </body>
 </html>
