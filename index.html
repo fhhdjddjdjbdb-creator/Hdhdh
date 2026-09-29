@@ -933,7 +933,9 @@ function renderHistory(){
 /* ============ أحداث البحث ============ */
 document.getElementById('form').onsubmit=e=>{
   e.preventDefault();const q=input.value.trim();if(!q)return;
-  saveHistory(q);location.href=SEARCH_ENGINES[engine].url(q);
+  saveHistory(q);
+  const provider=SEARCH_ENGINES[engine]||SEARCH_ENGINES.google;
+  location.assign(provider.url(q));
 };
 clearBtn.onclick=()=>{input.value='';updateClear();input.focus()};
 input.oninput=updateClear;
@@ -1081,6 +1083,14 @@ function setBioConfig(cfg){
   if(cfg)localStorage.setItem(BIO_KEY,JSON.stringify(cfg));
   else localStorage.removeItem(BIO_KEY);
 }
+function disablePasswordForBiometric(){
+  // لا نسمح بتفعيل كلمتي مرور وبصمة معًا.
+  setLockConfig(null);
+}
+function disableBiometricForPassword(){
+  // عند اختيار كلمة المرور تُلغى البصمة القديمة فورًا.
+  setBioConfig(null);
+}
 function bioSupported(){
   return !!(window.isSecureContext && window.PublicKeyCredential &&
     navigator.credentials && typeof navigator.credentials.create==='function' &&
@@ -1121,7 +1131,7 @@ function updateBioUI(){
     bioUnavailable.textContent='';
   }
   const note=document.getElementById('bioCardNote');
-  if(note)note.textContent=active?'البصمة مفعّلة وسيطلبها التطبيق عند كل فتح.':'فعّل البصمة ليطلب التطبيق بصمة الجهاز عند كل فتح.';
+  if(note)note.textContent=active?'البصمة مفعّلة. كلمة المرور غير مفعّلة وسيطلب التطبيق البصمة عند الفتح.':'فعّل البصمة ليطلب التطبيق بصمة الجهاز عند كل فتح. تفعيلها يلغي كلمة المرور.';
 }
 function startNativeBiometric(){
   if(window.AndroidBiometric && typeof window.AndroidBiometric.authenticateBiometric==='function'){
@@ -1180,6 +1190,7 @@ async function registerBiometric(){
     });
     if(!credential)throw new Error('no-credential');
     const rawId=new Uint8Array(credential.rawId);
+    disablePasswordForBiometric();
     setBioConfig({
       type:'webauthn',
       credentialId:bytesToBase64url(rawId),
@@ -1221,8 +1232,14 @@ async function verifyBiometric(){
   }
 }
 if(addBioBtn)addBioBtn.onclick=()=>{
-  // ضغطة واحدة داخل APK تفتح نافذة البصمة الأصلية مباشرة.
-  if(!startNativeBiometric()) openBioIntro();
+  // البصمة وكلمة المرور خياران متنافيان؛ عند اختيار البصمة تُلغى كلمة المرور.
+  if(window.AndroidBiometric && typeof window.AndroidBiometric.authenticateBiometric==='function'){
+    disablePasswordForBiometric();
+    refreshSettingsUI();
+    startNativeBiometric();
+  }else{
+    openBioIntro();
+  }
 };
 if(bioIntroClose)bioIntroClose.onclick=registerBiometric;
 if(bioIntroModal)bioIntroModal.onclick=e=>{if(e.target===bioIntroModal)closeBioIntro()};
@@ -1258,7 +1275,12 @@ async function hashPassword(password,salt){
 /* ---------- شاشة القفل ---------- */
 async function showLockScreen(){
   const bioCfg=getBioConfig();
-  const passCfg=getLockConfig();
+  let passCfg=getLockConfig();
+  // معالجة أي إعداد قديم جمع بين الخيارين: البصمة لها الأولوية.
+  if(bioCfg&&passCfg){
+    disablePasswordForBiometric();
+    passCfg=null;
+  }
 
   // قفل APK: لا تظهر الواجهة الرئيسية إلا بعد نجاح البصمة الأصلية.
   if(bioCfg&&bioCfg.type==='native'&&window.AndroidBiometric){
@@ -1401,12 +1423,13 @@ document.getElementById('savePass').onclick=async()=>{
 
   const salt=randomHex(16);
   const hash=await hashPassword(p1,salt);
+  disableBiometricForPassword();
   setLockConfig({type:'password',salt:salt,hash:hash,created:Date.now()});
 
   document.getElementById('newPass').value='';
   document.getElementById('newPass2').value='';
   refreshSettingsUI();
-  setSettingsMsg('✅ تم حفظ كلمة المرور. سيُطلب منك إدخالها في كل مرة تفتح التطبيق.','ok');
+  setSettingsMsg('✅ تم حفظ كلمة المرور وإلغاء البصمة. سيُطلب إدخالها عند فتح التطبيق.','ok');
 };
 
 document.getElementById('removePass').onclick=()=>{
