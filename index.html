@@ -207,16 +207,7 @@ body{
 .lock-screen{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;background:#02040d;padding:20px}
 .lock-screen.show{display:flex}
 html.prelock .lock-screen.show{display:flex}
-html.prelock body > *:not(.lock-screen):not(.splash-screen):not(.tap-gate){display:none!important}
-.tap-gate{position:fixed;inset:0;z-index:95;display:none;align-items:center;justify-content:center;background:#02040d;padding:20px}
-.tap-gate.show{display:flex}
-.tap-gate-card{width:min(420px,100%);background:#080b20;border:2px solid #6030d8;border-radius:26px;padding:30px 22px;text-align:center;box-shadow:0 0 35px rgba(82,0,255,.32);cursor:pointer;user-select:none}
-.tap-gate-icon{font-size:58px;line-height:1;margin-bottom:10px;text-shadow:0 0 18px rgba(210,40,255,.55)}
-.tap-gate-title{font-size:23px;font-weight:800;margin:7px 0 10px}
-.tap-gate-hint{color:var(--muted);font-size:14px;line-height:1.8;margin:0}
-.tap-gate-status{min-height:24px;color:#ff9aa8;font-size:13px;line-height:1.7;margin:14px 0 0}
-.tap-gate-card.is-busy{opacity:.7;cursor:wait}
-
+html.prelock body > *:not(.lock-screen):not(.splash-screen){display:none!important}
 .lock-card{
   width:min(420px,100%);background:#080b20;border:2px solid #6030d8;
   border-radius:26px;padding:28px 22px;text-align:center;box-shadow:0 0 35px rgba(82,0,255,.32)
@@ -534,16 +525,6 @@ body::before{
 
 <audio id="splashGreetingAudio" src="incognito-welcome.wav" preload="auto" autoplay aria-hidden="true"></audio>
 
-<!-- ================== بوابة الضغطة الواحدة ================== -->
-<div class="tap-gate" id="tapGate" aria-hidden="true">
-  <div class="tap-gate-card" id="tapGateCard" role="button" tabindex="0" aria-label="اضغط مرة واحدة لفتح البصمة">
-    <div class="tap-gate-icon" aria-hidden="true">☝️</div>
-    <div class="tap-gate-title">اضغط مرة واحدة</div>
-    <p class="tap-gate-hint">اضغط ضغطة واحدة لإظهار البصمة.<br>الضغط مرتين لا يفتح نافذة البصمة.</p>
-    <div class="tap-gate-status" id="tapGateStatus" role="status" aria-live="polite"></div>
-  </div>
-</div>
-
 <!-- ================== شاشة القفل ================== -->
 <div class="lock-screen" id="lockScreen" aria-hidden="true">
   <div class="lock-card" id="lockCard">
@@ -807,56 +788,7 @@ function rememberFirstRunSetup(){
   try{localStorage.setItem(FIRST_RUN_SETUP_KEY,'done');return}catch(e){}
   try{sessionStorage.setItem(FIRST_RUN_SETUP_KEY,'done')}catch(e){}
 }
-const tapGate=document.getElementById('tapGate');
-const tapGateCard=document.getElementById('tapGateCard');
-const tapGateStatus=document.getElementById('tapGateStatus');
-let tapCount=0,tapTimer=null,tapGateBusy=false;
-let welcomeAfterUnlock=false;
-function hideTapGate(){
-  if(tapGate){tapGate.classList.remove('show');tapGate.setAttribute('aria-hidden','true')}
-  tapCount=0;
-  if(tapTimer){clearTimeout(tapTimer);tapTimer=null}
-}
-function showTapGate(){
-  hideTapGate();
-  tapGateBusy=false;
-  if(tapGateCard)tapGateCard.classList.remove('is-busy');
-  if(tapGateStatus)tapGateStatus.textContent='';
-  if(tapGate){tapGate.classList.add('show');tapGate.setAttribute('aria-hidden','false')}
-  document.documentElement.classList.add('prelock');
-}
-function handleTapGate(){
-  if(tapGateBusy)return;
-  tapCount++;
-  if(tapCount>=2){
-    if(tapTimer){clearTimeout(tapTimer);tapTimer=null}
-    tapCount=0;
-    if(tapGateStatus)tapGateStatus.textContent='تم تجاهل الضغطتين. استخدم ضغطة واحدة فقط.';
-    return;
-  }
-  tapTimer=window.setTimeout(()=>{
-    tapTimer=null;
-    if(tapCount!==1)return;
-    tapCount=0;
-    tapGateBusy=true;
-    if(tapGateCard)tapGateCard.classList.add('is-busy');
-    if(tapGateStatus)tapGateStatus.textContent='جارٍ فتح البصمة…';
-    welcomeAfterUnlock=true;
-    hideTapGate();
-    showLockScreen();
-  },340);
-}
-if(tapGateCard){
-  tapGateCard.addEventListener('click',handleTapGate);
-  tapGateCard.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' ') {e.preventDefault();handleTapGate()}});
-}
-function revealApp(){
-  unlocked=true;
-  document.documentElement.classList.remove('prelock');
-  if(lockScreen){lockScreen.classList.remove('show');lockScreen.setAttribute('aria-hidden','true')}
-  hideTapGate();
-}
-function startSecretSplash(lockAfter=true){
+function startSecretSplash(){
   if(firstRunScreen){firstRunScreen.classList.add('is-hidden');firstRunScreen.setAttribute('aria-hidden','true')}
   if(splashScreen){splashScreen.classList.remove('is-hidden');splashScreen.setAttribute('aria-hidden','false')}
   if(splashAudioButton){splashAudioButton.hidden=false;splashAudioButton.disabled=false}
@@ -865,7 +797,7 @@ function startSecretSplash(lockAfter=true){
   window.setTimeout(()=>{
     clearSplashGreetingRetry();
     if(splashScreen){splashScreen.classList.add('is-hidden');splashScreen.setAttribute('aria-hidden','true')}
-    if(lockAfter)showLockScreen();else revealApp();
+    showLockScreen();
   },5000);
 }
 function startFirstRunSetup(){
@@ -902,8 +834,7 @@ if(isHistoryTraversal()){
   window.setTimeout(showLockScreen,0);
 }else if(hasCompletedFirstRunSetup()){
   if(firstRunScreen){firstRunScreen.classList.add('is-hidden');firstRunScreen.setAttribute('aria-hidden','true')}
-  // بعد أول تهيئة: لا نعرض الترحيب قبل البصمة؛ ننتظر ضغطة واحدة فقط.
-  showTapGate();
+  startSecretSplash();
 }else{
   if(firstRunScreen){firstRunScreen.classList.remove('is-hidden');firstRunScreen.setAttribute('aria-hidden','false')}
   if(splashScreen){splashScreen.classList.add('is-hidden');splashScreen.setAttribute('aria-hidden','true')}
@@ -1337,14 +1268,12 @@ async function showLockScreen(){
     lockErr.textContent='';
     lockIcon.textContent='🔒';
     lockTitle.textContent='التطبيق مقفول';
-    lockHint.textContent='ضع إصبعك على المستشعر للمتابعة';
+    lockHint.textContent='اضغط الزر بالأسفل لفتح التطبيق بالبصمة';
     lockPassArea.style.display='block';
     lockPassInput.style.display='none';
     lockSubmit.style.display='block';
     lockSubmit.textContent='فتح بالبصمة';
     lockSubmit.onclick=()=>startNativeBiometric();
-    // في مسار الضغطة الواحدة تُفتح نافذة البصمة فورًا، مع إبقاء زر إعادة المحاولة.
-    if(welcomeAfterUnlock)window.setTimeout(()=>startNativeBiometric(),0);
     return;
   }
 
@@ -1397,13 +1326,10 @@ async function showLockScreen(){
   setTimeout(()=>{try{lockPassInput.focus()}catch(e){}},180);
 }
 function unlockApp(){
-  if(welcomeAfterUnlock){
-    welcomeAfterUnlock=false;
-    if(lockScreen){lockScreen.classList.remove('show');lockScreen.setAttribute('aria-hidden','true')}
-    startSecretSplash(false);
-    return;
-  }
-  revealApp();
+  unlocked=true;
+  document.documentElement.classList.remove('prelock');
+  lockScreen.classList.remove('show');
+  lockScreen.setAttribute('aria-hidden','true');
 }
 
 async function checkPassword(){
