@@ -83,6 +83,19 @@ body{
   position:absolute;right:20px;top:50%;transform:translateY(-50%);
   font-size:30px;color:#d84dff;text-shadow:0 0 10px #c000ff
 }
+.voice-btn{position:absolute;left:8px;top:50%;transform:translateY(-50%);z-index:2;width:44px;height:44px;display:grid;place-items:center;padding:0;border:1px solid rgba(255,116,133,.62);border-radius:50%;background:radial-gradient(circle at 35% 25%,#57202a,#1c080e 72%);color:#ffdce1;cursor:pointer;box-shadow:0 0 14px rgba(255,55,82,.22),inset 0 0 12px rgba(255,140,155,.08);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.voice-btn svg{width:22px;height:22px;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;fill:none}
+.voice-btn:hover{transform:translateY(-50%) scale(1.06);border-color:#ff9aa7;box-shadow:0 0 20px rgba(255,55,82,.42)}
+.voice-btn:focus-visible{outline:2px solid #ffd0d7;outline-offset:3px}
+.voice-btn.is-listening{border-color:#ff8293;background:radial-gradient(circle,#aa233d,#390b17 75%);color:#fff;animation:voicePulse 1.25s ease-in-out infinite}
+.voice-btn.is-listening::after{content:"";position:absolute;inset:-4px;border:1px solid rgba(255,115,137,.72);border-radius:50%;animation:voiceRing 1.35s ease-out infinite;pointer-events:none}
+.voice-status{display:none;color:#e6b7be;text-align:center;font-size:12px;line-height:1.7}
+.voice-status:not(:empty){display:block;min-height:20px;margin:7px 5px 0}
+.voice-status.is-error{color:#ff9aa8}
+.voice-status.is-ready{color:#ffd0d6}
+@keyframes voicePulse{50%{box-shadow:0 0 22px rgba(255,58,87,.52),inset 0 0 14px rgba(255,190,199,.16)}}
+@keyframes voiceRing{0%{transform:scale(.85);opacity:.75}100%{transform:scale(1.55);opacity:0}}
+@media(prefers-reduced-motion:reduce){.voice-btn.is-listening,.voice-btn.is-listening::after{animation:none}}
 
 .actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
 .btn{
@@ -339,6 +352,7 @@ html.first-run-complete .first-run-screen{display:none!important}
 }
 @media(max-width:330px){
   .actions,.quick{grid-template-columns:1fr}
+  .search{padding-left:92px}.clear{left:48px;width:38px}.voice-btn{left:7px;width:36px;height:36px}
 }
 
 /* ============ الثيم الأحمر + نقاط خلفية متحركة ============ */
@@ -540,7 +554,9 @@ body::before{
       <span class="search-icon">⌕</span>
       <input id="input" class="search" placeholder="إبحث الآن في Google..." autocomplete="off">
       <button type="button" class="clear" id="clear">×</button>
+      <button type="button" class="voice-btn" id="voiceSearchButton" aria-label="بدء البحث الصوتي بالعربية" aria-pressed="false" title="بحث صوتي بالعربية"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3"></rect><path d="M5 11v1a7 7 0 0 0 14 0v-1M12 19v3m-4 0h8"></path></svg></button>
     </div>
+    <p class="voice-status" id="voiceStatus" role="status" aria-live="polite"></p>
     <div class="actions">
       <button class="btn primary" type="submit">⌕ بحث</button>
       <button class="btn" type="button" id="open">↗ فتح الرابط</button>
@@ -886,6 +902,83 @@ document.getElementById('form').onsubmit=e=>{
 };
 clearBtn.onclick=()=>{input.value='';updateClear();input.focus()};
 input.oninput=updateClear;
+
+/* ============ البحث الصوتي بالعربية ============ */
+const voiceSearchButton=document.getElementById('voiceSearchButton');
+const voiceStatus=document.getElementById('voiceStatus');
+let voiceRecognition=null,voiceListening=false,voiceHasFinal=false,voiceRecognitionError=false;
+function setVoiceStatus(text,type){
+  if(!voiceStatus)return;
+  voiceStatus.textContent=text||'';
+  voiceStatus.className='voice-status'+(type==='error'?' is-error':(type==='ready'?' is-ready':''));
+}
+function setVoiceListening(active){
+  voiceListening=active;
+  if(!voiceSearchButton)return;
+  voiceSearchButton.classList.toggle('is-listening',active);
+  voiceSearchButton.setAttribute('aria-pressed',String(active));
+  voiceSearchButton.setAttribute('aria-label',active?'إيقاف الاستماع الصوتي':'بدء البحث الصوتي بالعربية');
+  voiceSearchButton.title=active?'إيقاف الاستماع':'بحث صوتي بالعربية';
+}
+function voiceRecognitionErrorMessage(code){
+  const messages={
+    'not-allowed':'إذن الميكروفون مرفوض. اسمح به من إعدادات المتصفح أو التطبيق ثم حاول مجددًا.',
+    'service-not-allowed':'خدمة التعرّف الصوتي غير مسموح بها في هذا المتصفح.',
+    'audio-capture':'تعذر الوصول إلى الميكروفون. تحقق من إعدادات الجهاز والتطبيق.',
+    'no-speech':'لم أسمع كلامًا واضحًا. اضغط الميكروفون وحاول مرة أخرى.',
+    'network':'تعذر الاتصال بخدمة التعرّف الصوتي. تحقق من الإنترنت وحاول مجددًا.',
+    'language-not-supported':'التعرّف على العربية غير متاح في خدمة هذا المتصفح.'
+  };
+  return messages[code]||'تعذر بدء البحث الصوتي. تحقق من إذن الميكروفون ثم حاول مرة أخرى.';
+}
+function createVoiceRecognition(){
+  const Recognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!Recognition){
+    setVoiceStatus('المتصفح أو WebView الحالي لا يدعم التعرّف الصوتي. جرّب الإملاء الصوتي من لوحة مفاتيح الهاتف أو افتح الموقع في متصفح يدعم الميزة.','error');
+    return false;
+  }
+  try{voiceRecognition=new Recognition()}catch(e){setVoiceStatus('تعذر تشغيل خدمة التعرّف الصوتي في هذا المتصفح.','error');return false}
+  voiceRecognition.lang='ar-EG';
+  voiceRecognition.continuous=false;
+  voiceRecognition.interimResults=true;
+  voiceRecognition.maxAlternatives=1;
+  voiceRecognition.onstart=()=>{
+    voiceHasFinal=false;voiceRecognitionError=false;setVoiceListening(true);
+    setVoiceStatus('أستمع الآن بالعربية… تحدث بوضوح. قد يعالج المتصفح الصوت عبر خدمة على الإنترنت.');
+  };
+  voiceRecognition.onresult=event=>{
+    let transcript='';
+    for(let i=0;i<event.results.length;i++){
+      const result=event.results[i];
+      if(result&&result[0])transcript+=result[0].transcript+' ';
+      if(result&&result.isFinal)voiceHasFinal=true;
+    }
+    transcript=transcript.replace(/\s+/g,' ').trim();
+    if(transcript){input.value=transcript;updateClear()}
+  };
+  voiceRecognition.onerror=event=>{
+    voiceRecognitionError=true;
+    setVoiceStatus(voiceRecognitionErrorMessage(event.error),'error');
+  };
+  voiceRecognition.onnomatch=()=>{
+    voiceRecognitionError=true;
+    setVoiceStatus('لم أتمكن من فهم الكلام. حاول التحدث بوضوح وبالعربية.','error');
+  };
+  voiceRecognition.onend=()=>{
+    setVoiceListening(false);
+    if(voiceRecognitionError)return;
+    if(voiceHasFinal&&input.value.trim())setVoiceStatus('تم التعرّف على الكلام. راجع النص ثم اضغط «بحث».','ready');
+    else setVoiceStatus('لم ألتقط كلامًا واضحًا. اضغط الميكروفون وحاول مرة أخرى.','error');
+  };
+  return true;
+}
+if(voiceSearchButton)voiceSearchButton.addEventListener('click',()=>{
+  if(voiceListening){try{voiceRecognition.stop()}catch(e){}return}
+  if(!voiceRecognition&&!createVoiceRecognition())return;
+  voiceRecognitionError=false;voiceHasFinal=false;
+  try{voiceRecognition.start()}
+  catch(e){setVoiceListening(false);setVoiceStatus('تعذر بدء الاستماع. تأكد من أن الميكروفون غير مستخدم في تطبيق آخر، ثم حاول مجددًا.','error')}
+});
 
 document.getElementById('copy').onclick=async()=>{
   const q=input.value.trim();if(!q)return;
