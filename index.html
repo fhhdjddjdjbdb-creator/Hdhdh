@@ -6,7 +6,7 @@
 <title>متصفح خفي</title>
 <script>
 /* منع ظهور المحتوى قبل التحقق من القفل */
-try{if(localStorage.getItem('appLockConfig')||localStorage.getItem('appBiometricConfig'))document.documentElement.classList.add('prelock')}catch(e){}
+try{if(localStorage.getItem('appLockConfig'))document.documentElement.classList.add('prelock')}catch(e){}
 try{if(localStorage.getItem('incognitoFirstRunSetupComplete')==='done'||sessionStorage.getItem('incognitoFirstRunSetupComplete')==='done')document.documentElement.classList.add('first-run-complete')}catch(e){}
 </script>
 <style>
@@ -219,7 +219,6 @@ html.prelock body > *:not(.lock-screen):not(.splash-screen){display:none!importa
 .lock-btn.ghost{background:#0b0f27;border-color:#3a3d92;color:var(--text)}
 .lock-btn:disabled{opacity:.6;cursor:wait}
 .lock-err{color:#ff5b76;font-size:13px;min-height:20px;margin-bottom:8px;line-height:1.7}
-.bio-icon{font-size:56px;margin-bottom:6px}
 .shake{animation:shake .38s}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-9px)}60%{transform:translateX(9px)}}
 
@@ -628,23 +627,7 @@ body::before{
         <button class="engine-option" type="button" data-engine="yahoo" aria-pressed="false"><img class="engine-mark" alt=""><span class="engine-option-copy"><strong>Yahoo Search</strong><small>بحث عام</small></span><span class="engine-check" aria-hidden="true">✓</span></button>
       </div>
     </div>
-
-    <!-- البصمة -->
-    <div class="sec-card" id="bioCard">
-      <div class="sec-head">
-        <span>🔐 إضافة بصمة لتأمين التطبيق</span>
-        <span class="badge" id="bioBadge">غير مُفعّلة</span>
-      </div>
-      <div class="sec-note" id="bioCardNote">فعّل البصمة ليطلب التطبيق بصمة الجهاز عند كل فتح.</div>
-      <div id="bioActive" style="display:none">
-        <button class="btn" id="removeBio" type="button">إزالة بصمة التطبيق</button>
-        <div class="sec-note">✅ البصمة مُفعّلة. ستظهر مطالبة البصمة عند فتح التطبيق.</div>
-      </div>
-      <div id="bioUnavailable" class="sec-msg err" style="display:none"></div>
-      <button class="btn primary" id="addBio" type="button">إضافة بصمة</button>
-    </div>
-
-    <!-- دعم 24 ساعة -->
+<!-- دعم 24 ساعة -->
     <div class="sec-card clickable" id="supportCard">
       <div class="sec-head">
         <span>💬 دعم 24 ساعة</span>
@@ -660,27 +643,6 @@ body::before{
     </div>
   </div>
 </div>
-
-<!-- ================== شرح إضافة البصمة ================== -->
-<div class="modal" id="bioIntroModal" aria-hidden="true">
-  <div class="modal-box">
-    <div class="bio-setup-icon" aria-hidden="true">♧</div>
-    <h3 class="bio-setup-title">تأمين التطبيق بالبصمة</h3>
-    <p class="bio-setup-copy">
-      عند تفعيل هذه الميزة سيطلب التطبيق التحقق ببصمة الجهاز عند فتحه.
-      البصمة نفسها لا يتم حفظها داخل الموقع.
-    </p>
-    <ul class="bio-points">
-      <li>سيتم فتح نافذة البصمة الرسمية الخاصة بجهازك.</li>
-      <li>ضع إصبعك على مستشعر البصمة وأكمل التحقق.</li>
-      <li>بعد نجاح التفعيل ستصبح البصمة هي طريقة الدخول عند فتح التطبيق.</li>
-    </ul>
-    <div class="close-row">
-      <button id="bioIntroClose" type="button">إغلاق</button>
-    </div>
-  </div>
-</div>
-
 <!-- ================== نافذة دعم 24 ساعة ================== -->
 <div class="modal" id="supportModal" aria-hidden="true">
   <div class="modal-box support-box">
@@ -1062,176 +1024,6 @@ function setLockConfig(cfg){
   else localStorage.removeItem(LOCK_KEY);
 }
 
-/* =========================================================
-   نظام قفل التطبيق: البصمة عبر WebAuthn
-   ========================================================= */
-const BIO_KEY='appBiometricConfig';
-const bioIntroModal=document.getElementById('bioIntroModal');
-const bioIntroClose=document.getElementById('bioIntroClose');
-const addBioBtn=document.getElementById('addBio');
-const removeBioBtn=document.getElementById('removeBio');
-const bioBadge=document.getElementById('bioBadge');
-const bioActive=document.getElementById('bioActive');
-const bioUnavailable=document.getElementById('bioUnavailable');
-
-function getBioConfig(){
-  try{return JSON.parse(localStorage.getItem(BIO_KEY)||'null')}catch(e){return null}
-}
-function setBioConfig(cfg){
-  if(cfg)localStorage.setItem(BIO_KEY,JSON.stringify(cfg));
-  else localStorage.removeItem(BIO_KEY);
-}
-function bioSupported(){
-  return !!(window.isSecureContext && window.PublicKeyCredential &&
-    navigator.credentials && typeof navigator.credentials.create==='function' &&
-    typeof navigator.credentials.get==='function');
-}
-function bytesToBase64url(bytes){
-  let bin='';
-  const arr=bytes instanceof Uint8Array?bytes:new Uint8Array(bytes);
-  for(let i=0;i<arr.length;i++)bin+=String.fromCharCode(arr[i]);
-  return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
-}
-function base64urlToBytes(str){
-  const pad='='.repeat((4-str.length%4)%4);
-  const bin=atob(str.replace(/-/g,'+').replace(/_/g,'/')+pad);
-  const out=new Uint8Array(bin.length);
-  for(let i=0;i<bin.length;i++)out[i]=bin.charCodeAt(i);
-  return out;
-}
-function randomBytes(n){
-  const out=new Uint8Array(n);
-  crypto.getRandomValues(out);
-  return out;
-}
-function getRpId(){
-  try{return location.hostname||'localhost'}catch(e){return 'localhost'}
-}
-function updateBioUI(){
-  const active=!!getBioConfig();
-  if(bioBadge){
-    bioBadge.textContent=active?'مُفعّلة':'غير مُفعّلة';
-    bioBadge.classList.toggle('on',active);
-  }
-  if(bioActive)bioActive.style.display=active?'block':'none';
-  if(addBioBtn)addBioBtn.style.display=active?'none':'block';
-  // داخل APK تتم المصادقة عبر BiometricPrompt الأصلي، لذلك لا نعرض رسالة WebAuthn.
-  if(bioUnavailable){
-    bioUnavailable.style.display='none';
-    bioUnavailable.textContent='';
-  }
-  const note=document.getElementById('bioCardNote');
-  if(note)note.textContent=active?'البصمة مفعّلة وسيطلبها التطبيق عند كل فتح.':'فعّل البصمة ليطلب التطبيق بصمة الجهاز عند كل فتح.';
-}
-function startNativeBiometric(){
-  if(window.AndroidBiometric && typeof window.AndroidBiometric.authenticateBiometric==='function'){
-    window.AndroidBiometric.authenticateBiometric();
-    return true;
-  }
-  return false;
-}
-function openBioIntro(){
-  if(startNativeBiometric()) return;
-  if(!bioSupported()){
-    updateBioUI();
-    setSettingsMsg('⚠️ هذا المتصفح أو التطبيق لا يدعم بصمة الجهاز عبر WebAuthn.','err');
-    return;
-  }
-  if(bioIntroModal){
-    bioIntroModal.style.display='flex';
-    bioIntroModal.setAttribute('aria-hidden','false');
-  }
-}
-function closeBioIntro(){
-  if(bioIntroModal){
-    bioIntroModal.style.display='none';
-    bioIntroModal.setAttribute('aria-hidden','true');
-  }
-}
-async function registerBiometric(){
-  if(!bioSupported()){
-    setSettingsMsg('⚠️ البصمة غير مدعومة في بيئة التشغيل الحالية.','err');
-    return;
-  }
-  if(!window.isSecureContext){
-    setSettingsMsg('⚠️ يجب تشغيل الموقع عبر HTTPS حتى تعمل البصمة.','err');
-    return;
-  }
-  try{
-    const challenge=randomBytes(32);
-    const userId=randomBytes(16);
-    const credential=await navigator.credentials.create({
-      publicKey:{
-        challenge,
-        rp:{name:'متصفح خفي',id:getRpId()},
-        user:{id:userId,name:'app-user',displayName:'مستخدم التطبيق'},
-        pubKeyCredParams:[
-          {type:'public-key',alg:-7},
-          {type:'public-key',alg:-257}
-        ],
-        authenticatorSelection:{
-          authenticatorAttachment:'platform',
-          residentKey:'preferred',
-          userVerification:'required'
-        },
-        timeout:60000,
-        attestation:'none'
-      }
-    });
-    if(!credential)throw new Error('no-credential');
-    const rawId=new Uint8Array(credential.rawId);
-    setBioConfig({
-      type:'webauthn',
-      credentialId:bytesToBase64url(rawId),
-      created:Date.now()
-    });
-    closeBioIntro();
-    updateBioUI();
-    setSettingsMsg('✅ تمت إضافة البصمة بنجاح. ستُطلب عند كل فتح للتطبيق.','ok');
-  }catch(e){
-    closeBioIntro();
-    let msg='⚠️ لم يتم تفعيل البصمة.';
-    if(e&&e.name==='NotAllowedError')msg='⚠️ تم إلغاء عملية البصمة أو لم يكتمل التحقق.';
-    else if(e&&e.name==='NotSupportedError')msg='⚠️ جهازك أو المتصفح لا يدعم تسجيل البصمة بهذه الطريقة.';
-    setSettingsMsg(msg,'err');
-  }
-}
-async function verifyBiometric(){
-  const cfg=getBioConfig();
-  if(!cfg||cfg.type!=='webauthn')return false;
-  if(!bioSupported())return false;
-  try{
-    const challenge=randomBytes(32);
-    const assertion=await navigator.credentials.get({
-      publicKey:{
-        challenge,
-        rpId:getRpId(),
-        allowCredentials:[{
-          type:'public-key',
-          id:base64urlToBytes(cfg.credentialId),
-          transports:['internal']
-        }],
-        userVerification:'required',
-        timeout:60000
-      }
-    });
-    return !!assertion;
-  }catch(e){
-    return false;
-  }
-}
-if(addBioBtn)addBioBtn.onclick=()=>{
-  // ضغطة واحدة داخل APK تفتح نافذة البصمة الأصلية مباشرة.
-  if(!startNativeBiometric()) openBioIntro();
-};
-if(bioIntroClose)bioIntroClose.onclick=registerBiometric;
-if(bioIntroModal)bioIntroModal.onclick=e=>{if(e.target===bioIntroModal)closeBioIntro()};
-if(removeBioBtn)removeBioBtn.onclick=()=>{
-  setBioConfig(null);
-  updateBioUI();
-  setSettingsMsg('تمت إزالة قفل البصمة. سيعمل التطبيق بدون بصمة.','ok');
-};
-
 /* ---------- أدوات مساعدة ---------- */
 function randomHex(n){
   const a=new Uint8Array(n);
@@ -1257,57 +1049,7 @@ async function hashPassword(password,salt){
 
 /* ---------- شاشة القفل ---------- */
 async function showLockScreen(){
-  const bioCfg=getBioConfig();
-  const passCfg=getLockConfig();
-
-  // قفل APK: لا تظهر الواجهة الرئيسية إلا بعد نجاح البصمة الأصلية.
-  if(bioCfg&&bioCfg.type==='native'&&window.AndroidBiometric){
-    document.documentElement.classList.add('prelock');
-    lockScreen.classList.add('show');
-    lockScreen.setAttribute('aria-hidden','false');
-    lockErr.textContent='';
-    lockIcon.textContent='🔒';
-    lockTitle.textContent='التطبيق مقفول';
-    lockHint.textContent='اضغط الزر بالأسفل لفتح التطبيق بالبصمة';
-    lockPassArea.style.display='block';
-    lockPassInput.style.display='none';
-    lockSubmit.style.display='block';
-    lockSubmit.textContent='فتح بالبصمة';
-    lockSubmit.onclick=()=>startNativeBiometric();
-    return;
-  }
-
-  if(bioCfg&&bioCfg.type==='webauthn'&&bioSupported()){
-    document.documentElement.classList.add('prelock');
-    lockScreen.classList.add('show');
-    lockScreen.setAttribute('aria-hidden','false');
-    lockErr.textContent='';
-    lockIcon.textContent='☝️';
-    lockTitle.textContent='فتح بالبصمة';
-    lockHint.textContent='ضع إصبعك على مستشعر البصمة للمتابعة';
-    lockPassArea.style.display='none';
-
-    const ok=await verifyBiometric();
-    if(ok){
-      unlockApp();
-      return;
-    }
-
-    /* عند إلغاء البصمة لا نفتح التطبيق تلقائيًا. إن وُجدت كلمة مرور، نعرضها كخيار بديل. */
-    if(passCfg&&passCfg.type==='password'){
-      lockIcon.textContent='🔒';
-      lockTitle.textContent='التطبيق مقفل';
-      lockHint.textContent='يمكنك استخدام كلمة المرور بدل البصمة';
-      lockPassArea.style.display='block';
-      lockPassInput.value='';
-      setTimeout(()=>{try{lockPassInput.focus()}catch(e){}},180);
-    }else{
-      lockErr.textContent='لم يكتمل التحقق بالبصمة. حاول مرة أخرى.';
-      lockPassArea.style.display='none';
-      setTimeout(()=>showLockScreen(),700);
-    }
-    return;
-  }
+const passCfg=getLockConfig();
 
   if(!passCfg||passCfg.type!=='password'){
     unlockApp();
@@ -1374,7 +1116,6 @@ function refreshSettingsUI(){
   document.getElementById('passSetup').style.display=passActive?'none':'block';
   document.getElementById('passActive').style.display=passActive?'block':'none';
   document.getElementById('savePass').disabled=false;
-  updateBioUI();
 }
 
 function openSettings(){
