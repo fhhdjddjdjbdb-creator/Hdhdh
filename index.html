@@ -9,6 +9,7 @@
 try{if(localStorage.getItem('appLockConfig'))document.documentElement.classList.add('prelock')}catch(e){}
 try{if(localStorage.getItem('incognitoFirstRunSetupComplete')==='done'||sessionStorage.getItem('incognitoFirstRunSetupComplete')==='done')document.documentElement.classList.add('first-run-complete')}catch(e){}
 </script>
+<script id="palette-boot">(function(){var n='ruby';try{n=localStorage.getItem('appPalette')||'ruby'}catch(e){}if(!/^(ruby|ocean|emerald|violet|amber)$/.test(n))n='ruby';document.documentElement.setAttribute('data-palette',n)})();</script>
 <style>
 *{box-sizing:border-box}
 :root{
@@ -649,6 +650,18 @@ body::before{
         <button class="engine-option" type="button" data-engine="brave" aria-pressed="false"><img class="engine-mark" alt=""><span class="engine-option-copy"><strong>Brave Search</strong><small>محرك مستقل مع تركيز على الخصوصية</small></span><span class="engine-check" aria-hidden="true">✓</span></button>
         <button class="engine-option" type="button" data-engine="ecosia" aria-pressed="false"><img class="engine-mark" alt=""><span class="engine-option-copy"><strong>Ecosia</strong><small>بحث ويب مع مبادرات بيئية</small></span><span class="engine-check" aria-hidden="true">✓</span></button>
         <button class="engine-option" type="button" data-engine="yahoo" aria-pressed="false"><img class="engine-mark" alt=""><span class="engine-option-copy"><strong>Yahoo Search</strong><small>بحث عام</small></span><span class="engine-check" aria-hidden="true">✓</span></button>
+      </div>
+    </div>
+
+    <div class="sec-card palette-card" id="paletteCard">
+      <div class="sec-head"><span>🎨 ألوان الواجهة</span><span class="badge" id="paletteName">ياقوتي</span></div>
+      <div class="sec-note">اختار لونًا، وسيتم تطبيقه على الموقع والنوافذ والأزرار تلقائيًا.</div>
+      <div class="palette-grid" id="paletteGrid" role="group" aria-label="اختيار لون الواجهة">
+        <button type="button" class="palette-option" data-palette="ruby"><i></i><b>ياقوتي</b><small>Ruby</small></button>
+        <button type="button" class="palette-option" data-palette="ocean"><i></i><b>محيطي</b><small>Ocean</small></button>
+        <button type="button" class="palette-option" data-palette="emerald"><i></i><b>زمردي</b><small>Emerald</small></button>
+        <button type="button" class="palette-option" data-palette="violet"><i></i><b>بنفسجي</b><small>Violet</small></button>
+        <button type="button" class="palette-option" data-palette="amber"><i></i><b>ذهبي</b><small>Amber</small></button>
       </div>
     </div>
 <!-- دعم 24 ساعة -->
@@ -1748,6 +1761,70 @@ setInterval(()=>{ if(document.visibilityState==='visible') pollSupportReplies();
 .button-only-panel .engine-choice span{grid-row:1/3;font-size:18px;align-self:center}.button-only-panel .engine-choice b{font-size:12px}.button-only-panel .engine-choice small{font-size:9px;line-height:1}
 .button-only-panel .engine-choice:after{font-size:17px}
 @media(max-width:520px){.support-box{width:96vw;height:88vh;border-radius:20px}.support-head{min-height:70px}.button-only-panel{max-height:300px;padding:12px}.button-grid{gap:7px}.button-only-panel button{min-height:56px;border-radius:14px}.button-grid>button:first-child{min-height:64px}}
+</style>
+
+<style id="palette-v1">
+:root{--p-bg:#100307;--p-panel:#1c070c;--p-panel2:#260910;--p-border:#8f1b31;--p-accent:#ff3655;--p-accent2:#ff8a93;--p-glow:rgba(255,38,69,.32)}
+html[data-palette="ocean"]{--p-bg:#031018;--p-panel:#071b28;--p-panel2:#0b2638;--p-border:#087fa3;--p-accent:#08c7e8;--p-accent2:#74ecff;--p-glow:rgba(0,188,232,.32)}
+html[data-palette="emerald"]{--p-bg:#03130f;--p-panel:#071f18;--p-panel2:#0b2b21;--p-border:#159b70;--p-accent:#18d69a;--p-accent2:#8affcf;--p-glow:rgba(16,214,151,.3)}
+html[data-palette="violet"]{--p-bg:#0d0619;--p-panel:#1b0b31;--p-panel2:#271044;--p-border:#8d48d8;--p-accent:#bf63ff;--p-accent2:#edb2ff;--p-glow:rgba(171,72,255,.32)}
+html[data-palette="amber"]{--p-bg:#160d03;--p-panel:#281708;--p-panel2:#38200a;--p-border:#c77b18;--p-accent:#ffb52e;--p-accent2:#ffe09a;--p-glow:rgba(255,164,37,.3)}
+html[data-palette],html[data-palette] body{background-color:var(--p-bg)}
+html[data-palette] body{background-image:radial-gradient(circle at 50% 14%,color-mix(in srgb,var(--p-accent) 18%,transparent),transparent 33%),linear-gradient(var(--p-bg),var(--p-bg));color:var(--text)}
+html[data-palette] body::before{background-image:radial-gradient(circle,color-mix(in srgb,var(--p-accent2) 70%,transparent) 1px,transparent 2px),radial-gradient(circle,color-mix(in srgb,var(--p-accent) 40%,transparent) 1px,transparent 2px)}
+html[data-palette] .modal-box,html[data-palette] .support-box{background:linear-gradient(150deg,var(--p-bg),var(--p-panel),var(--p-bg));border-color:var(--p-border);box-shadow:0 0 32px var(--p-glow)}
+html[data-palette] .support-head{background:linear-gradient(120deg,var(--p-panel),var(--p-accent),var(--p-bg));border-color:var(--p-accent2)}
+html[data-palette] .sec-card,html[data-palette] .section,html[data-palette] .search{border-color:var(--p-border);background:linear-gradient(145deg,var(--p-panel2),var(--p-panel))}
+html[data-palette] .btn.primary,html[data-palette] .quick button:nth-child(3),html[data-palette] .button-grid>button:first-child{background:linear-gradient(110deg,var(--p-panel),var(--p-accent),var(--p-panel));border-color:var(--p-accent2)}
+html[data-palette] .button-only-panel{background:linear-gradient(180deg,var(--p-panel),var(--p-bg));border-color:var(--p-accent)}
+html[data-palette] .button-only-panel button{background:linear-gradient(145deg,var(--p-panel2),var(--p-panel));border-color:var(--p-border);box-shadow:0 5px 15px rgba(0,0,0,.22),0 0 12px var(--p-glow)}
+html[data-palette] .button-only-panel button:hover,html[data-palette] .button-only-panel button:focus{background:linear-gradient(145deg,var(--p-accent),var(--p-panel));border-color:var(--p-accent2);box-shadow:0 8px 22px var(--p-glow)}
+html[data-palette] .customer-fab{background:radial-gradient(circle at 35% 25%,var(--p-accent),var(--p-bg) 70%);border-color:var(--p-accent);box-shadow:0 0 22px var(--p-glow)}
+.palette-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:12px}.palette-option{min-height:76px!important;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:8px 3px!important;border:1px solid #59303b!important;border-radius:14px!important;background:#17070c!important;color:#fff;cursor:pointer;font-family:inherit}.palette-option i{width:25px;height:25px;border-radius:50%;display:block;box-shadow:0 0 12px currentColor,inset 0 2px rgba(255,255,255,.35)}.palette-option b{font-size:11px}.palette-option small{font-size:9px;opacity:.7}.palette-option[data-palette="ruby"] i{background:linear-gradient(135deg,#ff3655,#8f1231);color:#ff3655}.palette-option[data-palette="ocean"] i{background:linear-gradient(135deg,#08c7e8,#075b91);color:#08c7e8}.palette-option[data-palette="emerald"] i{background:linear-gradient(135deg,#18d69a,#087153);color:#18d69a}.palette-option[data-palette="violet"] i{background:linear-gradient(135deg,#bf63ff,#6023a0);color:#bf63ff}.palette-option[data-palette="amber"] i{background:linear-gradient(135deg,#ffcf55,#a95b0c);color:#ffb52e}.palette-option:hover,.palette-option:focus,.palette-option.active{transform:translateY(-3px);outline:none;border-color:var(--p-accent2)!important;box-shadow:0 0 0 2px var(--p-glow),0 0 18px var(--p-glow)}
+@media(max-width:520px){.palette-grid{grid-template-columns:repeat(3,1fr)}.palette-option:last-child{grid-column:2}}
+</style>
+<script>
+(function(){const names={ruby:'ياقوتي',ocean:'محيطي',emerald:'زمردي',violet:'بنفسجي',amber:'ذهبي'},valid=Object.keys(names);function apply(n){n=valid.includes(n)?n:'ruby';document.documentElement.dataset.palette=n;try{localStorage.setItem('appPalette',n)}catch(e){}const l=document.getElementById('paletteName');if(l)l.textContent=names[n];document.querySelectorAll('.palette-option').forEach(b=>{const a=b.dataset.palette===n;b.classList.toggle('active',a);b.setAttribute('aria-pressed',a)})}let saved='ruby';try{saved=localStorage.getItem('appPalette')||'ruby'}catch(e){}apply(saved);document.querySelectorAll('.palette-option').forEach(b=>b.onclick=()=>apply(b.dataset.palette))})();
+</script>
+
+<style id="palette-global-v2">
+/* تعميم اللون المختار على كل الموقع مع الحفاظ على المقاسات والشكل */
+html[data-palette] body,html[data-palette] main,html[data-palette] .wrap{background-color:var(--p-bg)}
+html[data-palette] .top .icon-btn{background:radial-gradient(circle at 35% 25%,var(--p-panel2),var(--p-bg) 70%)!important;border-color:var(--p-border)!important;box-shadow:0 0 16px var(--p-glow)!important}
+html[data-palette] .developer-link,html[data-palette] .sub,html[data-palette] .clear,html[data-palette] .note{color:var(--p-accent2)!important;text-shadow:0 0 10px var(--p-glow)!important}
+html[data-palette] .logo{color:var(--p-accent2);text-shadow:0 0 18px var(--p-glow)!important}
+html[data-palette] .logo b{color:var(--p-accent)!important}
+html[data-palette] .search{background:linear-gradient(var(--p-panel),var(--p-panel)) padding-box,linear-gradient(100deg,var(--p-accent2),var(--p-accent),var(--p-accent2)) border-box!important}
+html[data-palette] .search::placeholder{color:color-mix(in srgb,var(--p-accent2) 75%,#fff)!important}
+html[data-palette] .quick button{background:linear-gradient(var(--p-panel),var(--p-panel2)) padding-box,linear-gradient(135deg,var(--p-border),var(--p-accent),var(--p-accent2)) border-box!important;color:var(--text)!important;box-shadow:0 0 18px var(--p-glow)!important}
+html[data-palette] .quick button:hover{box-shadow:0 0 25px var(--p-glow)!important}
+html[data-palette] .bottom:before{border-color:var(--p-accent)!important;box-shadow:0 -4px 13px var(--p-glow),0 -1px 8px var(--p-accent2)!important}
+html[data-palette] .bottom:after{color:var(--p-accent2)!important;text-shadow:0 0 12px var(--p-glow)!important}
+html[data-palette] .modal{background:color-mix(in srgb,var(--p-bg) 78%,#000)!important}
+html[data-palette] .modal-box,html[data-palette] .sec-card,html[data-palette] .engine-picker,html[data-palette] .support-box{color:var(--text)!important}
+html[data-palette] .sec-head,html[data-palette] .support-head,html[data-palette] .section-head{border-color:color-mix(in srgb,var(--p-accent) 55%,transparent)!important}
+html[data-palette] .badge,html[data-palette] .support-status,html[data-palette] .support-session b{color:var(--p-accent2)!important}
+html[data-palette] .lock-input,html[data-palette] .search input,html[data-palette] .engine-toggle{background:var(--p-panel)!important;border-color:var(--p-border)!important;color:var(--text)!important}
+html[data-palette] .engine-option,html[data-palette] .btn,html[data-palette] .close-row button{background:linear-gradient(145deg,var(--p-panel2),var(--p-panel))!important;border-color:var(--p-border)!important;color:var(--text)!important}
+html[data-palette] .engine-option.selected,html[data-palette] .btn.primary{background:linear-gradient(110deg,var(--p-panel),var(--p-accent),var(--p-panel))!important;border-color:var(--p-accent2)!important}
+html[data-palette] .support-suggestions,html[data-palette] .support-clear{background:var(--p-panel)!important;border-color:var(--p-border)!important;color:var(--p-accent2)!important}
+html[data-palette] .chat-area{background:linear-gradient(180deg,var(--p-bg),var(--p-panel))!important}
+html[data-palette] .chat-bubble.user{background:linear-gradient(135deg,var(--p-accent),var(--p-panel2))!important;border-color:var(--p-accent2)!important}
+html[data-palette] .chat-bubble.admin{background:var(--p-panel2)!important;border-color:var(--p-border)!important}
+</style>
+
+<style id="palette-support-v3">
+html[data-palette] .customer-fab{background:radial-gradient(circle at 35% 25%,var(--p-accent),var(--p-panel) 48%,var(--p-bg) 78%)!important;border-color:var(--p-accent2)!important;box-shadow:0 0 0 5px var(--p-glow),0 0 26px var(--p-glow),inset 0 0 18px color-mix(in srgb,var(--p-accent2) 28%,transparent)!important}
+html[data-palette] .customer-fab:hover{box-shadow:0 0 0 7px var(--p-glow),0 0 38px var(--p-glow),inset 0 0 22px color-mix(in srgb,var(--p-accent2) 35%,transparent)!important}
+html[data-palette] .fab-halo{border-color:var(--p-accent2)!important}
+html[data-palette] .fab-label{background:var(--p-panel)!important;border-color:var(--p-border)!important;color:var(--p-accent2)!important}
+html[data-palette] .fab-robot{background:linear-gradient(145deg,var(--p-accent),var(--p-panel))!important;border-color:var(--p-accent2)!important;box-shadow:0 0 14px var(--p-glow)!important}
+html[data-palette] .fab-robot:before{background:var(--p-accent2)!important;box-shadow:0 -3px 0 2px var(--p-accent)!important}
+html[data-palette] .fab-robot i,html[data-palette] .fab-robot b{background:var(--p-accent2)!important;box-shadow:0 0 8px var(--p-accent)!important}
+html[data-palette] .fab-robot em{border-color:var(--p-accent2)!important}
+html[data-palette] .support-close{color:var(--p-accent2)!important}
+html[data-palette] .support-status .live{background:var(--p-accent2)!important;box-shadow:0 0 8px var(--p-accent)!important}
+html[data-palette] .support-suggestions button:hover,html[data-palette] .support-clear:hover{border-color:var(--p-accent2)!important;color:#fff!important;box-shadow:0 0 12px var(--p-glow)!important}
 </style>
 </body>
 </html>
