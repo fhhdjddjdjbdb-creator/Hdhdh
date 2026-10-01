@@ -1630,5 +1630,76 @@ setInterval(()=>{ if(document.visibilityState==='visible') pollSupportReplies();
 })();
 
 </script>
+
+<script>
+/* المساعد الذكي المحسن: أزرار المحركات تكتب وتُرسل تلقائيًا */
+(function(){
+  const fab=document.getElementById('customerFab'),modal=document.getElementById('supportModal');
+  const area=document.getElementById('chatArea'),input=document.getElementById('chatInput'),send=document.getElementById('sendMsg');
+  const quick=document.getElementById('supportSuggestions'),clear=document.getElementById('clearSupportChat'),close=document.getElementById('supportClose');
+  if(!fab||!modal||!area||!input||!send)return;
+  const NAME='supportCustomerName', CHAT='supportChatHistory';
+  let askingName=false,busy=false;
+  const engines={
+    Google:'Google محرك بحث شامل ومناسب للمواقع والأخبار والصور والخرائط. اكتب أي كلمة أو جملة وسيعرض لك نتائج كثيرة ومتنوعة.',
+    Bing:'Bing محرك بحث من Microsoft، ممتاز للويب والصور والفيديو ويمكن اختياره من إعدادات التطبيق.',
+    DuckDuckGo:'DuckDuckGo يركز على الخصوصية وتقليل التتبع، ومناسب لمن يريد بحثًا أكثر خصوصية.',
+    'Brave Search':'Brave Search محرك مستقل يهتم بالخصوصية ويقلل الاعتماد على التتبع.',
+    Ecosia:'Ecosia محرك بحث عام، ويعلن عن دعم مبادرات بيئية من عائدات الإعلانات.',
+    Yahoo:'Yahoo Search محرك بحث عام للويب والأخبار وبعض الخدمات الإضافية.'
+  };
+  const aliases=[['Google',['جوجل','google','غوغل']],['Bing',['بينج','بنغ','bing']],['DuckDuckGo',['داك داك جو','دك دك جو','duckduckgo','duck duck go']],['Brave Search',['بريف','brave']],['Ecosia',['ايكوسيا','إيكوسيا','ecosia']],['Yahoo',['ياهو','yahoo']]];
+  const norm=x=>String(x||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[إأآا]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/ـ/g,'').replace(/[^\u0600-\u06ffa-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
+  const read=()=>{try{return JSON.parse(localStorage.getItem(CHAT)||'[]')}catch(e){return[]}};
+  const write=h=>{try{localStorage.setItem(CHAT,JSON.stringify(h.slice(-200)))}catch(e){}};
+  const draw=()=>{if(typeof renderSupportChat==='function')renderSupportChat();else{const h=read();area.innerHTML=h.map(x=>'<div class="chat-bubble '+(x.role==='user'?'user':'admin')+'">'+String(x.text).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))+'</div>').join('')}};
+  const bot=text=>{const h=read();h.push({role:'admin',text,t:Date.now()});write(h);draw()};
+  const user=text=>{const h=read();h.push({role:'user',text,t:Date.now()});write(h);draw()};
+  const engineFor=q=>{for(const [name,words] of aliases)if(words.some(w=>q.includes(norm(w))))return name;return null};
+  function engineButtons(){
+    if(!quick)return;
+    quick.innerHTML='<span class="engine-choice-title">اختار محركًا للتعرف عليه:</span>'+Object.keys(engines).map(name=>'<button type="button" class="engine-choice" data-engine="'+name+'">'+name+'</button>').join('');
+    quick.querySelectorAll('.engine-choice').forEach(b=>b.onclick=()=>sendText('عايز أعرف '+b.dataset.engine));
+  }
+  function normalButtons(){
+    if(!quick)return;
+    quick.innerHTML='<button type="button" data-q="عايز أعرف محركات البحث">🌐 محركات البحث</button><button type="button" data-q="ازاي أبحث؟">🔎 طريقة البحث</button><button type="button" data-q="ازاي أمسح السجل؟">🔒 الخصوصية</button><button type="button" data-q="اشرح الإعدادات">⚙ الإعدادات</button>';
+    quick.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>sendText(b.dataset.q));
+  }
+  function reply(text){
+    const q=norm(text),engine=engineFor(q);
+    if(engine)return engines[engine]+'\n\nلو عايز تستخدمه: افتح الإعدادات واختر «'+engine+'»، ثم اكتب كلمة أو جملة واضغط بحث.';
+    if(/محرك|محركات|محرك البحث|اختار|اختيار|فرق بينهم|انواع البحث|بحث/.test(q)&&(/محرك|محركات|اختار|اختيار|فرق|انواع/.test(q)))return 'تمام، دي محركات البحث الموجودة عندك. دوس على أي زر، واسم المحرك هيتكتب ويتبعت تلقائيًا وأنا أشرح لك وظيفته.';
+    if(/بحث|ادور|دور|نتيج|كلمه|جمله|اكتب/.test(q))return 'اكتب أي كلمة أو جملة في مربع البحث، مش لازم صياغة معينة، واضغط «بحث» لفتح النتائج في المحرك المختار.';
+    if(/خصوص|سجل|حذف|مسح|بيانات/.test(q))return 'لمسح سجل البحث اضغط «مسح الكل». وحافظ على عدم كتابة كلمات المرور أو البيانات الحساسة في البحث.';
+    if(/اعداد|امان|امن|قفل|باسورد|كلمه المرور/.test(q))return 'من الإعدادات تقدر تختار محرك البحث وتفعّل كلمة المرور وتراجع إعدادات الأمان.';
+    if(/ميكروفون|صوت|اتكلم|نطق/.test(q))return 'اضغط زر الميكروفون بجانب مربع البحث واسمح للمتصفح باستخدامه عند الطلب.';
+    if(/تقييم|نجمه|نجوم/.test(q))return 'اضغط «قيم التطبيق»، اختر النجوم، ثم أرسل تقييمك.';
+    return 'فهمت إنك بتسأل عن التطبيق. أقدر أشرح لك المحركات، البحث، الخصوصية، السجل، الميكروفون والإعدادات. جرّب تكتب سؤالك بطريقتك أو اختار زرًا تحت.';
+  }
+  const greetings=['تمام، استلمت اسمك يا ','وصلني اسمك يا ','أهلًا يا ','منورنا يا ','تشرفنا يا '];
+  function extractName(t){const x=String(t).trim().replace(/^(انا|أنا|اسمي|اسمى|اسمي هو|my name is)\s*/i,'').trim();return (x.split(/\s+/).filter(Boolean).slice(0,3).join(' ')||'صديقي').replace(/[.!؟،]+$/,'')}
+  function welcome(){
+    const h=read();
+    if(!h.length){askingName=true;bot('أهلًا بك في خدمة العملاء 🤖\nقول لي اسمك الأول عشان أرحب بك.');}
+    else if(!localStorage.getItem(NAME))askingName=true;
+    normalButtons();
+  }
+  async function sendText(text){
+    if(busy)return; text=String(text||'').trim();if(!text)return;
+    busy=true;user(text);await new Promise(r=>setTimeout(r,300));
+    if(askingName){const name=extractName(text);localStorage.setItem(NAME,name);askingName=false;const g=greetings[Math.floor(Math.random()*greetings.length)];bot(g+name+' ✨\nقول لي عايز تعرف إيه، أو دوس على «محركات البحث» لو عايز تشوف الاختيارات.');}
+    else{const q=norm(text);bot(reply(text));if(/محرك|محركات|اختيار|انواع/.test(q)&&!engineFor(q))engineButtons();else normalButtons();}
+    busy=false;input.focus();
+  }
+  function open(){modal.style.display='flex';modal.setAttribute('aria-hidden','false');welcome();setTimeout(()=>input.focus(),100)}
+  fab.onclick=open;
+  send.onclick=()=>sendText(input.value);
+  input.onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendText(input.value)}};
+  if(close)close.onclick=()=>{modal.style.display='none';modal.setAttribute('aria-hidden','true')};
+  if(clear)clear.onclick=()=>{localStorage.removeItem(CHAT);localStorage.removeItem(NAME);area.innerHTML='';askingName=true;bot('تم مسح الدردشة بالكامل 🧹\nقول لي اسمك الأول من جديد.');normalButtons()};
+  welcome();
+})();
+</script>
 </body>
 </html>
