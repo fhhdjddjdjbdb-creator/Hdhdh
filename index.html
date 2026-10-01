@@ -1586,6 +1586,49 @@ setInterval(()=>{ if(document.visibilityState==='visible') pollSupportReplies();
   const close=document.getElementById('supportClose');if(close)close.onclick=closeSupport;
   firstWelcome();
 })();
+
+</script>
+
+<script>
+/* ربط احتياطي مباشر: يضمن فتح الشات حتى لو تأخر أي كود سابق */
+(function(){
+  const f=document.getElementById('customerFab');
+  const m=document.getElementById('supportModal');
+  const a=document.getElementById('chatArea');
+  const i=document.getElementById('chatInput');
+  const send=document.getElementById('sendMsg');
+  const close=document.getElementById('supportClose');
+  if(!f||!m)return;
+  const open=()=>{
+    const settings=document.getElementById('modal');
+    if(settings)settings.style.display='none';
+    m.style.display='flex';
+    m.setAttribute('aria-hidden','false');
+    if(typeof getSupportSessionId==='function'&&typeof sessionIdText!=='undefined')sessionIdText.textContent=getSupportSessionId();
+    if(a&&typeof getSupportChat==='function'&&!getSupportChat().length){
+      const h=getSupportChat();h.push({role:'admin',text:'أهلًا بك في خدمة العملاء 🤖\nقول لي اسمك الأول عشان أساعدك.',t:Date.now()});
+      if(typeof saveSupportChat==='function')saveSupportChat(h);
+      if(typeof renderSupportChat==='function')renderSupportChat();
+    }
+    setTimeout(()=>{if(i)i.focus()},120);
+  };
+  f.onclick=open;
+  if(close)close.onclick=()=>{m.style.display='none';m.setAttribute('aria-hidden','true')};
+  if(send&&i){
+    send.onclick=()=>{
+      const text=(i.value||'').trim();if(!text)return;
+      i.value='';
+      if(typeof getSupportChat==='function'){
+        const h=getSupportChat();h.push({role:'user',text,t:Date.now()});
+        const reply=/محرك|جوجل|google|bing|بينج/i.test(text)?'تقدر تختار محرك البحث من الإعدادات، ثم اكتب أي كلمة أو جملة واضغط بحث.':'وصلت رسالتك. أقدر أساعدك في البحث، المحركات، الخصوصية والإعدادات.';
+        h.push({role:'admin',text:reply,t:Date.now()});
+        if(typeof saveSupportChat==='function')saveSupportChat(h);
+        if(typeof renderSupportChat==='function')renderSupportChat();
+      }
+    };
+  }
+})();
+
 </script>
 </body>
 </html>
