@@ -525,8 +525,8 @@ body::before{
     <div class="splash-art" aria-hidden="true">
       <svg viewBox="0 0 240 240" role="presentation" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <linearGradient id="portalLine" x1="32" y1="26" x2="204" y2="214" gradientUnits="userSpaceOnUse"><stop stop-color="#e8a1ae"/><stop offset=".48" stop-color="#a51b3d"/><stop offset="1" stop-color="#42101f"/></linearGradient>
-          <radialGradient id="portalCore"><stop stop-color="#ed5369" stop-opacity=".55"/><stop offset="1" stop-color="#5c0b20" stop-opacity="0"/></radialGradient>
+          <linearGradient id="portalLine" x1="32" y1="26" x2="204" y2="214" gradientUnits="userSpaceOnUse"><stop stop-color="var(--p-accent)"/><stop offset=".48" stop-color="var(--p-accent)"/><stop offset="1" stop-color="var(--p-accent)"/></linearGradient>
+          <radialGradient id="portalCore"><stop stop-color="var(--p-accent)" stop-opacity=".55"/><stop offset="1" stop-color="var(--p-accent)" stop-opacity="0"/></radialGradient>
         </defs>
         <g class="splash-orbit" fill="none" stroke="url(#portalLine)">
           <circle cx="120" cy="120" r="101" opacity=".25"/>
@@ -534,10 +534,10 @@ body::before{
           <path d="m120 14 7 13-7 13-7-13 7-13Zm0 186 7 13-7 13-7-13 7-13ZM14 120l13-7 13 7-13 7-13-7Zm186 0 13-7 13 7-13 7-13-7Z" opacity=".8"/>
         </g>
         <path class="splash-portal" d="M69 197v-78a51 51 0 0 1 102 0v78" fill="none" stroke="url(#portalLine)" stroke-width="2.5"/>
-        <path d="M81 196v-76a39 39 0 0 1 78 0v76" fill="#10070d" fill-opacity=".7" stroke="#6f1a30" stroke-width="1.4"/>
+        <path d="M81 196v-76a39 39 0 0 1 78 0v76" fill="var(--p-accent)" fill-opacity=".7" stroke="var(--p-accent)" stroke-width="1.4"/>
         <circle class="splash-core" cx="120" cy="124" r="48" fill="url(#portalCore)"/>
-        <path class="splash-core" d="M120 99a15 15 0 0 0-8 27l-5 23h26l-5-23a15 15 0 0 0-8-27Z" fill="#d84a62" fill-opacity=".82"/>
-        <path d="M61 197h118m-104 9h90" stroke="#9b2842" stroke-opacity=".62" stroke-width="2" stroke-linecap="round"/>
+        <path class="splash-core" d="M120 99a15 15 0 0 0-8 27l-5 23h26l-5-23a15 15 0 0 0-8-27Z" fill="var(--p-accent)" fill-opacity=".82"/>
+        <path d="M61 197h118m-104 9h90" stroke="var(--p-accent)" stroke-opacity=".62" stroke-width="2" stroke-linecap="round"/>
       </svg>
     </div>
     <h1 class="splash-title">شاشة الدخول السرية</h1>
@@ -1862,7 +1862,6 @@ html[data-palette] .splash-eyebrow{border-color:var(--p-border)!important;backgr
 html[data-palette] .splash-title,html[data-palette] .splash-subtitle,html[data-palette] .splash-hint{color:var(--p-accent2)!important;text-shadow:0 0 13px var(--p-glow)!important}
 html[data-palette] .splash-button,html[data-palette] .splash-audio,html[data-palette] #splashAudioButton{background:linear-gradient(100deg,var(--p-panel),var(--p-accent),var(--p-panel))!important;border-color:var(--p-accent2)!important;color:var(--p-accent2)!important;box-shadow:0 0 20px var(--p-glow)!important}
 html[data-palette] .splash-art svg path,html[data-palette] .splash-art svg circle,html[data-palette] .splash-art svg ellipse,html[data-palette] .splash-art svg line,html[data-palette] .splash-art svg polyline{stroke:var(--p-accent)!important}
-html[data-palette] .splash-art svg path,html[data-palette] .splash-art svg circle,html[data-palette] .splash-art svg ellipse,html[data-palette] .splash-art svg polygon{fill:var(--p-accent)!important;stroke:var(--p-accent2)!important}
 html[data-palette] .lock-screen{background:var(--p-bg)!important}.lock-screen .lock-card{background:linear-gradient(150deg,var(--p-panel2),var(--p-bg))!important;border-color:var(--p-border)!important;box-shadow:0 0 35px var(--p-glow)!important}.lock-screen .lock-title,.lock-screen .lock-hint,.lock-screen .lock-err{color:var(--p-accent2)!important}.lock-screen .lock-btn{background:linear-gradient(100deg,var(--p-panel),var(--p-accent),var(--p-panel))!important;border-color:var(--p-accent2)!important;color:var(--p-accent2)!important}
 html[data-palette] .rating-box,html[data-palette] .rating-box::before{background:var(--p-panel)!important}.rating-box .rating-star{color:var(--p-accent2)!important;border-color:var(--p-border)!important;background:var(--p-panel2)!important}.rating-box .rating-star:hover,.rating-box .rating-star.active{color:var(--p-accent2)!important;border-color:var(--p-accent2)!important;background:var(--p-accent)!important;text-shadow:0 0 14px var(--p-glow)!important}
 </style>
@@ -1870,8 +1869,6 @@ html[data-palette] .rating-box,html[data-palette] .rating-box::before{background
 <style id="palette-svg-responsive-v6">
 /* لا ألوان ثابتة في رسمة البداية أو شريط التقدم */
 html[data-palette] .splash-art svg stop{stop-color:var(--p-accent)!important}
-html[data-palette] .splash-art svg [fill]{fill:var(--p-accent)!important}
-html[data-palette] .splash-art svg [stroke]{stroke:var(--p-accent2)!important}
 html[data-palette] .first-run-bar{background:linear-gradient(90deg,var(--p-panel),var(--p-accent),var(--p-accent2))!important;box-shadow:0 0 15px var(--p-glow)!important}
 html[data-palette] .first-run-progress-row,html[data-palette] .first-run-countdown{color:var(--p-accent2)!important}
 /* تكيف آمن مع الهاتف والآيفون والتابلت واللابتوب */
@@ -1894,6 +1891,13 @@ html[data-palette] #supportModal .support-input-row,html[data-palette] #supportM
 html[data-palette] #modal .engine-toggle-icon,html[data-palette] #modal .engine-check{background:var(--p-accent)!important;color:var(--p-accent2)!important}
 html[data-palette] #modal .sec-card.clickable:hover{border-color:var(--p-accent2)!important;box-shadow:0 0 16px var(--p-glow)!important}
 html[data-palette] #modal .sec-msg.ok,html[data-palette] #modal .sec-msg.err{color:var(--p-accent2)!important}
+</style>
+
+<style id="palette-art-bars-v8">
+html[data-palette] .splash-loader::after{background:linear-gradient(90deg,var(--p-panel),var(--p-accent),var(--p-accent2))!important;box-shadow:0 0 10px var(--p-glow)!important}
+html[data-palette] .splash-loader{background:color-mix(in srgb,var(--p-accent) 12%,var(--p-panel))!important}
+html[data-palette] .search-wrap .voice-btn{border-color:var(--p-border)!important;background:radial-gradient(circle at 35% 25%,var(--p-panel2),var(--p-bg) 72%)!important;color:var(--p-accent2)!important;box-shadow:0 0 14px var(--p-glow)!important}
+html[data-palette] .search-icon{color:var(--p-accent2)!important;text-shadow:0 0 10px var(--p-glow)!important}
 </style>
 </body>
 </html>
