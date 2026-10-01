@@ -1340,9 +1340,11 @@ function openSupport(){
   renderSupportChat();
   supportModal.style.display='flex';
   supportModal.setAttribute('aria-hidden','false');
+  if(chatInput){chatInput.setAttribute('readonly','true');chatInput.setAttribute('tabindex','-1');}
+  if(document.activeElement && document.activeElement.blur)document.activeElement.blur();
   supportUnread=0;
   updateSupportBadge();
-  setTimeout(()=>{try{chatInput.focus()}catch(e){}},200);
+  // لا نركز على خانة كتابة عند فتح الدعم؛ الواجهة أزرار فقط.
 }
 function closeSupport(){
   if(!supportModal) return;
@@ -1559,13 +1561,15 @@ setInterval(()=>{ if(document.visibilityState==='visible') pollSupportReplies();
     await new Promise(r=>setTimeout(r,380));
     if(waitingForName){const name=nameFrom(text);localStorage.setItem(NAME_KEY,name);waitingForName=false;pushBot('منور يا '+name+' ✨\nأنا جاهز أساعدك في أي حاجة تخص التطبيق. اكتب سؤالك أو اختار من الاقتراحات تحت.');}
     else pushBot(smartReply(text));
-    sendMsgBtn.disabled=false;chatInput.focus();
+    sendMsgBtn.disabled=false;
   }
   function openSmart(){
     const settingsModal=document.getElementById('modal');if(settingsModal)settingsModal.style.display='none';
     supportModal.style.display='flex';supportModal.setAttribute('aria-hidden','false');
+    if(chatInput){chatInput.setAttribute('readonly','true');chatInput.setAttribute('tabindex','-1');}
+    if(document.activeElement && document.activeElement.blur)document.activeElement.blur();
     if(sessionIdText)sessionIdText.textContent=getSupportSessionId();
-    firstWelcome();setTimeout(()=>chatInput.focus(),180);
+    firstWelcome();
   }
   fab.onclick=openSmart;
   const oldCard=document.getElementById('supportCard');if(oldCard)oldCard.onclick=openSmart;
@@ -1698,7 +1702,7 @@ setInterval(()=>{ if(document.visibilityState==='visible') pollSupportReplies();
     else{const q=norm(text);bot(reply(text));if(/رجوع|القائمه الرئيسيه|القائمة الرئيسية/.test(q))normalButtons();else if(/افتح قائمه|افتح قائمة|اعدادات التطبيق|إعدادات التطبيق/.test(q))settingsButtons();else if(/محرك|محركات|اختيار|انواع/.test(q)&&!engineFor(q))engineButtons();else normalButtons();}
     busy=false;
   }
-  function open(){modal.style.display='flex';modal.setAttribute('aria-hidden','false');welcome();setTimeout(()=>input.focus(),100)}
+  function open(){modal.style.display='flex';modal.setAttribute('aria-hidden','false');welcome();}
   fab.onclick=open;
   if(close)close.onclick=()=>{modal.style.display='none';modal.setAttribute('aria-hidden','true')};
   if(clear)clear.onclick=()=>{localStorage.removeItem(CHAT);localStorage.removeItem(NAME);area.innerHTML='';askingName=false;bot('تم مسح الدردشة بالكامل 🧹\nاختار أي زر من القائمة عشان نبدأ من جديد.');normalButtons()};
@@ -1716,6 +1720,11 @@ setInterval(()=>{ if(document.visibilityState==='visible') pollSupportReplies();
 @media(max-width:420px){.button-grid{gap:6px}.button-only-panel{max-height:245px;padding:10px}.button-only-panel button{min-height:48px}}
 </style>
 
+<style id="button-only-no-keyboard">
+/* الدعم يعمل بالأزرار فقط: لا خانة كتابة ولا لوحة مفاتيح تلقائية */
+#supportModal #chatInput,#supportModal #sendMsg,#supportModal .support-input-row,#supportModal .chat-input-row{display:none!important}
+#supportModal input,#supportModal textarea{pointer-events:none!important;caret-color:transparent!important}
+</style>
 <style id="button-redesign-v2">
 /* تصميم الأزرار الجديد: بطاقات مرتبة بطابع النيون الأحمر */
 .support-box{width:min(700px,96vw);height:min(86vh,780px);border:1px solid rgba(255,72,105,.68);border-radius:24px;background:linear-gradient(150deg,#16050b 0%,#250710 52%,#100309 100%);box-shadow:0 0 28px rgba(255,32,75,.24),inset 0 1px rgba(255,180,190,.12)}
