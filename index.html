@@ -1899,5 +1899,40 @@ html[data-palette] .splash-loader{background:color-mix(in srgb,var(--p-accent) 1
 html[data-palette] .search-wrap .voice-btn{border-color:var(--p-border)!important;background:radial-gradient(circle at 35% 25%,var(--p-panel2),var(--p-bg) 72%)!important;color:var(--p-accent2)!important;box-shadow:0 0 14px var(--p-glow)!important}
 html[data-palette] .search-icon{color:var(--p-accent2)!important;text-shadow:0 0 10px var(--p-glow)!important}
 </style>
+
+<style id="palette-settings-support-v9">
+/* عناصر نافذة الإعدادات التي كانت تحتفظ بالأحمر */
+html[data-palette] #modal .close-row{justify-content:flex-end!important;text-align:left!important}
+html[data-palette] #modal .sec-card{border-color:var(--p-border)!important;box-shadow:0 0 18px var(--p-glow)!important}
+html[data-palette] #modal #supportCard{border-color:var(--p-border)!important}
+html[data-palette] #modal .badge,html[data-palette] #modal #passBadge,html[data-palette] #modal #selectedEngineName,html[data-palette] #modal #paletteName,html[data-palette] #modal #supportBadge{background:var(--p-panel)!important;border-color:var(--p-border)!important;color:var(--p-accent2)!important;box-shadow:0 0 8px var(--p-glow)!important}
+html[data-palette] #modal .badge.on{background:var(--p-accent)!important;color:var(--p-accent2)!important;border-color:var(--p-accent2)!important}
+html[data-palette] #modal .engine-toggle,html[data-palette] #modal .engine-picker,html[data-palette] #modal .engine-option{border-color:var(--p-border)!important;background:var(--p-panel)!important;color:var(--p-accent2)!important}
+html[data-palette] #modal .engine-option[aria-pressed="true"],html[data-palette] #modal .engine-option.selected{border-color:var(--p-accent2)!important;background:color-mix(in srgb,var(--p-accent) 22%,var(--p-panel))!important;color:var(--p-accent2)!important}
+html[data-palette] #modal .engine-option-copy strong,html[data-palette] #modal .engine-option-copy small,html[data-palette] #modal .engine-toggle-copy strong,html[data-palette] #modal .engine-toggle-copy small,html[data-palette] #modal .engine-toggle-arrow{color:var(--p-accent2)!important}
+/* عنوان اختر سؤالك والخطان الموجودان فوق وتحته */
+html[data-palette] #supportModal .button-section-title{color:var(--p-accent2)!important;text-shadow:0 0 10px var(--p-glow)!important}
+html[data-palette] #supportModal .button-only-panel{border-top-color:var(--p-border)!important;background:linear-gradient(180deg,var(--p-panel2),var(--p-panel))!important}
+html[data-palette] #supportModal .support-suggestions{border-top-color:var(--p-border)!important;border-bottom-color:var(--p-border)!important}
+html[data-palette] #supportModal .support-head{border-bottom-color:var(--p-border)!important}
+html[data-palette] #supportModal .support-status,html[data-palette] #supportModal .support-status .live,html[data-palette] #supportModal .support-close,html[data-palette] #supportModal .support-clear{color:var(--p-accent2)!important}
+html[data-palette] #supportModal .support-clear{border-color:var(--p-border)!important;background:var(--p-panel)!important}
+</style>
+
+<style id="palette-support-scroll-v10">
+html[data-palette] #supportModal .button-only-panel::-webkit-scrollbar-thumb,html[data-palette] #supportModal .support-suggestions::-webkit-scrollbar-thumb{background:var(--p-accent)!important;border:1px solid var(--p-accent2)!important;border-radius:99px}
+html[data-palette] #supportModal .button-only-panel::-webkit-scrollbar-track,html[data-palette] #supportModal .support-suggestions::-webkit-scrollbar-track{background:var(--p-panel)!important}
+html[data-palette] #supportModal .button-only-panel,html[data-palette] #supportModal .support-suggestions{scrollbar-color:var(--p-accent) var(--p-panel)!important}
+</style>
+
+<style id="palette-final-precise-v11">
+/* الخطان الفعليان قبل وبعد عنوان اختر سؤالك */
+html[data-palette] #supportModal .button-section-title::before,html[data-palette] #supportModal .button-section-title::after{background:linear-gradient(90deg,transparent,var(--p-accent),transparent)!important;box-shadow:0 0 8px var(--p-glow)!important}
+html[data-palette] #supportModal .button-only-panel button{border-color:var(--p-border)!important;background:linear-gradient(145deg,var(--p-panel2),var(--p-panel))!important;color:var(--p-accent2)!important;box-shadow:0 5px 15px var(--p-glow)!important}
+html[data-palette] #supportModal .button-only-panel button:hover{border-color:var(--p-accent2)!important;background:linear-gradient(145deg,var(--p-panel),var(--p-accent))!important}
+/* اتجاه مستقل عن RTL لضمان ظهور إغلاق الإعدادات في الجهة اليسرى */
+html[data-palette] #modal .close-row{direction:ltr!important;justify-content:flex-start!important;width:100%!important}
+html[data-palette] #modal .close-row button{direction:rtl!important;margin-left:0!important;margin-right:0!important}
+</style>
 </body>
 </html>
