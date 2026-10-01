@@ -1946,5 +1946,16 @@ html[data-palette] #supportModal .support-close:hover{color:var(--p-accent2)!imp
 /* العلامة/السهم الصغير بجانب كل زر في الشات */
 html[data-palette] #supportModal .button-only-panel button::after{color:var(--p-accent2)!important;text-shadow:0 0 8px var(--p-glow)!important}
 </style>
+
+<style id="palette-swatch-original-v13">
+/* دوائر الألوان تظل ثابتة لتمييز كل اختيار، ولا تتبع الثيم الحالي */
+html[data-palette] .palette-option[data-palette="ruby"] i{background:linear-gradient(135deg,#ff3655,#8f1231)!important;color:#ff3655!important;border-color:#ff8a93!important;box-shadow:0 0 12px rgba(255,54,85,.35)!important}
+html[data-palette] .palette-option[data-palette="ocean"] i{background:linear-gradient(135deg,#08c7e8,#075b91)!important;color:#08c7e8!important;border-color:#74ecff!important;box-shadow:0 0 12px rgba(8,199,232,.35)!important}
+html[data-palette] .palette-option[data-palette="emerald"] i{background:linear-gradient(135deg,#18d69a,#087153)!important;color:#18d69a!important;border-color:#8affcf!important;box-shadow:0 0 12px rgba(24,214,154,.35)!important}
+html[data-palette] .palette-option[data-palette="violet"] i{background:linear-gradient(135deg,#bf63ff,#6023a0)!important;color:#bf63ff!important;border-color:#edb2ff!important;box-shadow:0 0 12px rgba(191,99,255,.35)!important}
+html[data-palette] .palette-option[data-palette="amber"] i{background:linear-gradient(135deg,#ffcf55,#a95b0c)!important;color:#ffcf55!important;border-color:#ffe09a!important;box-shadow:0 0 12px rgba(255,207,85,.35)!important}
+/* التحديد يوضح الاختيار فقط ولا يغير لون الدائرة */
+html[data-palette] .palette-option.active i{filter:brightness(1.08)!important}
+</style>
 </body>
 </html>
