@@ -1934,5 +1934,17 @@ html[data-palette] #supportModal .button-only-panel button:hover{border-color:va
 html[data-palette] #modal .close-row{direction:ltr!important;justify-content:flex-start!important;width:100%!important}
 html[data-palette] #modal .close-row button{direction:rtl!important;margin-left:0!important;margin-right:0!important}
 </style>
+
+<style id="palette-swatch-close-marker-v12">
+/* مربعات الألوان نفسها تتغير مع اللون المختار دون فقدان تمييز كل خيار */
+html[data-palette] .palette-option i{background:linear-gradient(135deg,var(--p-accent2),var(--p-accent),var(--p-border))!important;color:var(--p-accent2)!important;border-color:var(--p-accent2)!important;box-shadow:0 0 12px var(--p-glow)!important}
+html[data-palette] .palette-option.active i{background:linear-gradient(135deg,var(--p-accent2),var(--p-accent))!important;box-shadow:0 0 18px var(--p-glow)!important}
+html[data-palette] .palette-option.active{border-color:var(--p-accent2)!important;background:color-mix(in srgb,var(--p-accent) 20%,var(--p-panel))!important}
+/* زر X أعلى شات الدعم */
+html[data-palette] #supportModal .support-close{color:var(--p-accent2)!important;background:var(--p-panel)!important;border:1px solid var(--p-border)!important;border-radius:10px!important;box-shadow:0 0 10px var(--p-glow)!important}
+html[data-palette] #supportModal .support-close:hover{color:var(--p-accent2)!important;background:var(--p-accent)!important;border-color:var(--p-accent2)!important}
+/* العلامة/السهم الصغير بجانب كل زر في الشات */
+html[data-palette] #supportModal .button-only-panel button::after{color:var(--p-accent2)!important;text-shadow:0 0 8px var(--p-glow)!important}
+</style>
 </body>
 </html>
