@@ -1550,7 +1550,7 @@ setInterval(()=>{ if(document.visibilityState==='visible') pollSupportReplies();
     if(/صوت|ميكروفون|اتكلم|نطق/.test(q))return 'اضغط زر الميكروفون بجانب مربع البحث، واسمح للمتصفح باستخدام الميكروفون إذا طلب ذلك.';
     if(/تقييم|نجمه|نجوم/.test(q))return 'من زر «قيم التطبيق» اختر عدد النجوم ثم اضغط إرسال التقييم.';
     if(/تحميل|تطبيق|apk|تثبيت/.test(q))return 'لو تستخدم Android، حمّل التطبيق من مصدر موثوق فقط، وتأكد من صلاحيات الملف قبل التثبيت.';
-    return 'فاهمك. أقدر أشرح لك البحث، المحركات، الخصوصية، السجل، الميكروفون، الإعدادات والتقييم. جرّب تكتب مثلًا: «ما الفرق بين جوجل وبنج؟»';
+    return 'فاهمك. أقدر أشرح لك البحث، المحركات، الخصوصية، السجل، الميكروفون، الإعدادات والتقييم. اختار من الأزرار مثلًا: «ما الفرق بين جوجل وبنج؟»';
   }
   async function handleSmartSend(){
     const text=(chatInput.value||'').trim();if(!text||sendMsgBtn.disabled)return;
@@ -1657,21 +1657,30 @@ setInterval(()=>{ if(document.visibilityState==='visible') pollSupportReplies();
     quick.innerHTML='<div class="button-section-title">🌐 شرح محركات البحث</div>'+Object.keys(engines).map(name=>'<button type="button" class="engine-choice" data-engine="'+name+'"><span>🔍</span><b>'+name+'</b><small>اضغط للشرح</small></button>').join('');
     quick.querySelectorAll('.engine-choice').forEach(b=>b.onclick=()=>sendText('اشرح لي '+b.dataset.engine+' وماذا يفعل'));
   }
+  function settingsButtons(){
+    if(!quick)return;
+    quick.innerHTML='<div class="button-section-title">⚙ اختار من الإعدادات</div><div class="button-grid settings-grid"><button type="button" data-q="اختيار محرك البحث">🌐<b>محرك البحث</b><small>اختار المحرك المناسب</small></button><button type="button" data-q="شرح كلمة المرور والأمان">🔐<b>الأمان</b><small>كلمة المرور والحماية</small></button><button type="button" data-q="إعدادات السجل والخصوصية">🧹<b>السجل والخصوصية</b><small>المسح والحماية</small></button><button type="button" data-q="طريقة استخدام التطبيق">✨<b>طريقة الاستخدام</b><small>شرح سريع للتطبيق</small></button><button type="button" class="settings-back" data-q="رجوع للقائمة الرئيسية">↩<b>رجوع</b><small>القائمة الرئيسية</small></button></div>';
+    quick.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>sendText(b.dataset.q));
+  }
   function normalButtons(){
     if(!quick)return;
-    quick.innerHTML='<div class="button-section-title">اختار سؤالك</div><div class="button-grid"><button type="button" data-q="عايز أعرف محركات البحث">🌐<b>محركات البحث</b><small>اعرض المحركات</small></button><button type="button" data-q="ازاي أبحث بطريقة صحيحة؟">🔎<b>طريقة البحث</b><small>شرح البحث</small></button><button type="button" data-q="اشرح الخصوصية ومسح السجل">🔒<b>الخصوصية</b><small>السجل والحماية</small></button><button type="button" data-q="اشرح الإعدادات والأمان">⚙<b>الإعدادات</b><small>تحكم وأمان</small><\/button><button type="button" data-q="اشرح استخدام الميكروفون">🎙️<b>البحث الصوتي</b><small>استخدام الميكروفون</small></button><button type="button" data-q="كيف أقيم التطبيق؟">⭐<b>تقييم التطبيق</b><small>إرسال تقييم</small></button></div>';
-    quick.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>sendText(b.dataset.q));
+    quick.innerHTML='<div class="button-section-title">اختار سؤالك</div><div class="button-grid"><button type="button" data-q="عايز أعرف محركات البحث">🌐<b>محركات البحث</b><small>اعرض المحركات</small></button><button type="button" data-q="ازاي أبحث بطريقة صحيحة؟">🔎<b>طريقة البحث</b><small>شرح البحث</small></button><button type="button" data-q="اشرح الخصوصية ومسح السجل">🔒<b>الخصوصية</b><small>السجل والحماية</small></button><button type="button" data-q="افتح قائمة إعدادات التطبيق">⚙<b>الإعدادات</b><small>تحكم وأمان</small><\/button><button type="button" data-q="اعرض المساعدة السريعة">💡<b>مساعدة سريعة</b><small>أهم خطوات التطبيق</small></button><button type="button" data-q="كيف أقيم التطبيق؟">⭐<b>تقييم التطبيق</b><small>إرسال تقييم</small></button></div>';
+    quick.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{
+      if(/اعدادات|إعدادات/.test(b.dataset.q)){ sendText(b.dataset.q); setTimeout(settingsButtons,360); }
+      else sendText(b.dataset.q);
+    });
   }
   function reply(text){
     const q=norm(text),engine=engineFor(q);
-    if(engine)return engines[engine]+'\n\nلو عايز تستخدمه: افتح الإعدادات واختر «'+engine+'»، ثم اكتب كلمة أو جملة واضغط بحث.';
-    if(/محرك|محركات|محرك البحث|اختار|اختيار|فرق بينهم|انواع البحث|بحث/.test(q)&&(/محرك|محركات|اختار|اختيار|فرق|انواع/.test(q)))return 'تمام، دي محركات البحث الموجودة عندك. دوس على أي زر، واسم المحرك هيتكتب ويتبعت تلقائيًا وأنا أشرح لك وظيفته.';
-    if(/بحث|ادور|دور|نتيج|كلمه|جمله|اكتب/.test(q))return 'اكتب أي كلمة أو جملة في مربع البحث، مش لازم صياغة معينة، واضغط «بحث» لفتح النتائج في المحرك المختار.';
+    if(engine)return engines[engine]+'\n\nلاستخدامه: افتح الإعدادات واختر «'+engine+'»، ثم استخدم مربع البحث الرئيسي واضغط بحث.';
+    if(/افتح قائمه|افتح قائمة|اعدادات التطبيق|إعدادات التطبيق/.test(q))return 'تمام، دي اختيارات الإعدادات. اختار أي زر عشان أوضح لك وظيفته.';
+    if(/محرك|محركات|محرك البحث|اختار|اختيار|فرق بينهم|انواع البحث|بحث/.test(q)&&(/محرك|محركات|اختار|اختيار|فرق|انواع/.test(q)))return 'تمام، دي محركات البحث الموجودة عندك. دوس على أي زر، وهيظهر لك شرح المحرك وطريقة استخدامه.';
+    if(/بحث|ادور|دور|نتيج|كلمه|جمله|اكتب/.test(q))return 'استخدم مربع البحث الرئيسي واكتب كلمة أو جملة بالطريقة التي تريدها، ثم اضغط «بحث» لفتح النتائج في المحرك المختار.';
     if(/خصوص|سجل|حذف|مسح|بيانات/.test(q))return 'لمسح سجل البحث اضغط «مسح الكل». وحافظ على عدم كتابة كلمات المرور أو البيانات الحساسة في البحث.';
     if(/اعداد|امان|امن|قفل|باسورد|كلمه المرور/.test(q))return 'من الإعدادات تقدر تختار محرك البحث وتفعّل كلمة المرور وتراجع إعدادات الأمان.';
-    if(/ميكروفون|صوت|اتكلم|نطق/.test(q))return 'اضغط زر الميكروفون بجانب مربع البحث واسمح للمتصفح باستخدامه عند الطلب.';
+    if(/ميكروفون|صوت|اتكلم|نطق/.test(q))return 'هذه الميزة غير موجودة داخل الدردشة حاليًا. اختار أي خدمة أخرى من الأزرار المتاحة.';
     if(/تقييم|نجمه|نجوم/.test(q))return 'اضغط «قيم التطبيق»، اختر النجوم، ثم أرسل تقييمك.';
-    return 'فهمت إنك بتسأل عن التطبيق. أقدر أشرح لك المحركات، البحث، الخصوصية، السجل، الميكروفون والإعدادات. جرّب تكتب سؤالك بطريقتك أو اختار زرًا تحت.';
+    return 'فاهمك. اختار أي زر من القائمة، وأنا أوضح لك المحركات والبحث والخصوصية والسجل والإعدادات خطوة بخطوة.';
   }
   const greetings=['تمام، استلمت اسمك يا ','وصلني اسمك يا ','أهلًا يا ','منورنا يا ','تشرفنا يا '];
   function extractName(t){const x=String(t).trim().replace(/^(انا|أنا|اسمي|اسمى|اسمي هو|my name is)\s*/i,'').trim();return (x.split(/\s+/).filter(Boolean).slice(0,3).join(' ')||'صديقي').replace(/[.!؟،]+$/,'')}
@@ -1685,8 +1694,8 @@ setInterval(()=>{ if(document.visibilityState==='visible') pollSupportReplies();
   async function sendText(text){
     if(busy)return; text=String(text||'').trim();if(!text)return;
     busy=true;user(text);await new Promise(r=>setTimeout(r,300));
-    if(askingName){const name=extractName(text);localStorage.setItem(NAME,name);askingName=false;const g=greetings[Math.floor(Math.random()*greetings.length)];bot(g+name+' ✨\nقول لي عايز تعرف إيه، أو دوس على «محركات البحث» لو عايز تشوف الاختيارات.');}
-    else{const q=norm(text);bot(reply(text));if(/محرك|محركات|اختيار|انواع/.test(q)&&!engineFor(q))engineButtons();else normalButtons();}
+    if(askingName){const name=extractName(text);localStorage.setItem(NAME,name);askingName=false;const g=greetings[Math.floor(Math.random()*greetings.length)];bot(g+name+' ✨\nاختار من الأزرار تحت عشان تشوف الاختيارات والشرح.');}
+    else{const q=norm(text);bot(reply(text));if(/رجوع|القائمه الرئيسيه|القائمة الرئيسية/.test(q))normalButtons();else if(/افتح قائمه|افتح قائمة|اعدادات التطبيق|إعدادات التطبيق/.test(q))settingsButtons();else if(/محرك|محركات|اختيار|انواع/.test(q)&&!engineFor(q))engineButtons();else normalButtons();}
     busy=false;
   }
   function open(){modal.style.display='flex';modal.setAttribute('aria-hidden','false');welcome();setTimeout(()=>input.focus(),100)}
