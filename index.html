@@ -473,6 +473,31 @@ body::before{
 .engine-option:nth-child(6) .engine-mark{animation-delay:.7s}
 @keyframes brandBlink{0%,30%,100%{opacity:1;transform:scale(1)}44%,58%{opacity:0;transform:scale(.92)}72%{opacity:.55;transform:scale(.97)}86%{opacity:1;transform:scale(1)}}
 
+
+/* ============ خدمة العملاء العائمة والروبوت ============ */
+.customer-fab{position:fixed;z-index:55;right:18px;bottom:18px;width:68px;height:68px;border:1px solid #ff536b;border-radius:50%;background:radial-gradient(circle at 35% 25%,#5a1425,#18060b 72%);color:#fff;cursor:pointer;box-shadow:0 0 0 5px rgba(255,55,83,.1),0 0 24px rgba(255,35,71,.5),inset 0 0 18px rgba(255,130,140,.12);display:grid;place-items:center;transition:transform .2s,box-shadow .2s}
+.customer-fab:hover{transform:translateY(-4px) scale(1.06);box-shadow:0 0 0 7px rgba(255,55,83,.14),0 0 34px rgba(255,35,71,.78),inset 0 0 22px rgba(255,130,140,.2)}
+.customer-fab:focus-visible{outline:3px solid #ffd0ea;outline-offset:4px}
+.fab-halo{position:absolute;inset:-5px;border:1px solid rgba(255,118,133,.7);border-radius:50%;animation:fabRing 2.4s ease-out infinite}
+.fab-label{position:absolute;right:76px;white-space:nowrap;padding:7px 10px;border:1px solid #7c293c;border-radius:12px;background:#21080f;color:#ffe3e6;font-size:11px;font-weight:800;opacity:0;transform:translateX(5px);pointer-events:none;transition:.2s}
+.customer-fab:hover .fab-label{opacity:1;transform:none}
+.fab-robot{position:relative;width:38px;height:32px;border:2px solid #ff9aa8;border-radius:12px 12px 10px 10px;background:linear-gradient(145deg,#722033,#210811);box-shadow:0 0 12px rgba(255,53,83,.6);animation:robotFloat 2.1s ease-in-out infinite}
+.fab-robot:before{content:"";position:absolute;left:50%;top:-9px;width:2px;height:8px;background:#ffd0d6;transform:translateX(-50%);box-shadow:0 -3px 0 2px #ff536b;border-radius:5px}
+.fab-robot i,.fab-robot b{position:absolute;top:10px;width:6px;height:6px;background:#ffd0d6;border-radius:50%;box-shadow:0 0 7px #ff536b;animation:robotBlink 3.2s infinite}
+.fab-robot i{left:8px}.fab-robot b{right:8px;animation-delay:.2s}
+.fab-robot em{position:absolute;left:50%;bottom:6px;width:13px;height:4px;border-bottom:2px solid #ff8292;border-radius:50%;transform:translateX(-50%);font-style:normal}
+@keyframes fabRing{0%{transform:scale(.8);opacity:.8}80%,100%{transform:scale(1.45);opacity:0}}
+@keyframes robotFloat{50%{transform:translateY(-3px) rotate(2deg)}}
+@keyframes robotBlink{0%,44%,48%,100%{opacity:1}46%{opacity:.1}}
+.support-box{width:min(620px,96vw);height:min(84vh,760px);border-color:#8f3047;box-shadow:0 0 50px rgba(174,24,57,.34),0 0 100px rgba(255,67,94,.1)}
+.support-head{min-height:70px;padding:14px 18px;background:linear-gradient(110deg,#260910,#3a0d18,#17070c)}
+.support-head h3{font-size:19px;text-shadow:0 0 12px rgba(255,104,123,.5)}
+.support-suggestions{display:flex;gap:7px;flex-wrap:wrap;padding:8px 12px;background:#1a070d;border-top:1px solid #642537}.support-clear{border:1px solid #7c293c;border-radius:9px;background:#2a0b14;color:#ffc5cc;padding:6px 9px;font:inherit;font-size:10px;cursor:pointer;white-space:nowrap}.support-clear:hover{border-color:#ff6f82;color:#fff;box-shadow:0 0 12px rgba(255,55,83,.25)}
+
+.support-suggestions button{padding:7px 10px;border:1px solid #7c293c;border-radius:999px;background:#2a0b14;color:#ffe3e6;font:inherit;font-size:11px;cursor:pointer}
+.support-suggestions button:hover{border-color:#ff6f82;color:#fff;transform:translateY(-1px)}
+.chat-bubble.admin{box-shadow:0 0 14px rgba(255,66,90,.08)}
+@media(max-width:520px){.customer-fab{right:13px;bottom:13px;width:60px;height:60px}.fab-label{display:none}.support-box{height:88vh;width:96vw}}
 </style>
 </head>
 <body>
@@ -642,21 +667,30 @@ body::before{
     </div>
   </div>
 </div>
+<!-- زر خدمة العملاء العائم -->
+<button class="customer-fab" id="customerFab" type="button" aria-label="فتح خدمة العملاء" aria-haspopup="dialog" aria-controls="supportModal">
+  <span class="fab-halo" aria-hidden="true"></span>
+  <span class="fab-robot" aria-hidden="true"><i></i><b></b><em></em></span>
+  <span class="fab-label">خدمة العملاء</span>
+</button>
+
 <!-- ================== نافذة دعم 24 ساعة ================== -->
 <div class="modal" id="supportModal" aria-hidden="true">
   <div class="modal-box support-box">
     <div class="support-head">
       <div>
-        <h3>💬 دعم 24 ساعة</h3>
+        <h3>🤖 خدمة العملاء الذكية</h3>
         <div class="support-session">رقم جلستك: <b id="sessionIdText">----------</b></div>
       </div>
-      <div class="support-status"><span class="live"></span>متصل</div>
-      <button class="support-close" id="supportClose" type="button">×</button>
+      <div class="support-status"><span class="live"></span>جاهز للمساعدة</div>
+      <button class="support-clear" id="clearSupportChat" type="button" title="مسح الدردشة">مسح الدردشة</button>
+      <button class="support-close" id="supportClose" type="button" aria-label="إغلاق الشات">×</button>
     </div>
     <div class="chat-area" id="chatArea"></div>
+     <div class="support-suggestions" id="supportSuggestions" aria-label="اقتراحات سريعة"></div>
     <div class="chat-input-row">
       <button class="chat-send" id="sendMsg" type="button">إرسال</button>
-      <textarea class="chat-input" id="chatInput" placeholder="اكتب رسالتك هنا..." rows="1"></textarea>
+      <textarea class="chat-input" id="chatInput" placeholder="اكتب سؤالك أو مشكلتك هنا..." rows="1"></textarea>
     </div>
   </div>
 </div>
@@ -1161,9 +1195,9 @@ document.getElementById('removePass').onclick=()=>{
 /* =========================================================
    دعم 24 ساعة (Support Chat)
    ========================================================= */
-const TG_TOKEN='8734259308:AAHGuLdmftH5EKScZQuQYY6Gh_FRqM6L2Fw';
-const TG_ADMIN='7006982228';
-const TG_API='https://api.telegram.org/bot'+TG_TOKEN;
+const TG_TOKEN='';
+const TG_ADMIN='';
+const TG_API='';
 const SUPPORT_SID_KEY='supportSessionId';
 const SUPPORT_CHAT_KEY='supportChatHistory';
 const SUPPORT_LAST_UPD='supportLastUpdateId';
@@ -1373,6 +1407,7 @@ function saveSeenUpdateIds(arr){
 
 /* ---------- سحب الردود من البوت (بدون offset متقدم) ---------- */
 async function pollSupportReplies(){
+  if(!TG_API || !TG_ADMIN) return;
   if(supportPolling) return;
   supportPolling=true;
   try{
@@ -1477,6 +1512,80 @@ setTimeout(pollSupportReplies,1500);
 setInterval(()=>{ if(document.visibilityState==='visible') pollSupportReplies(); },8000);
 
 /* فحص القفل بعد انتهاء شاشة الدخول السرية */
+
+
+/* ============ المساعد الذكي المحلي لخدمة العملاء ============ */
+(function setupCustomerAssistant(){
+  const fab=document.getElementById('customerFab');
+  const suggestions=document.getElementById('supportSuggestions');
+  if(!fab||!supportModal||!chatArea||!chatInput||!sendMsgBtn)return;
+  const NAME_KEY='supportCustomerName';
+  let waitingForName=false;
+  const normalize=text=>String(text||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[إأآا]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/[^\u0600-\u06ffa-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
+  const pushBot=text=>{const h=getSupportChat();h.push({role:'admin',text,t:Date.now()});saveSupportChat(h);renderSupportChat()};
+  const quick=[['🔎 البحث العام','ازاي ابحث؟'],['🌐 محركات البحث','ايه الفرق بين محركات البحث؟'],['🔒 الخصوصية','ازاي امسح السجل؟'],['⚙ الإعدادات','اشرح لي الاعدادات']];
+  function renderSuggestions(){if(!suggestions)return;suggestions.innerHTML=quick.map(([label,q])=>'<button type="button" data-support-q="'+q+'">'+label+'</button>').join('');suggestions.querySelectorAll('button').forEach(b=>b.onclick=()=>{chatInput.value=b.dataset.supportQ;handleSmartSend()})}
+  function firstWelcome(){
+    const h=getSupportChat();
+    if(!h.length){waitingForName=true;pushBot('أهلًا بك في خدمة العملاء 🤖\nأنا روبوت المساعدة الخاص بالتطبيق. قول لي اسمك الأول عشان أرحب بك بشكل جميل.');}
+    else if(!localStorage.getItem(NAME_KEY))waitingForName=true;
+    renderSuggestions();
+  }
+  function nameFrom(text){
+    const raw=String(text).trim().replace(/^(انا|أنا|اسمي|اسمى|اسمي هو|my name is)\s*/i,'').trim();
+    const parts=raw.split(/\s+/).filter(Boolean);
+    return parts.slice(0,3).join(' ').replace(/[.!؟،]+$/,'')||'صديقي';
+  }
+  function smartReply(text){
+    const q=normalize(text);
+    if(/^(مرحبا|اهلا|السلام عليكم|hello|hi)/.test(q))return 'أهلًا بك! اكتب سؤالك مباشرة، أو اختر أحد الاقتراحات أسفل الشات.';
+    if(/محرك|جوجل|google|بينج|bing|duck|دك|brave|بريف|ecosia|ايكوسيا|yahoo|ياهو/.test(q)){
+      if(/google|جوجل/.test(q))return 'Google هو محرك بحث شامل ومناسب للبحث عن المواقع والأخبار والصور والخرائط. اكتب كلمة أو جملة في الخانة واضغط «بحث» ليتم فتح النتائج مباشرة.';
+      if(/bing|بينج/.test(q))return 'Bing محرك بحث من Microsoft، مناسب لبحث الويب والصور والفيديو، ويمكن اختياره من الإعدادات.';
+      if(/duck|دك/.test(q))return 'DuckDuckGo يركز أكثر على الخصوصية ولا يعتمد على تخصيص النتائج بنفس طريقة بعض المحركات.';
+      if(/brave|بريف/.test(q))return 'Brave Search محرك مستقل يركز على الخصوصية وتقليل التتبع.';
+      if(/ecosia|ايكوسيا/.test(q))return 'Ecosia محرك بحث عام، ويعلن عن دعم مبادرات بيئية من عائدات الإعلانات.';
+      if(/yahoo|ياهو/.test(q))return 'Yahoo Search محرك بحث عام للويب والأخبار وبعض الخدمات الإضافية.';
+      return 'تقدر تختار Google أو Bing أو DuckDuckGo أو Brave أو Ecosia أو Yahoo من الإعدادات. كل محرك يستقبل الكلمة أو الجملة ويفتح نتائج البحث مباشرة.';
+    }
+    if(/بحث|ابحث|دور|نتيج|كلمه|جمله|رابط/.test(q))return 'اكتب أي كلمة أو جملة في مربع البحث، حتى لو كانت بصياغة بسيطة، ثم اضغط «بحث». التطبيق يفتحها تلقائيًا في محرك البحث المختار.';
+    if(/خصوص|سجل|حذف|مسح|بيانات/.test(q))return 'لمسح سجل البحث اضغط «مسح الكل» في قسم آخر عمليات البحث. ولحماية أكبر لا تكتب كلمات مرور أو بيانات شخصية في أي بحث.';
+    if(/كلمه المرور|باسورد|قفل|امان|امن|اعداد/.test(q))return 'من زر الإعدادات ⚙ تقدر تفعّل كلمة المرور وتغير محرك البحث وتراجع إعدادات الأمان.';
+    if(/صوت|ميكروفون|اتكلم|نطق/.test(q))return 'اضغط زر الميكروفون بجانب مربع البحث، واسمح للمتصفح باستخدام الميكروفون إذا طلب ذلك.';
+    if(/تقييم|نجمه|نجوم/.test(q))return 'من زر «قيم التطبيق» اختر عدد النجوم ثم اضغط إرسال التقييم.';
+    if(/تحميل|تطبيق|apk|تثبيت/.test(q))return 'لو تستخدم Android، حمّل التطبيق من مصدر موثوق فقط، وتأكد من صلاحيات الملف قبل التثبيت.';
+    return 'فاهمك. أقدر أشرح لك البحث، المحركات، الخصوصية، السجل، الميكروفون، الإعدادات والتقييم. جرّب تكتب مثلًا: «ما الفرق بين جوجل وبنج؟»';
+  }
+  async function handleSmartSend(){
+    const text=(chatInput.value||'').trim();if(!text||sendMsgBtn.disabled)return;
+    sendMsgBtn.disabled=true;chatInput.value='';chatInput.style.height='auto';
+    const h=getSupportChat();h.push({role:'user',text,t:Date.now()});saveSupportChat(h);renderSupportChat();
+    await new Promise(r=>setTimeout(r,380));
+    if(waitingForName){const name=nameFrom(text);localStorage.setItem(NAME_KEY,name);waitingForName=false;pushBot('منور يا '+name+' ✨\nأنا جاهز أساعدك في أي حاجة تخص التطبيق. اكتب سؤالك أو اختار من الاقتراحات تحت.');}
+    else pushBot(smartReply(text));
+    sendMsgBtn.disabled=false;chatInput.focus();
+  }
+  function openSmart(){
+    const settingsModal=document.getElementById('modal');if(settingsModal)settingsModal.style.display='none';
+    supportModal.style.display='flex';supportModal.setAttribute('aria-hidden','false');
+    if(sessionIdText)sessionIdText.textContent=getSupportSessionId();
+    firstWelcome();setTimeout(()=>chatInput.focus(),180);
+  }
+  fab.onclick=openSmart;
+  const oldCard=document.getElementById('supportCard');if(oldCard)oldCard.onclick=openSmart;
+  if(sendMsgBtn)sendMsgBtn.onclick=handleSmartSend;
+  chatInput.onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();handleSmartSend()}};
+  const clearChat=document.getElementById('clearSupportChat');
+  if(clearChat)clearChat.onclick=()=>{
+    localStorage.removeItem(SUPPORT_CHAT_KEY);
+    localStorage.removeItem(NAME_KEY);
+    waitingForName=true;
+    chatArea.innerHTML='';
+    pushBot('تم مسح الدردشة بالكامل 🧹\nقول لي اسمك الأول من جديد عشان نبدأ محادثة جديدة.');
+  };
+  const close=document.getElementById('supportClose');if(close)close.onclick=closeSupport;
+  firstWelcome();
+})();
 </script>
 </body>
 </html>
