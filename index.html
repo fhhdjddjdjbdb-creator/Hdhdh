@@ -687,11 +687,7 @@ body::before{
       <button class="support-close" id="supportClose" type="button" aria-label="إغلاق الشات">×</button>
     </div>
     <div class="chat-area" id="chatArea"></div>
-     <div class="support-suggestions" id="supportSuggestions" aria-label="اقتراحات سريعة"></div>
-    <div class="chat-input-row">
-      <button class="chat-send" id="sendMsg" type="button">إرسال</button>
-      <textarea class="chat-input" id="chatInput" placeholder="اكتب سؤالك أو مشكلتك هنا..." rows="1"></textarea>
-    </div>
+    <div class="support-suggestions button-only-panel" id="supportSuggestions" aria-label="اختيارات خدمة العملاء"></div>
   </div>
 </div>
 
@@ -1610,7 +1606,7 @@ setInterval(()=>{ if(document.visibilityState==='visible') pollSupportReplies();
       if(typeof saveSupportChat==='function')saveSupportChat(h);
       if(typeof renderSupportChat==='function')renderSupportChat();
     }
-    setTimeout(()=>{if(i)i.focus()},120);
+
   };
   f.onclick=open;
   if(close)close.onclick=()=>{m.style.display='none';m.setAttribute('aria-hidden','true')};
@@ -1635,9 +1631,9 @@ setInterval(()=>{ if(document.visibilityState==='visible') pollSupportReplies();
 /* المساعد الذكي المحسن: أزرار المحركات تكتب وتُرسل تلقائيًا */
 (function(){
   const fab=document.getElementById('customerFab'),modal=document.getElementById('supportModal');
-  const area=document.getElementById('chatArea'),input=document.getElementById('chatInput'),send=document.getElementById('sendMsg');
+  const area=document.getElementById('chatArea');
   const quick=document.getElementById('supportSuggestions'),clear=document.getElementById('clearSupportChat'),close=document.getElementById('supportClose');
-  if(!fab||!modal||!area||!input||!send)return;
+  if(!fab||!modal||!area)return;
   const NAME='supportCustomerName', CHAT='supportChatHistory';
   let askingName=false,busy=false;
   const engines={
@@ -1658,12 +1654,12 @@ setInterval(()=>{ if(document.visibilityState==='visible') pollSupportReplies();
   const engineFor=q=>{for(const [name,words] of aliases)if(words.some(w=>q.includes(norm(w))))return name;return null};
   function engineButtons(){
     if(!quick)return;
-    quick.innerHTML='<span class="engine-choice-title">اختار محركًا للتعرف عليه:</span>'+Object.keys(engines).map(name=>'<button type="button" class="engine-choice" data-engine="'+name+'">'+name+'</button>').join('');
-    quick.querySelectorAll('.engine-choice').forEach(b=>b.onclick=()=>sendText('عايز أعرف '+b.dataset.engine));
+    quick.innerHTML='<div class="button-section-title">🌐 شرح محركات البحث</div>'+Object.keys(engines).map(name=>'<button type="button" class="engine-choice" data-engine="'+name+'"><span>🔍</span><b>'+name+'</b><small>اضغط للشرح</small></button>').join('');
+    quick.querySelectorAll('.engine-choice').forEach(b=>b.onclick=()=>sendText('اشرح لي '+b.dataset.engine+' وماذا يفعل'));
   }
   function normalButtons(){
     if(!quick)return;
-    quick.innerHTML='<button type="button" data-q="عايز أعرف محركات البحث">🌐 محركات البحث</button><button type="button" data-q="ازاي أبحث؟">🔎 طريقة البحث</button><button type="button" data-q="ازاي أمسح السجل؟">🔒 الخصوصية</button><button type="button" data-q="اشرح الإعدادات">⚙ الإعدادات</button>';
+    quick.innerHTML='<div class="button-section-title">اختار سؤالك</div><div class="button-grid"><button type="button" data-q="عايز أعرف محركات البحث">🌐<b>محركات البحث</b><small>اعرض المحركات</small></button><button type="button" data-q="ازاي أبحث بطريقة صحيحة؟">🔎<b>طريقة البحث</b><small>شرح البحث</small></button><button type="button" data-q="اشرح الخصوصية ومسح السجل">🔒<b>الخصوصية</b><small>السجل والحماية</small></button><button type="button" data-q="اشرح الإعدادات والأمان">⚙<b>الإعدادات</b><small>تحكم وأمان</small><\/button><button type="button" data-q="اشرح استخدام الميكروفون">🎙️<b>البحث الصوتي</b><small>استخدام الميكروفون</small></button><button type="button" data-q="كيف أقيم التطبيق؟">⭐<b>تقييم التطبيق</b><small>إرسال تقييم</small></button></div>';
     quick.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>sendText(b.dataset.q));
   }
   function reply(text){
@@ -1681,8 +1677,9 @@ setInterval(()=>{ if(document.visibilityState==='visible') pollSupportReplies();
   function extractName(t){const x=String(t).trim().replace(/^(انا|أنا|اسمي|اسمى|اسمي هو|my name is)\s*/i,'').trim();return (x.split(/\s+/).filter(Boolean).slice(0,3).join(' ')||'صديقي').replace(/[.!؟،]+$/,'')}
   function welcome(){
     const h=read();
-    if(!h.length){askingName=true;bot('أهلًا بك في خدمة العملاء 🤖\nقول لي اسمك الأول عشان أرحب بك.');}
-    else if(!localStorage.getItem(NAME))askingName=true;
+    /* الواجهة أصبحت أزرارًا فقط؛ لا نطلب اسمًا لأن المستخدم لا يكتب داخل الشات */
+    askingName=false;
+    if(!h.length)bot('أهلًا بك في خدمة العملاء 🤖\nاختار من الأزرار تحت، وكل اختيار هيتبعت تلقائيًا ويوصلك شرحه.');
     normalButtons();
   }
   async function sendText(text){
@@ -1690,16 +1687,49 @@ setInterval(()=>{ if(document.visibilityState==='visible') pollSupportReplies();
     busy=true;user(text);await new Promise(r=>setTimeout(r,300));
     if(askingName){const name=extractName(text);localStorage.setItem(NAME,name);askingName=false;const g=greetings[Math.floor(Math.random()*greetings.length)];bot(g+name+' ✨\nقول لي عايز تعرف إيه، أو دوس على «محركات البحث» لو عايز تشوف الاختيارات.');}
     else{const q=norm(text);bot(reply(text));if(/محرك|محركات|اختيار|انواع/.test(q)&&!engineFor(q))engineButtons();else normalButtons();}
-    busy=false;input.focus();
+    busy=false;
   }
   function open(){modal.style.display='flex';modal.setAttribute('aria-hidden','false');welcome();setTimeout(()=>input.focus(),100)}
   fab.onclick=open;
-  send.onclick=()=>sendText(input.value);
-  input.onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendText(input.value)}};
   if(close)close.onclick=()=>{modal.style.display='none';modal.setAttribute('aria-hidden','true')};
-  if(clear)clear.onclick=()=>{localStorage.removeItem(CHAT);localStorage.removeItem(NAME);area.innerHTML='';askingName=true;bot('تم مسح الدردشة بالكامل 🧹\nقول لي اسمك الأول من جديد.');normalButtons()};
+  if(clear)clear.onclick=()=>{localStorage.removeItem(CHAT);localStorage.removeItem(NAME);area.innerHTML='';askingName=false;bot('تم مسح الدردشة بالكامل 🧹\nاختار أي زر من القائمة عشان نبدأ من جديد.');normalButtons()};
   welcome();
 })();
 </script>
+
+<style>
+.button-only-panel{padding:12px 14px 16px;display:block;max-height:230px;overflow-y:auto;border-top:1px solid rgba(255,77,119,.22)}
+.button-section-title{color:#ffd8e2;font-weight:800;text-align:center;font-size:13px;margin:2px 0 10px}
+.button-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.button-only-panel button{font-family:inherit;cursor:pointer;color:#fff;background:linear-gradient(145deg,rgba(94,10,35,.95),rgba(38,7,20,.98));border:1px solid rgba(255,71,116,.72);border-radius:13px;min-height:52px;padding:8px 6px;display:flex;align-items:center;justify-content:center;gap:5px;flex-wrap:wrap;box-shadow:0 0 10px rgba(255,33,91,.12);transition:transform .18s ease,background .18s ease,border-color .18s ease}
+.button-only-panel button:hover,.button-only-panel button:focus{transform:translateY(-2px);background:linear-gradient(145deg,rgba(157,18,60,.98),rgba(65,7,27,.98));border-color:#ff809f;outline:none}
+.button-only-panel button b{font-size:12px}.button-only-panel button small{width:100%;font-size:10px;color:#ffb7c9}.button-only-panel .engine-choice{min-height:48px}.button-only-panel .engine-choice span{font-size:14px}.button-only-panel .engine-choice b{font-size:11px}.button-only-panel .engine-choice small{font-size:9px}
+@media(max-width:420px){.button-grid{gap:6px}.button-only-panel{max-height:245px;padding:10px}.button-only-panel button{min-height:48px}}
+</style>
+
+<style id="button-redesign-v2">
+/* تصميم الأزرار الجديد: بطاقات مرتبة بطابع النيون الأحمر */
+.support-box{width:min(700px,96vw);height:min(86vh,780px);border:1px solid rgba(255,72,105,.68);border-radius:24px;background:linear-gradient(150deg,#16050b 0%,#250710 52%,#100309 100%);box-shadow:0 0 28px rgba(255,32,75,.24),inset 0 1px rgba(255,180,190,.12)}
+.support-head{min-height:76px;padding:15px 18px;background:linear-gradient(120deg,#3a0a16,#7f112e 48%,#260610);border-bottom:1px solid rgba(255,102,125,.35)}
+.support-head h3{font-size:19px;letter-spacing:.2px;text-shadow:0 0 14px rgba(255,115,139,.75)}
+.chat-area{padding:16px 18px 10px;background:radial-gradient(circle at 50% 100%,rgba(153,15,48,.13),transparent 54%),#11040a}
+.button-only-panel{padding:14px 16px 18px;max-height:285px;overflow-y:auto;background:linear-gradient(180deg,#1d060e,#100309);border-top:1px solid rgba(255,75,107,.38);scrollbar-width:thin;scrollbar-color:#8f2944 transparent}
+.button-section-title{display:flex;align-items:center;justify-content:center;gap:8px;color:#ffe2e7;font-size:13px;letter-spacing:.3px;margin:0 0 12px}
+.button-section-title:before,.button-section-title:after{content:"";height:1px;flex:1;background:linear-gradient(90deg,transparent,#b52a4d,transparent)}
+.button-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.button-only-panel button{position:relative;min-height:58px;padding:9px 10px;border:1px solid rgba(255,78,111,.58);border-radius:16px;background:linear-gradient(145deg,rgba(100,13,39,.96),rgba(40,6,19,.98));color:#fff;font-family:inherit;box-shadow:0 5px 15px rgba(0,0,0,.2),inset 0 1px rgba(255,194,203,.1);transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease,background .2s ease}
+.button-only-panel button:after{content:"›";position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#ff91a6;font-size:18px;opacity:.65}
+.button-only-panel button:hover,.button-only-panel button:focus{transform:translateY(-3px);border-color:#ff9aac;background:linear-gradient(145deg,#b41d4b,#4c091f);box-shadow:0 8px 22px rgba(255,35,77,.22),0 0 0 1px rgba(255,118,141,.15);outline:none}
+.button-only-panel button b{font-size:12px;font-weight:800;letter-spacing:.15px}.button-only-panel button small{width:100%;font-size:10px;color:#ffb8c6;margin-top:2px}
+/* الزر الرئيسي يأخذ عرضًا كاملًا */
+.button-grid>button:first-child{grid-column:1/-1;min-height:66px;background:linear-gradient(110deg,#8e1239,#e42d5c 50%,#8c1238);border-color:#ff8ca2;box-shadow:0 8px 22px rgba(226,32,83,.28),inset 0 1px rgba(255,255,255,.2)}
+.button-grid>button:first-child b{font-size:14px}.button-grid>button:first-child small{color:#ffe5ea}
+.button-grid>button:nth-child(6){grid-column:1/-1;background:linear-gradient(110deg,rgba(104,13,40,.98),rgba(66,8,27,.98));}
+/* بطاقات المحركات */
+.button-only-panel .engine-choice{min-height:58px;display:grid;grid-template-columns:24px 1fr;grid-template-rows:1fr 1fr;align-items:center;justify-items:start;text-align:right;padding-right:12px;padding-left:26px}
+.button-only-panel .engine-choice span{grid-row:1/3;font-size:18px;align-self:center}.button-only-panel .engine-choice b{font-size:12px}.button-only-panel .engine-choice small{font-size:9px;line-height:1}
+.button-only-panel .engine-choice:after{font-size:17px}
+@media(max-width:520px){.support-box{width:96vw;height:88vh;border-radius:20px}.support-head{min-height:70px}.button-only-panel{max-height:300px;padding:12px}.button-grid{gap:7px}.button-only-panel button{min-height:56px;border-radius:14px}.button-grid>button:first-child{min-height:64px}}
+</style>
 </body>
 </html>
