@@ -1826,5 +1826,24 @@ html[data-palette] .support-close{color:var(--p-accent2)!important}
 html[data-palette] .support-status .live{background:var(--p-accent2)!important;box-shadow:0 0 8px var(--p-accent)!important}
 html[data-palette] .support-suggestions button:hover,html[data-palette] .support-clear:hover{border-color:var(--p-accent2)!important;color:#fff!important;box-shadow:0 0 12px var(--p-glow)!important}
 </style>
+
+<style id="palette-text-v4">
+/* كل النصوص الظاهرة تتبع لون الثيم المختار، دون تغيير التصميم */
+html[data-palette] body,
+html[data-palette] h1,html[data-palette] h2,html[data-palette] h3,html[data-palette] h4,html[data-palette] h5,html[data-palette] h6,
+html[data-palette] p,html[data-palette] span,html[data-palette] b,html[data-palette] strong,html[data-palette] small,
+html[data-palette] label,html[data-palette] a,html[data-palette] button,html[data-palette] input,html[data-palette] textarea,
+html[data-palette] .dev,html[data-palette] .developer-link,html[data-palette] .note,html[data-palette] .muted-p,
+html[data-palette] .sec-note,html[data-palette] .sec-msg,html[data-palette] .chat-empty,html[data-palette] .chat-bubble,
+html[data-palette] .engine-option-copy,html[data-palette] .engine-toggle-copy,html[data-palette] .fab-label{
+  color:var(--p-accent2)!important;
+}
+html[data-palette] input::placeholder,html[data-palette] textarea::placeholder{color:color-mix(in srgb,var(--p-accent2) 72%,transparent)!important}
+html[data-palette] .logo b,html[data-palette] .logo span,html[data-palette] .logo{color:var(--p-accent)!important}
+html[data-palette] .support-status,html[data-palette] .support-session b,html[data-palette] .badge{color:var(--p-accent2)!important}
+html[data-palette] .palette-option i{color:var(--p-accent)!important}
+html[data-palette] .palette-option b,html[data-palette] .palette-option small{color:var(--p-accent2)!important}
+html[data-palette] .btn.primary,html[data-palette] .quick button:nth-child(3){color:var(--p-accent2)!important}
+</style>
 </body>
 </html>
