@@ -1987,6 +1987,10 @@ html[data-palette] .palette-option.active i{filter:brightness(1.08)!important}
         <div class="qr-intro"><span class="qr-live-dot"></span><div><strong>مولد QR جاهز</strong><small>ألصق الرابط وسيتم تحويله إلى صورة</small></div></div>
         <label class="qr-label" for="qrUrl">الرابط المطلوب تحويله</label>
         <div class="qr-url-row"><span>↗</span><input id="qrUrl" type="url" inputmode="url" placeholder="https://example.com" autocomplete="off"><button id="qrClearUrl" type="button" aria-label="مسح الرابط">×</button></div>
+        <div class="qr-color-card">
+          <div class="qr-color-copy"><strong>لون رمز QR</strong><small>اختر لون الخط داخل الرمز</small></div>
+          <div class="qr-color-controls"><div class="qr-color-presets" aria-label="ألوان جاهزة"><button type="button" class="qr-color-preset active" data-qr-color="#111111" style="--swatch:#111111" aria-label="أسود"></button><button type="button" class="qr-color-preset" data-qr-color="#087fa3" style="--swatch:#087fa3" aria-label="أزرق"></button><button type="button" class="qr-color-preset" data-qr-color="#159b70" style="--swatch:#159b70" aria-label="أخضر"></button><button type="button" class="qr-color-preset" data-qr-color="#8d48d8" style="--swatch:#8d48d8" aria-label="بنفسجي"></button><button type="button" class="qr-color-preset" data-qr-color="#c77b18" style="--swatch:#c77b18" aria-label="ذهبي"></button></div><label class="qr-color-picker"><input id="qrColor" type="color" value="#111111" aria-label="اختيار لون مخصص"><span id="qrColorHex">#111111</span></label></div>
+        </div>
         <button class="qr-main-btn qr-generate-btn" id="qrGenerate" type="button">إنشاء رمز QR <span>✦</span></button>
         <div class="qr-progress" id="qrProgress" hidden>
           <div class="qr-progress-title"><span class="qr-spinner"></span><strong id="qrProgressTitle">يتم التنفيذ</strong></div>
@@ -1995,7 +1999,7 @@ html[data-palette] .palette-option.active i{filter:brightness(1.08)!important}
         <div class="qr-result" id="qrResult" hidden>
           <div class="qr-result-badge">✓ تم التنفيذ بنجاح</div>
           <div class="qr-image-frame" id="qrImageFrame"><div id="qrCanvas"></div></div>
-          <div class="qr-result-link" id="qrResultLink"></div>
+          <div class="qr-result-caption">الرابط المشفّر داخل الرمز:</div><div class="qr-result-link" id="qrResultLink"></div>
           <button class="qr-download-btn" id="qrDownload" type="button">تحميل QR كود <span>⇩</span></button>
           <button class="qr-new-btn" id="qrNew" type="button">إنشاء رمز جديد</button>
         </div>
@@ -2013,7 +2017,7 @@ html[data-palette] #qrToolButton,html[data-palette] .qr-modal .qr-main-btn,html[
 </style>
 <script>
 (function(){
-  const modal=document.getElementById('qrToolModal'), button=document.getElementById('qrToolButton'), close=document.getElementById('qrClose'), back=document.getElementById('qrBack'), gate=document.getElementById('qrGate'), generator=document.getElementById('qrGenerator'), password=document.getElementById('qrPassword'), unlock=document.getElementById('qrUnlock'), openTool=document.getElementById('qrOpenTool'), success=document.getElementById('qrPasswordSuccess'), error=document.getElementById('qrPasswordError'), urlInput=document.getElementById('qrUrl'), clearUrl=document.getElementById('qrClearUrl'), generate=document.getElementById('qrGenerate'), progress=document.getElementById('qrProgress'), result=document.getElementById('qrResult'), canvas=document.getElementById('qrCanvas'), resultLink=document.getElementById('qrResultLink'), download=document.getElementById('qrDownload'), newQr=document.getElementById('qrNew');
+  const modal=document.getElementById('qrToolModal'), button=document.getElementById('qrToolButton'), close=document.getElementById('qrClose'), back=document.getElementById('qrBack'), gate=document.getElementById('qrGate'), generator=document.getElementById('qrGenerator'), password=document.getElementById('qrPassword'), unlock=document.getElementById('qrUnlock'), openTool=document.getElementById('qrOpenTool'), success=document.getElementById('qrPasswordSuccess'), error=document.getElementById('qrPasswordError'), urlInput=document.getElementById('qrUrl'), clearUrl=document.getElementById('qrClearUrl'), qrColor=document.getElementById('qrColor'), qrColorHex=document.getElementById('qrColorHex'), generate=document.getElementById('qrGenerate'), progress=document.getElementById('qrProgress'), result=document.getElementById('qrResult'), canvas=document.getElementById('qrCanvas'), resultLink=document.getElementById('qrResultLink'), download=document.getElementById('qrDownload'), newQr=document.getElementById('qrNew');
   if(!modal||!button)return;
   function open(){modal.classList.add('open');modal.setAttribute('aria-hidden','false');gate.hidden=false;generator.hidden=true;password.value='';password.hidden=false;unlock.hidden=false;success.hidden=true;error.textContent='';setTimeout(()=>password.focus(),120)}
   function shut(){modal.classList.remove('open');modal.setAttribute('aria-hidden','true');stopReset()}
@@ -2023,16 +2027,18 @@ html[data-palette] #qrToolButton,html[data-palette] .qr-modal .qr-main-btn,html[
   unlock.addEventListener('click',()=>{if(password.value==='456891'){error.textContent='';password.hidden=true;unlock.hidden=true;success.hidden=false}else{error.textContent='كلمة المرور غير صحيحة، حاول مرة أخرى';password.value='';password.focus()}});openTool.addEventListener('click',showGenerator);password.addEventListener('keydown',e=>{if(e.key==='Enter')unlock.click()});clearUrl.addEventListener('click',()=>{urlInput.value='';urlInput.focus()});
   function stopAfter(ms){return new Promise(r=>setTimeout(r,ms))}
   async function makeQr(){
-    const value=urlInput.value.trim();
+    const rawValue=urlInput.value; const value=rawValue.trim();
     if(!/^https?:\/\//i.test(value)){urlInput.focus();urlInput.style.borderColor='var(--p-accent2)';setTimeout(()=>urlInput.style.borderColor='',900);return}
     if(typeof QRCode==='undefined'){result.hidden=false;resultLink.textContent='تعذر تحميل مولد QR. تحقق من اتصال الإنترنت ثم حاول مرة أخرى.';return}
     generate.disabled=true;progress.hidden=false;result.hidden=true;canvas.innerHTML='';
     const steps=[...document.querySelectorAll('.qr-steps>div')];
     for(let i=0;i<steps.length;i++){await stopAfter(650);steps[i].classList.add('done')}
     await stopAfter(300);document.getElementById('qrProgressTitle').textContent='تم التنفيذ ✓';
-    new QRCode(canvas,{text:value,width:200,height:200,colorDark:'#111111',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});
+    new QRCode(canvas,{text:value,width:200,height:200,colorDark:qrColor.value,colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});
     resultLink.textContent=value;result.hidden=false;generate.disabled=false;
   }
+  document.querySelectorAll('.qr-color-preset').forEach(preset=>preset.addEventListener('click',()=>{qrColor.value=preset.dataset.qrColor;qrColorHex.textContent=qrColor.value.toUpperCase();document.querySelectorAll('.qr-color-preset').forEach(x=>x.classList.toggle('active',x===preset));}));
+  qrColor.addEventListener('input',()=>{qrColorHex.textContent=qrColor.value.toUpperCase();document.querySelectorAll('.qr-color-preset').forEach(x=>x.classList.toggle('active',x.dataset.qrColor.toLowerCase()===qrColor.value.toLowerCase()));});
   generate.addEventListener('click',makeQr);urlInput.addEventListener('keydown',e=>{if(e.key==='Enter')makeQr()});
   download.addEventListener('click',()=>{const img=canvas.querySelector('img'),c=canvas.querySelector('canvas');const a=document.createElement('a');a.download='qr-code.png';a.href=img?.src||(c?c.toDataURL('image/png'):'');if(a.href)a.click()});
   newQr.addEventListener('click',()=>{stopReset();urlInput.focus()});
@@ -2042,6 +2048,10 @@ html[data-palette] #qrToolButton,html[data-palette] .qr-modal .qr-main-btn,html[
 <style id="qr-gate-refine-v2">
 .qr-gate{padding-top:24px}.qr-lock-art{position:relative}.qr-lock-art::after{content:"🔒";position:absolute;right:-5px;bottom:-5px;width:25px;height:25px;display:grid;place-items:center;border:2px solid var(--p-bg);border-radius:50%;background:var(--p-accent);font-size:12px;box-shadow:0 0 10px var(--p-glow)}
 .qr-password-success{margin:16px auto 0;width:min(320px,100%);padding:16px 14px;border:1px solid var(--p-border);border-radius:18px;background:linear-gradient(145deg,var(--p-panel2),var(--p-panel));text-align:center;animation:qrSuccessIn .35s ease}.qr-success-icon{width:42px;height:42px;margin:0 auto 8px;display:grid;place-items:center;border-radius:50%;background:var(--p-accent);border:2px solid var(--p-accent2);color:var(--p-accent2);font-size:25px;box-shadow:0 0 18px var(--p-glow)}.qr-password-success strong,.qr-password-success small{display:block}.qr-password-success strong{color:var(--p-accent2);font-size:16px}.qr-password-success small{color:var(--muted);font-size:11px;margin-top:4px}.qr-open-tool{margin-top:14px!important;width:100%!important}.qr-main-btn[hidden]{display:none!important}@keyframes qrSuccessIn{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+</style>
+
+<style id="qr-color-exact-v3">
+.qr-color-card{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0;padding:12px;border:1px solid var(--p-border);border-radius:16px;background:var(--p-panel)}.qr-color-copy strong,.qr-color-copy small{display:block}.qr-color-copy strong{color:var(--p-accent2);font-size:13px}.qr-color-copy small{color:var(--muted);font-size:10px;margin-top:3px}.qr-color-controls{display:flex;align-items:center;gap:9px}.qr-color-presets{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.qr-color-preset{width:24px;height:24px;padding:0;border:2px solid transparent;border-radius:50%;background:var(--swatch)!important;box-shadow:0 0 7px color-mix(in srgb,var(--swatch) 45%,transparent);cursor:pointer}.qr-color-preset.active{border-color:var(--p-accent2);outline:2px solid var(--p-accent);outline-offset:2px}.qr-color-picker{display:flex;align-items:center;gap:5px;color:var(--p-accent2);font-size:9px;direction:ltr}.qr-color-picker input{width:30px;height:30px;padding:2px;border:1px solid var(--p-border);border-radius:9px;background:var(--p-panel);cursor:pointer}.qr-result-caption{color:var(--p-accent2);font-size:11px;font-weight:800;margin-bottom:5px}.qr-result-link{padding:7px 9px;border:1px solid var(--p-border);border-radius:9px;background:var(--p-panel);font-family:monospace}.qr-image-frame{border:3px solid var(--p-accent2)}@media(max-width:520px){.qr-color-card{align-items:flex-start;flex-direction:column}.qr-color-controls{width:100%;justify-content:space-between}}
 </style>
 </body>
 </html>
