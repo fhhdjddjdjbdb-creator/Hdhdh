@@ -1994,13 +1994,14 @@ html[data-palette] .palette-option.active i{filter:brightness(1.08)!important}
         <button class="qr-main-btn qr-generate-btn" id="qrGenerate" type="button">إنشاء رمز QR <span>✦</span></button>
         <div class="qr-progress" id="qrProgress" hidden>
           <div class="qr-progress-title"><span class="qr-spinner"></span><strong id="qrProgressTitle">يتم التنفيذ</strong></div>
-          <div class="qr-steps"><div data-step="0"><i>✓</i><span>التحقق من الرابط</span></div><div data-step="1"><i>✓</i><span>تجهيز البيانات</span></div><div data-step="2"><i>✓</i><span>إنشاء رمز QR</span></div></div>
+          <div class="qr-steps"><div data-step="0"><i>✓</i><span>التحقق من الرابط</span></div><div data-step="1"><i>✓</i><span>فحص صلاحية الرابط</span></div><div data-step="2"><i>✓</i><span>تجهيز البيانات</span></div><div data-step="3"><i>✓</i><span>اختيار لون رمز QR</span></div><div data-step="4"><i>✓</i><span>إنشاء رمز QR</span></div></div>
         </div>
         <div class="qr-result" id="qrResult" hidden>
           <div class="qr-result-badge">✓ تم التنفيذ بنجاح</div>
           <div class="qr-image-frame" id="qrImageFrame"><div id="qrCanvas"></div></div>
           <div class="qr-result-caption">الرابط المشفّر داخل الرمز:</div><div class="qr-result-link" id="qrResultLink"></div>
-          <button class="qr-download-btn" id="qrDownload" type="button">تحميل QR كود <span>⇩</span></button>
+          <button class="qr-download-btn" id="qrDownload" type="button"><span class="qr-btn-spark">✦</span> تحميل صورة QR <span>⇩</span><b class="qr-btn-dots">•••</b></button>
+          <div class="qr-apk-save-note" id="qrApkSaveNote">في تطبيق APK: إذا لم يبدأ التحميل، افتح الصورة ثم اضغط عليها مطولًا واختر حفظ الصورة أو مشاركتها.</div>
           <button class="qr-new-btn" id="qrNew" type="button">إنشاء رمز جديد</button>
         </div>
       </section>
@@ -2025,22 +2026,32 @@ html[data-palette] #qrToolButton,html[data-palette] .qr-modal .qr-main-btn,html[
   function stopReset(){progress.hidden=true;result.hidden=true;canvas.innerHTML='';urlInput.value='';document.querySelectorAll('.qr-steps>div').forEach(x=>x.classList.remove('done'));}
   button.addEventListener('click',open);close.addEventListener('click',shut);back.addEventListener('click',()=>{generator.hidden=true;gate.hidden=false;password.hidden=false;unlock.hidden=false;success.hidden=true;password.value='';stopReset();setTimeout(()=>password.focus(),80)});modal.addEventListener('click',e=>{if(e.target===modal)shut()});
   unlock.addEventListener('click',()=>{if(password.value==='456891'){error.textContent='';password.hidden=true;unlock.hidden=true;success.hidden=false}else{error.textContent='كلمة المرور غير صحيحة، حاول مرة أخرى';password.value='';password.focus()}});openTool.addEventListener('click',showGenerator);password.addEventListener('keydown',e=>{if(e.key==='Enter')unlock.click()});clearUrl.addEventListener('click',()=>{urlInput.value='';urlInput.focus()});
+  let valueForDownload='';
   function stopAfter(ms){return new Promise(r=>setTimeout(r,ms))}
   async function makeQr(){
-    const rawValue=urlInput.value; const value=rawValue.trim();
+    const rawValue=urlInput.value; const value=rawValue.trim(); valueForDownload=value;
     if(!/^https?:\/\//i.test(value)){urlInput.focus();urlInput.style.borderColor='var(--p-accent2)';setTimeout(()=>urlInput.style.borderColor='',900);return}
     if(typeof QRCode==='undefined'){result.hidden=false;resultLink.textContent='تعذر تحميل مولد QR. تحقق من اتصال الإنترنت ثم حاول مرة أخرى.';return}
     generate.disabled=true;progress.hidden=false;result.hidden=true;canvas.innerHTML='';
     const steps=[...document.querySelectorAll('.qr-steps>div')];
-    for(let i=0;i<steps.length;i++){await stopAfter(650);steps[i].classList.add('done')}
-    await stopAfter(300);document.getElementById('qrProgressTitle').textContent='تم التنفيذ ✓';
-    new QRCode(canvas,{text:value,width:200,height:200,colorDark:qrColor.value,colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});
+    const stepTitles=['يتم التحقق من الرابط','يتم فحص صلاحية الرابط','يتم تجهيز البيانات','يتم تطبيق اللون المختار','يتم إنشاء رمز QR'];
+    for(let i=0;i<steps.length;i++){steps.forEach(x=>x.classList.remove('active'));steps[i].classList.add('active');document.getElementById('qrProgressTitle').textContent=stepTitles[i];await stopAfter(1800);steps[i].classList.remove('active');steps[i].classList.add('done')}
+    await stopAfter(1000);document.getElementById('qrProgressTitle').textContent='تم التنفيذ ✓';
+    new QRCode(canvas,{text:value,width:260,height:260,colorDark:qrColor.value,colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});
     resultLink.textContent=value;result.hidden=false;generate.disabled=false;
   }
   document.querySelectorAll('.qr-color-preset').forEach(preset=>preset.addEventListener('click',()=>{qrColor.value=preset.dataset.qrColor;qrColorHex.textContent=qrColor.value.toUpperCase();document.querySelectorAll('.qr-color-preset').forEach(x=>x.classList.toggle('active',x===preset));}));
   qrColor.addEventListener('input',()=>{qrColorHex.textContent=qrColor.value.toUpperCase();document.querySelectorAll('.qr-color-preset').forEach(x=>x.classList.toggle('active',x.dataset.qrColor.toLowerCase()===qrColor.value.toLowerCase()));});
   generate.addEventListener('click',makeQr);urlInput.addEventListener('keydown',e=>{if(e.key==='Enter')makeQr()});
-  download.addEventListener('click',()=>{const img=canvas.querySelector('img'),c=canvas.querySelector('canvas');const a=document.createElement('a');a.download='qr-code.png';a.href=img?.src||(c?c.toDataURL('image/png'):'');if(a.href)a.click()});
+  download.addEventListener('click',()=>{
+    const source=canvas.querySelector('canvas'); if(!source)return;
+    const out=document.createElement('canvas'); out.width=340; out.height=380; const ctx=out.getContext('2d');
+    ctx.fillStyle='#ffffff';ctx.fillRect(0,0,out.width,out.height);ctx.drawImage(source,40,22,260,260);
+    ctx.fillStyle=qrColor.value;ctx.font='bold 15px Arial';ctx.textAlign='center';ctx.fillText('QR CODE',170,315);
+    ctx.fillStyle='#333333';ctx.font='12px Arial';const short=valueForDownload.length>44?valueForDownload.slice(0,41)+'...':valueForDownload;ctx.fillText(short,170,340);
+    const data=out.toDataURL('image/png'); const a=document.createElement('a');a.download='qr-code.png';a.href=data;document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>{try{const w=window.open(data,'_blank');if(w)w.document.title='QR Code - اضغط مطولاً للحفظ'}catch(e){location.href=data}},120);
+  });
   newQr.addEventListener('click',()=>{stopReset();urlInput.focus()});
 })();
 </script>
@@ -2052,6 +2063,12 @@ html[data-palette] #qrToolButton,html[data-palette] .qr-modal .qr-main-btn,html[
 
 <style id="qr-color-exact-v3">
 .qr-color-card{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0;padding:12px;border:1px solid var(--p-border);border-radius:16px;background:var(--p-panel)}.qr-color-copy strong,.qr-color-copy small{display:block}.qr-color-copy strong{color:var(--p-accent2);font-size:13px}.qr-color-copy small{color:var(--muted);font-size:10px;margin-top:3px}.qr-color-controls{display:flex;align-items:center;gap:9px}.qr-color-presets{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.qr-color-preset{width:24px;height:24px;padding:0;border:2px solid transparent;border-radius:50%;background:var(--swatch)!important;box-shadow:0 0 7px color-mix(in srgb,var(--swatch) 45%,transparent);cursor:pointer}.qr-color-preset.active{border-color:var(--p-accent2);outline:2px solid var(--p-accent);outline-offset:2px}.qr-color-picker{display:flex;align-items:center;gap:5px;color:var(--p-accent2);font-size:9px;direction:ltr}.qr-color-picker input{width:30px;height:30px;padding:2px;border:1px solid var(--p-border);border-radius:9px;background:var(--p-panel);cursor:pointer}.qr-result-caption{color:var(--p-accent2);font-size:11px;font-weight:800;margin-bottom:5px}.qr-result-link{padding:7px 9px;border:1px solid var(--p-border);border-radius:9px;background:var(--p-panel);font-family:monospace}.qr-image-frame{border:3px solid var(--p-accent2)}@media(max-width:520px){.qr-color-card{align-items:flex-start;flex-direction:column}.qr-color-controls{width:100%;justify-content:space-between}}
+</style>
+
+<style id="qr-final-polish-v4">
+.qr-color-card{position:relative;overflow:hidden}.qr-color-card::after{content:"";position:absolute;inset:-50%;background:conic-gradient(from 0deg,transparent,var(--p-accent),transparent 25%);opacity:.08;animation:qrOrbit 6s linear infinite;pointer-events:none}.qr-color-controls,.qr-color-copy{position:relative;z-index:1}.qr-color-preset{transform:scale(1);transition:transform .2s,box-shadow .2s}.qr-color-preset:hover{transform:scale(1.18)}
+.qr-progress{min-height:236px}.qr-steps>div{min-height:30px}.qr-steps>div.active{opacity:1;color:var(--p-accent2);transform:translateX(-3px)}.qr-steps>div.active i{animation:qrStepPulse 1s infinite;background:var(--p-accent);border-color:var(--p-accent2)}
+.qr-image-frame{width:310px!important;height:310px!important;padding:14px!important;overflow:hidden!important;background:#fff!important;display:grid!important;place-items:center!important}.qr-image-frame canvas,.qr-image-frame img{width:280px!important;height:280px!important;max-width:none!important;max-height:none!important;display:block!important;image-rendering:pixelated}.qr-download-btn{position:relative;overflow:hidden;isolation:isolate}.qr-download-btn::before,.qr-download-btn::after{content:"";position:absolute;width:8px;height:8px;border-radius:50%;background:var(--p-accent2);opacity:.85;z-index:-1;animation:qrBtnParticle 2.4s infinite}.qr-download-btn::before{right:18%;top:10px}.qr-download-btn::after{left:20%;bottom:8px;animation-delay:-1.2s}.qr-btn-spark{display:inline-block;animation:qrSpark 1.1s infinite}.qr-btn-dots{display:inline-block;margin-right:7px;letter-spacing:3px;animation:qrDots 1.4s infinite;color:var(--p-accent2)}.qr-apk-save-note{margin:8px auto;color:var(--muted);font-size:10px;line-height:1.6;max-width:330px}.qr-result{overflow:hidden}@keyframes qrOrbit{to{transform:rotate(360deg)}}@keyframes qrStepPulse{50%{box-shadow:0 0 14px var(--p-glow);transform:scale(1.08)}}@keyframes qrBtnParticle{50%{transform:translate(8px,-7px) scale(1.5);opacity:.25}}@keyframes qrSpark{50%{transform:rotate(20deg) scale(1.25)}}@keyframes qrDots{50%{opacity:.25;letter-spacing:5px}}@media(max-width:520px){.qr-image-frame{width:270px!important;height:270px!important}.qr-image-frame canvas,.qr-image-frame img{width:240px!important;height:240px!important}}
 </style>
 </body>
 </html>
