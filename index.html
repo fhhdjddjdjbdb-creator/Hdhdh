@@ -602,6 +602,7 @@ body::before{
     <button id="privacy"><span>♢</span>الخصوصية</button>
     <button id="quickSettings"><span>⚙</span>الإعدادات</button>
     <button id="quickRate" type="button" aria-haspopup="dialog" aria-controls="ratingModal"><span>★</span>قيم التطبيق</button>
+    <button id="qrToolButton" type="button" aria-haspopup="dialog" aria-controls="qrToolModal"><span>▣</span>تحويل أي رابط إلى QR</button>
   </div>
 
   <div class="bottom"><img src="bottom_image.png" alt="الصورة الإضافية"></div>
@@ -1956,6 +1957,91 @@ html[data-palette] .palette-option[data-palette="violet"] i{background:linear-gr
 html[data-palette] .palette-option[data-palette="amber"] i{background:linear-gradient(135deg,#ffcf55,#a95b0c)!important;color:#ffcf55!important;border-color:#ffe09a!important;box-shadow:0 0 12px rgba(255,207,85,.35)!important}
 /* التحديد يوضح الاختيار فقط ولا يغير لون الدائرة */
 html[data-palette] .palette-option.active i{filter:brightness(1.08)!important}
+</style>
+
+<!-- ================== أداة تحويل الرابط إلى QR ================== -->
+<div class="qr-modal" id="qrToolModal" aria-hidden="true">
+  <div class="qr-box" role="dialog" aria-modal="true" aria-labelledby="qrToolTitle">
+    <div class="qr-head">
+      <div class="qr-head-icon">▣</div>
+      <div><h2 id="qrToolTitle">تحويل أي رابط إلى QR</h2><p>أداة محلية سريعة وآمنة</p></div>
+      <button class="qr-close" id="qrClose" type="button" aria-label="إغلاق">×</button>
+    </div>
+    <div class="qr-body">
+      <section class="qr-gate" id="qrGate">
+        <div class="qr-lock-art">⌁</div>
+        <h3>الأداة محمية</h3>
+        <p>أدخل كلمة المرور لفتح مولد رمز QR.</p>
+        <input class="qr-password" id="qrPassword" type="password" inputmode="numeric" maxlength="6" placeholder="كلمة المرور" autocomplete="off">
+        <button class="qr-main-btn" id="qrUnlock" type="button">تحقق من كلمة المرور <span>↗</span></button>
+        <div class="qr-error" id="qrPasswordError" role="alert"></div>
+        <div class="qr-password-success" id="qrPasswordSuccess" hidden>
+          <div class="qr-success-icon">✓</div>
+          <strong>كلمة المرور صحيحة</strong>
+          <small>تم السماح بالدخول إلى أداة QR</small>
+          <button class="qr-main-btn qr-open-tool" id="qrOpenTool" type="button">افتح الأداة <span>↗</span></button>
+        </div>
+      </section>
+      <section class="qr-generator" id="qrGenerator" hidden>
+        <button class="qr-back" id="qrBack" type="button">↩ رجوع</button>
+        <div class="qr-intro"><span class="qr-live-dot"></span><div><strong>مولد QR جاهز</strong><small>ألصق الرابط وسيتم تحويله إلى صورة</small></div></div>
+        <label class="qr-label" for="qrUrl">الرابط المطلوب تحويله</label>
+        <div class="qr-url-row"><span>↗</span><input id="qrUrl" type="url" inputmode="url" placeholder="https://example.com" autocomplete="off"><button id="qrClearUrl" type="button" aria-label="مسح الرابط">×</button></div>
+        <button class="qr-main-btn qr-generate-btn" id="qrGenerate" type="button">إنشاء رمز QR <span>✦</span></button>
+        <div class="qr-progress" id="qrProgress" hidden>
+          <div class="qr-progress-title"><span class="qr-spinner"></span><strong id="qrProgressTitle">يتم التنفيذ</strong></div>
+          <div class="qr-steps"><div data-step="0"><i>✓</i><span>التحقق من الرابط</span></div><div data-step="1"><i>✓</i><span>تجهيز البيانات</span></div><div data-step="2"><i>✓</i><span>إنشاء رمز QR</span></div></div>
+        </div>
+        <div class="qr-result" id="qrResult" hidden>
+          <div class="qr-result-badge">✓ تم التنفيذ بنجاح</div>
+          <div class="qr-image-frame" id="qrImageFrame"><div id="qrCanvas"></div></div>
+          <div class="qr-result-link" id="qrResultLink"></div>
+          <button class="qr-download-btn" id="qrDownload" type="button">تحميل QR كود <span>⇩</span></button>
+          <button class="qr-new-btn" id="qrNew" type="button">إنشاء رمز جديد</button>
+        </div>
+      </section>
+    </div>
+    <div class="qr-foot"><span>🔒 لا يتم إرسال الرابط إلى أي خادم</span><span>محليًا على جهازك</span></div>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style id="qr-tool-v1">
+#qrToolButton{grid-column:1/-1!important}
+.qr-modal{position:fixed;inset:0;z-index:120;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,.76);backdrop-filter:blur(12px)}
+.qr-modal.open{display:flex;animation:qrFade .25s ease}.qr-box{width:min(510px,96vw);max-height:92vh;overflow:auto;border:1px solid var(--p-border,#8f1b31);border-radius:28px;background:linear-gradient(155deg,var(--p-bg,#100307),var(--p-panel,#1c070c),var(--p-bg,#100307));color:var(--text,#fff);box-shadow:0 0 45px var(--p-glow,rgba(255,38,69,.32)),inset 0 1px rgba(255,255,255,.12);direction:rtl}.qr-head{display:flex;align-items:center;gap:12px;padding:18px 18px 15px;border-bottom:1px solid var(--p-border,#8f1b31);background:linear-gradient(120deg,var(--p-panel2,#260910),var(--p-accent,#ff3655),var(--p-bg,#100307));text-align:right}.qr-head-icon{width:46px;height:46px;display:grid;place-items:center;border:1px solid var(--p-accent2,#ff8a93);border-radius:15px;color:var(--p-accent2,#ff8a93);font-size:25px;background:var(--p-panel,#1c070c);box-shadow:0 0 16px var(--p-glow)}.qr-head h2{margin:0;font-size:18px;color:var(--p-accent2,#ff8a93)}.qr-head p{margin:4px 0 0;color:var(--muted,#b9a9df);font-size:11px}.qr-close{margin-right:auto;width:38px;height:38px;border:1px solid var(--p-border)!important;border-radius:12px!important;background:var(--p-panel)!important;color:var(--p-accent2)!important;font-size:25px;cursor:pointer}.qr-close:hover{background:var(--p-accent)!important;border-color:var(--p-accent2)!important}.qr-body{padding:20px}.qr-gate{text-align:center;padding:18px 6px 10px}.qr-lock-art{width:70px;height:70px;margin:0 auto 12px;display:grid;place-items:center;border-radius:24px;color:var(--p-accent2);font-size:42px;background:radial-gradient(circle,var(--p-accent),var(--p-panel));border:1px solid var(--p-border);box-shadow:0 0 25px var(--p-glow);animation:qrFloat 2.8s ease-in-out infinite}.qr-gate h3{margin:0 0 7px;color:var(--p-accent2);font-size:20px}.qr-gate p{margin:0 auto 18px;color:var(--muted);font-size:13px}.qr-password{width:min(320px,100%);height:52px;display:block;margin:0 auto 10px;border:1px solid var(--p-border);border-radius:15px;background:var(--p-panel);color:var(--text);text-align:center;font-size:18px;letter-spacing:6px;outline:none}.qr-password:focus{border-color:var(--p-accent2);box-shadow:0 0 14px var(--p-glow)}.qr-main-btn,.qr-download-btn,.qr-new-btn{border:1px solid var(--p-accent2);border-radius:15px;min-height:50px;padding:10px 18px;font:inherit;font-weight:800;cursor:pointer;color:var(--p-accent2);background:linear-gradient(120deg,var(--p-panel2),var(--p-accent),var(--p-panel));box-shadow:0 0 16px var(--p-glow);transition:transform .18s,box-shadow .18s}.qr-main-btn{width:min(320px,100%)}.qr-main-btn:hover,.qr-download-btn:hover,.qr-new-btn:hover{transform:translateY(-2px);box-shadow:0 0 25px var(--p-glow)}.qr-main-btn span,.qr-download-btn span{margin-right:8px;font-size:20px}.qr-error{min-height:22px;color:var(--p-accent2);font-size:12px;margin-top:8px}.qr-generator{position:relative}.qr-back{border:0;background:transparent;color:var(--p-accent2);font:inherit;font-weight:800;cursor:pointer;padding:0 0 16px}.qr-intro{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid var(--p-border);border-radius:16px;background:var(--p-panel);margin-bottom:17px}.qr-intro strong,.qr-intro small{display:block}.qr-intro strong{color:var(--p-accent2)}.qr-intro small{color:var(--muted);font-size:11px;margin-top:3px}.qr-live-dot{width:10px;height:10px;border-radius:50%;background:var(--p-accent2);box-shadow:0 0 10px var(--p-accent);animation:qrPulse 1.4s infinite}.qr-label{display:block;margin-bottom:7px;color:var(--p-accent2);font-size:13px;font-weight:800}.qr-url-row{display:flex;align-items:center;gap:8px;border:1px solid var(--p-border);border-radius:15px;padding:0 12px;background:var(--p-panel);margin-bottom:12px}.qr-url-row>span{color:var(--p-accent2);font-size:20px}.qr-url-row input{min-width:0;flex:1;height:50px;border:0;outline:0;background:transparent;color:var(--text);font:inherit;direction:ltr;text-align:left}.qr-url-row input::placeholder{color:var(--muted)}.qr-url-row button{border:0;background:transparent;color:var(--p-accent2);font-size:22px;cursor:pointer}.qr-generate-btn{width:100%}.qr-progress{margin-top:16px;padding:14px;border:1px solid var(--p-border);border-radius:17px;background:var(--p-panel)}.qr-progress-title{display:flex;align-items:center;gap:8px;color:var(--p-accent2);margin-bottom:10px}.qr-spinner{width:15px;height:15px;border:2px solid var(--p-border);border-top-color:var(--p-accent2);border-radius:50%;animation:qrSpin .7s linear infinite}.qr-steps{display:grid;gap:7px}.qr-steps>div{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;opacity:.45;transition:.25s}.qr-steps i{display:grid;place-items:center;width:21px;height:21px;border:1px solid var(--p-border);border-radius:50%;font-style:normal;color:var(--p-accent2)}.qr-steps>div.done{opacity:1;color:var(--p-accent2)}.qr-steps>div.done i{background:var(--p-accent);border-color:var(--p-accent2);box-shadow:0 0 9px var(--p-glow)}.qr-result{margin-top:16px;text-align:center;padding:14px;border:1px solid var(--p-border);border-radius:19px;background:linear-gradient(150deg,var(--p-panel2),var(--p-panel))}.qr-result-badge{color:var(--p-accent2);font-weight:800;margin-bottom:10px}.qr-image-frame{width:220px;height:220px;margin:0 auto 10px;display:grid;place-items:center;border-radius:18px;background:#fff;padding:10px;box-shadow:0 0 22px var(--p-glow)}.qr-image-frame img,.qr-image-frame canvas{max-width:200px;max-height:200px}.qr-result-link{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);font-size:11px;direction:ltr;margin-bottom:12px}.qr-download-btn{width:100%;margin-bottom:8px}.qr-new-btn{min-height:38px;padding:6px 14px;background:transparent;box-shadow:none;font-size:12px}.qr-foot{display:flex;justify-content:space-between;gap:10px;padding:11px 18px;border-top:1px solid var(--p-border);color:var(--muted);font-size:10px}.qr-foot span:first-child{color:var(--p-accent2)}@keyframes qrFade{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:scale(1)}}@keyframes qrFloat{50%{transform:translateY(-5px)}}@keyframes qrPulse{50%{opacity:.45;transform:scale(.8)}}@keyframes qrSpin{to{transform:rotate(360deg)}}@media(max-width:520px){.qr-modal{padding:8px}.qr-box{max-height:95vh;border-radius:22px}.qr-body{padding:15px}.qr-image-frame{width:200px;height:200px}}
+html[data-palette] #qrToolButton,html[data-palette] .qr-modal .qr-main-btn,html[data-palette] .qr-modal .qr-download-btn{border-color:var(--p-accent2)!important;color:var(--p-accent2)!important;background:linear-gradient(120deg,var(--p-panel2),var(--p-accent),var(--p-panel))!important}html[data-palette] .qr-modal .qr-close,html[data-palette] .qr-modal .qr-new-btn{border-color:var(--p-border)!important;color:var(--p-accent2)!important;background:var(--p-panel)!important}
+</style>
+<script>
+(function(){
+  const modal=document.getElementById('qrToolModal'), button=document.getElementById('qrToolButton'), close=document.getElementById('qrClose'), back=document.getElementById('qrBack'), gate=document.getElementById('qrGate'), generator=document.getElementById('qrGenerator'), password=document.getElementById('qrPassword'), unlock=document.getElementById('qrUnlock'), openTool=document.getElementById('qrOpenTool'), success=document.getElementById('qrPasswordSuccess'), error=document.getElementById('qrPasswordError'), urlInput=document.getElementById('qrUrl'), clearUrl=document.getElementById('qrClearUrl'), generate=document.getElementById('qrGenerate'), progress=document.getElementById('qrProgress'), result=document.getElementById('qrResult'), canvas=document.getElementById('qrCanvas'), resultLink=document.getElementById('qrResultLink'), download=document.getElementById('qrDownload'), newQr=document.getElementById('qrNew');
+  if(!modal||!button)return;
+  function open(){modal.classList.add('open');modal.setAttribute('aria-hidden','false');gate.hidden=false;generator.hidden=true;password.value='';password.hidden=false;unlock.hidden=false;success.hidden=true;error.textContent='';setTimeout(()=>password.focus(),120)}
+  function shut(){modal.classList.remove('open');modal.setAttribute('aria-hidden','true');stopReset()}
+  function showGenerator(){gate.hidden=true;generator.hidden=false;setTimeout(()=>urlInput.focus(),120)}
+  function stopReset(){progress.hidden=true;result.hidden=true;canvas.innerHTML='';urlInput.value='';document.querySelectorAll('.qr-steps>div').forEach(x=>x.classList.remove('done'));}
+  button.addEventListener('click',open);close.addEventListener('click',shut);back.addEventListener('click',()=>{generator.hidden=true;gate.hidden=false;password.hidden=false;unlock.hidden=false;success.hidden=true;password.value='';stopReset();setTimeout(()=>password.focus(),80)});modal.addEventListener('click',e=>{if(e.target===modal)shut()});
+  unlock.addEventListener('click',()=>{if(password.value==='456891'){error.textContent='';password.hidden=true;unlock.hidden=true;success.hidden=false}else{error.textContent='كلمة المرور غير صحيحة، حاول مرة أخرى';password.value='';password.focus()}});openTool.addEventListener('click',showGenerator);password.addEventListener('keydown',e=>{if(e.key==='Enter')unlock.click()});clearUrl.addEventListener('click',()=>{urlInput.value='';urlInput.focus()});
+  function stopAfter(ms){return new Promise(r=>setTimeout(r,ms))}
+  async function makeQr(){
+    const value=urlInput.value.trim();
+    if(!/^https?:\/\//i.test(value)){urlInput.focus();urlInput.style.borderColor='var(--p-accent2)';setTimeout(()=>urlInput.style.borderColor='',900);return}
+    if(typeof QRCode==='undefined'){result.hidden=false;resultLink.textContent='تعذر تحميل مولد QR. تحقق من اتصال الإنترنت ثم حاول مرة أخرى.';return}
+    generate.disabled=true;progress.hidden=false;result.hidden=true;canvas.innerHTML='';
+    const steps=[...document.querySelectorAll('.qr-steps>div')];
+    for(let i=0;i<steps.length;i++){await stopAfter(650);steps[i].classList.add('done')}
+    await stopAfter(300);document.getElementById('qrProgressTitle').textContent='تم التنفيذ ✓';
+    new QRCode(canvas,{text:value,width:200,height:200,colorDark:'#111111',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});
+    resultLink.textContent=value;result.hidden=false;generate.disabled=false;
+  }
+  generate.addEventListener('click',makeQr);urlInput.addEventListener('keydown',e=>{if(e.key==='Enter')makeQr()});
+  download.addEventListener('click',()=>{const img=canvas.querySelector('img'),c=canvas.querySelector('canvas');const a=document.createElement('a');a.download='qr-code.png';a.href=img?.src||(c?c.toDataURL('image/png'):'');if(a.href)a.click()});
+  newQr.addEventListener('click',()=>{stopReset();urlInput.focus()});
+})();
+</script>
+
+<style id="qr-gate-refine-v2">
+.qr-gate{padding-top:24px}.qr-lock-art{position:relative}.qr-lock-art::after{content:"🔒";position:absolute;right:-5px;bottom:-5px;width:25px;height:25px;display:grid;place-items:center;border:2px solid var(--p-bg);border-radius:50%;background:var(--p-accent);font-size:12px;box-shadow:0 0 10px var(--p-glow)}
+.qr-password-success{margin:16px auto 0;width:min(320px,100%);padding:16px 14px;border:1px solid var(--p-border);border-radius:18px;background:linear-gradient(145deg,var(--p-panel2),var(--p-panel));text-align:center;animation:qrSuccessIn .35s ease}.qr-success-icon{width:42px;height:42px;margin:0 auto 8px;display:grid;place-items:center;border-radius:50%;background:var(--p-accent);border:2px solid var(--p-accent2);color:var(--p-accent2);font-size:25px;box-shadow:0 0 18px var(--p-glow)}.qr-password-success strong,.qr-password-success small{display:block}.qr-password-success strong{color:var(--p-accent2);font-size:16px}.qr-password-success small{color:var(--muted);font-size:11px;margin-top:4px}.qr-open-tool{margin-top:14px!important;width:100%!important}.qr-main-btn[hidden]{display:none!important}@keyframes qrSuccessIn{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
 </style>
 </body>
 </html>
