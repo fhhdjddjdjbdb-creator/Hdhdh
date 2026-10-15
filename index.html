@@ -3,84 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة أدمن تطبيق المحادثات والتحديثات</title>
+    <title>لوحة تحكم الأدمن | استوديو 1</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Cairo', sans-serif; background-color: #030712; color: #f3f4f6; user-select: none; }
-        .cyber-glass { 
-            background: linear-gradient(145deg, rgba(17, 24, 39, 0.75), rgba(15, 23, 42, 0.85)); 
-            backdrop-filter: blur(24px); 
-            border: 1px solid rgba(255, 255, 255, 0.08); 
-            box-shadow: 0 20px 50px -10px rgba(0,0,0,0.8); 
+        body { font-family: 'Cairo', sans-serif; background-color: #050203; color: #f8fafc; user-select: none; -webkit-user-select: none; overflow-x: hidden; }
+        
+        .admin-container { width: 100%; max-width: 28rem; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; position: relative; padding: 1rem; }
+        @media (min-width: 768px) {
+            .admin-container { max-width: 56rem; padding: 2rem; }
+            .admin-desktop-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; align-items: start; }
+            .admin-full-span { grid-column: span 2; }
         }
-        .neon-btn {
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.35);
-        }
-        @keyframes popIn { 
-            from { opacity: 0; transform: scale(0.96) translateY(8px); } 
-            to { opacity: 1; transform: scale(1) translateY(0); } 
-        }
-        .animate-enter { animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+        .cyber-glass-red { background: linear-gradient(135deg, rgba(20, 5, 8, 0.9), rgba(40, 8, 12, 0.8)); backdrop-filter: blur(40px); border: 1px solid rgba(225, 29, 72, 0.3); box-shadow: 0 30px 60px -15px rgba(225, 29, 72, 0.25), inset 0 1px 2px rgba(255, 255, 255, 0.1); }
+        .cyber-input-red { background: rgba(30, 6, 10, 0.8); border: 1px solid rgba(225, 29, 72, 0.25); box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.7); transition: all 0.3s ease; }
+        .cyber-input-red:focus { border-color: #e11d48; box-shadow: 0 0 25px rgba(225, 29, 72, 0.4), inset 0 2px 4px rgba(0, 0, 0, 0.7); outline: none; }
+
+        .neon-btn-red { background: linear-gradient(135deg, #e11d48, #be123c, #9f1239); box-shadow: 0 0 30px rgba(225, 29, 72, 0.6), inset 0 1px 2px rgba(255,255,255,0.4); transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .neon-btn-red:hover { box-shadow: 0 0 45px rgba(225, 29, 72, 0.9); transform: translateY(-2px); }
+        .neon-btn-red:active { transform: scale(0.97); }
+
+        @keyframes popIn { from { opacity: 0; transform: scale(0.96) translateY(12px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        .animate-enter { animation: popIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     </style>
 </head>
-<body class="bg-[#030712] text-slate-100 min-h-screen p-4 md:p-8">
+<body class="bg-[#050203] text-slate-100 min-h-screen flex flex-col items-center justify-start relative">
 
-    <div class="max-w-3xl mx-auto space-y-6">
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div class="absolute -top-32 -right-32 w-[30rem] h-[30rem] bg-rose-600/15 rounded-full blur-[150px]"></div>
+        <div class="absolute -bottom-32 -left-32 w-[30rem] h-[30rem] bg-red-700/10 rounded-full blur-[180px]"></div>
+    </div>
+
+    <!-- شاشة تسجيل دخول الأدمن (تظهر حصرياً وتختفي تماماً بعد كلمة المرور الصحيحة) -->
+    <div id="admin-login-screen" class="w-full max-w-md cyber-glass-red p-8 rounded-[2.5rem] space-y-6 shadow-2xl relative z-10 animate-enter my-auto">
+        <div class="text-center space-y-3">
+            <div class="w-20 h-20 bg-gradient-to-tr from-rose-600 to-red-600 text-white rounded-3xl flex items-center justify-center text-3xl mx-auto shadow-2xl neon-btn-red rotate-3">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <div>
+                <h1 class="text-2xl font-black text-white tracking-wide">بوابة الأدمن المحمية</h1>
+                <p class="text-xs text-rose-400 mt-1 font-semibold">استوديو 1 | مرخص لـ Marzouq & Mohamed</p>
+            </div>
+        </div>
+
+        <form onsubmit="verifyAdminPassword(event)" class="space-y-4">
+            <div class="relative">
+                <i class="fa-solid fa-lock absolute right-4 top-4 text-rose-500 text-xs"></i>
+                <input type="password" id="admin-pass-input" required placeholder="أدخل كلمة مرور الأدمن..." class="w-full pr-11 pl-4 py-4 rounded-2xl cyber-input-red text-white text-xs outline-none">
+            </div>
+            <button type="submit" class="w-full py-4 text-white font-black rounded-2xl neon-btn-red text-xs cursor-pointer shadow-lg">تسجيل الدخول للوحة التحكم</button>
+        </form>
+    </div>
+
+    <!-- لوحة تحكم الأدمن الرئيسية (مخفية كلياً بـ display: none في البداية) -->
+    <div id="admin-dashboard" style="display: none;" class="admin-container space-y-6 relative z-10 animate-enter">
         
-        <!-- هيدر اللوحة -->
-        <header class="cyber-glass p-6 rounded-[2rem] flex flex-wrap items-center justify-between gap-4 border border-slate-800 animate-enter">
+        <!-- هيدر الأدمن -->
+        <header class="cyber-glass-red p-5 rounded-[2.5rem] flex items-center justify-between shadow-xl">
             <div class="flex items-center gap-3.5">
-                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center text-xl shadow-lg neon-btn">
-                    <i class="fa-solid fa-user-shield"></i>
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-rose-600 to-red-600 text-white flex items-center justify-center text-lg font-black shadow-lg neon-btn-red">
+                    <i class="fa-solid fa-crown"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-black text-white tracking-wide">إدارة مستخدمي الشات والتحديثات</h1>
-                    <p class="text-xs text-slate-400 mt-0.5">مراقبة الحسابات، كلمات المرور، ورفع ملفات التحديثات الفورية</p>
+                    <h2 class="text-xs font-black text-white tracking-wide">Welcome, Marzouq & Mohamed 🔥</h2>
+                    <span class="text-[10px] text-rose-400 font-bold flex items-center gap-1.5 mt-0.5"><span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span> لوحة التحكم نشطة وآمنة</span>
                 </div>
             </div>
-            <div class="px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs font-bold text-blue-400 flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-blue-500 animate-ping"></span> متصل مباشرة بالفايربيس
-            </div>
+            <button onclick="logoutAdmin()" class="px-4 py-2.5 bg-slate-900 border border-rose-900/60 text-rose-400 font-bold rounded-xl text-xs hover:bg-rose-950/50 cursor-pointer transition-all shadow-md">خروج</button>
         </header>
 
-        <!-- قسم رفع ملفات التحديثات الجديدة الفورية -->
-        <div class="cyber-glass p-6 rounded-[2.5rem] space-y-4 border border-slate-800 animate-enter">
-            <h2 class="text-sm font-black text-white flex items-center gap-2 border-b border-slate-800 pb-3">
-                <i class="fa-solid fa-cloud-arrow-up text-blue-400"></i> رفع ملفات التحديث الجديد لتطبيق المستخدمين
-            </h2>
-            <p class="text-[11px] text-slate-400">اختر ملف التحديث أو الشكل الجديد من جهازك، وسيتم تطبيقه وتحديثه لدى جميع المستخدمين فوراً:</p>
-            
-            <form onsubmit="publishFileUploadUpdate(event)" class="space-y-3.5">
-                <input type="text" id="update-file-title" required placeholder="عنوان أو اسم التحديث (مثال: تحديث واجهة الشات الجديدة)..." class="w-full px-4.5 py-3 rounded-2xl bg-slate-900 border border-slate-800 text-white text-xs outline-none focus:border-blue-500">
-                
-                <!-- زر رفع الملفات الفعلي من الجهاز -->
-                <label class="flex flex-col items-center justify-center gap-2 w-full py-5 px-4 bg-slate-900 border border-dashed border-slate-700 rounded-2xl cursor-pointer hover:border-blue-500 transition-all">
-                    <i class="fa-solid fa-file-arrow-up text-blue-400 text-2xl"></i>
-                    <span id="selected-update-filename" class="text-xs font-bold text-slate-300">اضغط لاختيار ملف التحديث من جهازك...</span>
-                    <input type="file" id="app-update-file" required onchange="handleUpdateFileSelect(event)" class="hidden">
-                </label>
+        <!-- شبكة الأدمن المتجاوبة -->
+        <div class="admin-desktop-grid space-y-6 md:space-y-0">
 
-                <button type="submit" id="upload-update-btn" class="w-full py-3.5 neon-btn text-white font-black rounded-2xl text-xs cursor-pointer shadow-lg">رفع وتطبيق التحديث لجميع المستخدمين</button>
-            </form>
-        </div>
+            <!-- رفع فيديو جديد -->
+            <div class="cyber-glass-red p-6 rounded-[2.5rem] space-y-4 shadow-2xl flex flex-col justify-between">
+                <div>
+                    <h3 class="text-xs font-black text-white border-b border-rose-900/60 pb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-video text-rose-500"></i> رفع فيديو جديد للمعرض
+                    </h3>
+                    <form onsubmit="adminUploadVideoFile(event)" class="space-y-3.5 mt-3">
+                        <input type="text" id="admin-vid-title" required placeholder="عنوان الفيديو..." class="w-full px-4.5 py-3.5 rounded-2xl cyber-input-red text-white text-xs outline-none">
+                        
+                        <label class="flex flex-col items-center justify-center gap-2 w-full py-4 px-4 cyber-input-red rounded-2xl cursor-pointer hover:border-rose-500/60 transition-all border border-dashed border-rose-900/60">
+                            <i class="fa-solid fa-cloud-arrow-up text-rose-400 text-xl"></i>
+                            <span id="selected-file-name" class="text-[11px] font-bold text-slate-300">اختر فيديو من الجهاز...</span>
+                            <input type="file" id="admin-vid-file" accept="video/*" required onchange="handleVideoFileSelect(event)" class="hidden">
+                        </label>
 
-        <!-- قائمة المستخدمين والتوثيق -->
-        <div class="cyber-glass p-6 rounded-[2.5rem] space-y-4 border border-slate-800 animate-enter">
-            <div class="flex items-center justify-between px-2">
-                <h2 class="text-sm font-black text-white flex items-center gap-2">
-                    <i class="fa-solid fa-users text-blue-400"></i> الحسابات المسجلة (<span id="users-count">0</span>)
-                </h2>
+                        <textarea id="admin-vid-note" rows="2" placeholder="ملاحظة الأدمن تحت الفيديو (اختياري)..." class="w-full px-4.5 py-3.5 rounded-2xl cyber-input-red text-white text-xs outline-none"></textarea>
+                        <button type="submit" id="upload-submit-btn" class="w-full py-3.5 neon-btn-red text-white font-black rounded-2xl text-xs cursor-pointer shadow-lg">رفع ونشر الفيديو</button>
+                    </form>
+                </div>
             </div>
 
-            <div id="admin-users-list" class="space-y-3">
-                <div class="text-center py-20 text-slate-500 text-xs font-bold">جاري تحميل الحسابات...</div>
+            <!-- إدارة معرض الفيديوهات -->
+            <div class="cyber-glass-red p-6 rounded-[2.5rem] space-y-4 shadow-2xl">
+                <h3 class="text-xs font-black text-white border-b border-rose-900/60 pb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-clapperboard text-rose-400"></i> المعرض الحالي (إدارة وحذف)
+                </h3>
+                <div id="admin-gallery-manager" class="space-y-3 max-h-[350px] overflow-y-auto pr-1">
+                    <p class="text-xs text-slate-500 text-center py-6">جاري تحميل المعرض...</p>
+                </div>
             </div>
-        </div>
 
+            <!-- طلبات العملاء -->
+            <div class="cyber-glass p-6 rounded-[2.5rem] space-y-4 shadow-2xl admin-full-span cyber-glass-red">
+                <h3 class="text-xs font-black text-white border-b border-rose-900/60 pb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-inbox text-rose-400"></i> طلبات العملاء الواردة لحظياً
+                </h3>
+                <div id="admin-requests-list" class="space-y-3.5 desktop-grid">
+                    <p class="text-xs text-slate-500 text-center py-8 col-span-2">جاري جلب الطلبات...</p>
+                </div>
+            </div>
+
+        </div>
     </div>
+
+    <!-- جافاسكريبت وربط Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <script>
@@ -93,114 +134,181 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        let selectedFileBase64 = null;
+        const CORRECT_PASSWORD = "456891";
+        let selectedVideoBase64 = null;
 
-        function handleUpdateFileSelect(event) {
+        // التحقق من الجلسة المخزنة بخصوص كلمة المرور
+        if (localStorage.getItem('studio1_admin_logged') === 'true') {
+            document.getElementById('admin-login-screen').style.display = 'none';
+            document.getElementById('admin-dashboard').style.display = 'flex';
+            loadAdminData();
+        }
+
+        function verifyAdminPassword(e) {
+            e.preventDefault();
+            const pass = document.getElementById('admin-pass-input').value.trim();
+            if (pass === CORRECT_PASSWORD) {
+                localStorage.setItem('studio1_admin_logged', 'true');
+                document.getElementById('admin-login-screen').style.display = 'none';
+                document.getElementById('admin-dashboard').style.display = 'flex';
+                loadAdminData();
+            } else {
+                alert('كلمة المرور غير صحيحة!');
+                document.getElementById('admin-pass-input').value = '';
+            }
+        }
+
+        function logoutAdmin() {
+            localStorage.removeItem('studio1_admin_logged');
+            location.reload();
+        }
+
+        function handleVideoFileSelect(event) {
             const file = event.target.files[0];
             if (!file) return;
 
-            document.getElementById('selected-update-filename').textContent = `تم اختيار الملف: ${file.name}`;
+            document.getElementById('selected-file-name').textContent = `تم اختيار: ${file.name}`;
             
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = function() {
-                selectedFileBase64 = reader.result;
+                selectedVideoBase64 = reader.result;
             };
         }
 
-        function publishFileUploadUpdate(e) {
+        function adminUploadVideoFile(e) {
             e.preventDefault();
-            const title = document.getElementById('update-file-title').value.trim();
+            const title = document.getElementById('admin-vid-title').value.trim();
+            const note = document.getElementById('admin-vid-note').value.trim();
 
-            if (!selectedFileBase64) {
-                alert('يرجى اختيار ملف التحديث أولاً!');
+            if (!selectedVideoBase64) {
+                alert('يرجى اختيار فيديو من المعرض أولاً!');
                 return;
             }
 
-            const btn = document.getElementById('upload-update-btn');
-            btn.textContent = 'جاري الرفع والتحديث...';
+            const btn = document.getElementById('upload-submit-btn');
+            btn.textContent = 'جاري الرفع...';
             btn.disabled = true;
 
-            const updateObj = {
-                title: title,
-                fileData: selectedFileBase64,
-                time: Date.now()
+            const vidObj = { 
+                title: title, 
+                url: selectedVideoBase64, 
+                note: note, 
+                time: Date.now() 
             };
 
-            db.ref('app_file_updates').set(updateObj).then(() => {
-                alert('تم رفع ملف التحديث بنجاح وسيظهر تلقائياً عند جميع المستخدمين!');
-                document.getElementById('update-file-title').value = '';
-                document.getElementById('app-update-file').value = '';
-                document.getElementById('selected-update-filename').textContent = 'اضغط لاختيار ملف التحديث من جهازك...';
-                selectedFileBase64 = null;
-                btn.textContent = 'رفع وتطبيق التحديث لجميع المستخدمين';
+            db.ref('studio1_videos').push(vidObj).then(() => {
+                alert('تم نشر الفيديو بنجاح في المعرض!');
+                document.getElementById('admin-vid-title').value = '';
+                document.getElementById('admin-vid-note').value = '';
+                document.getElementById('admin-vid-file').value = '';
+                document.getElementById('selected-file-name').textContent = 'اختر فيديو من الجهاز...';
+                selectedVideoBase64 = null;
+                btn.textContent = 'رفع ونشر الفيديو';
                 btn.disabled = false;
             }).catch(err => {
-                alert('حدث خطأ أثناء الرفع، تأكد من حجم الملف.');
-                btn.textContent = 'رفع وتطبيق التحديث لجميع المستخدمين';
+                alert('حدث خطأ أثناء الرفع، تأكد من حجم الفيديو.');
+                btn.textContent = 'رفع ونشر الفيديو';
                 btn.disabled = false;
             });
         }
 
-        db.ref('chat_users').on('value', snap => {
-            const users = snap.val() || {};
-            const listContainer = document.getElementById('admin-users-list');
-            const countEl = document.getElementById('users-count');
-            const keys = Object.keys(users);
+        function loadAdminData() {
+            loadAdminRequests();
+            loadAdminGalleryManager();
+        }
 
-            countEl.textContent = keys.length;
+        function loadAdminGalleryManager() {
+            const container = document.getElementById('admin-gallery-manager');
+            db.ref('studio1_videos').on('value', snap => {
+                const videos = snap.val() || {};
+                const keys = Object.keys(videos);
 
-            if (keys.length === 0) {
-                listContainer.innerHTML = `<div class="text-center py-16 text-slate-500 text-xs font-bold">لا يوجد شيء</div>`;
-                return;
-            }
+                if (keys.length === 0) {
+                    container.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">لا توجد فيديوهات في المعرض حالياً.</p>`;
+                    return;
+                }
 
-            let html = '';
-            keys.forEach(username => {
-                const u = users[username];
-                const isVerified = u.verified === true;
-                const cleanName = username.replace('@', '');
-                const firstChar = cleanName.charAt(0).toUpperCase();
-
-                const avatarHtml = u.avatar 
-                    ? `<img src="${u.avatar}" class="w-full h-full object-cover">` 
-                    : `<span class="font-black text-sm">${firstChar}</span>`;
-
-                const verifyBadge = isVerified 
-                    ? `<span class="inline-flex items-center justify-center text-sky-500 text-sm ml-1" title="حساب موثق"><i class="fa-solid fa-circle-check"></i></span>` 
-                    : '';
-
-                html += `
-                <div class="cyber-glass p-4 rounded-3xl flex flex-wrap items-center justify-between gap-3.5 border border-slate-800/80 transition-all hover:border-blue-500/30">
-                    <div class="flex items-center gap-3.5">
-                        <div class="w-13 h-13 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-bold flex items-center justify-center text-sm shadow-md overflow-hidden shrink-0 border border-blue-400/30">
-                            ${avatarHtml}
-                        </div>
-                        <div>
-                            <div class="flex items-center gap-1">
-                                <h3 class="text-xs font-black text-white">${username}</h3>
-                                ${verifyBadge}
+                let html = '';
+                keys.reverse().forEach(vKey => {
+                    const v = videos[vKey];
+                    html += `
+                        <div class="p-3.5 cyber-input-red rounded-2xl flex items-center justify-between gap-3 text-xs shadow-md">
+                            <div class="flex items-center gap-3 overflow-hidden">
+                                <div class="w-12 h-12 rounded-xl bg-black overflow-hidden shrink-0 flex items-center justify-center">
+                                    <video src="${v.url}#t=0.001" preload="metadata" muted playsinline class="w-full h-full object-cover"></video>
+                                </div>
+                                <div class="truncate">
+                                    <h4 class="font-black text-white truncate">${v.title}</h4>
+                                    <p class="text-[10px] text-rose-400 truncate mt-0.5">فيديو مرفوع ومعروض باللقطة</p>
+                                </div>
                             </div>
-                            <div class="text-[11px] text-slate-400 mt-1 font-semibold">
-                                كلمة المرور: <span class="text-blue-300 font-mono bg-slate-900/90 px-2 py-0.5 rounded-lg border border-slate-800">${u.password || 'غير محددة'}</span>
-                            </div>
+                            <button onclick="deleteGalleryVideo('${vKey}')" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl shrink-0 cursor-pointer transition-all shadow-md">
+                                <i class="fa-solid fa-trash-can"></i> حذف
+                            </button>
                         </div>
-                    </div>
-
-                    <div class="flex items-center gap-2">
-                        <button onclick="toggleVerification('${username}', ${!isVerified})" class="px-4 py-2.5 rounded-2xl font-bold text-xs transition-all cursor-pointer flex items-center gap-1.5 ${isVerified ? 'bg-sky-950/60 border border-sky-800 text-sky-400 hover:bg-sky-900/60' : 'bg-slate-900 border border-slate-800 text-slate-300 hover:bg-blue-600 hover:text-white'}">
-                            <i class="fa-solid fa-circle-check text-xs"></i>
-                            ${isVerified ? 'إلغاء التوثيق' : 'توثيق الحساب'}
-                        </button>
-                    </div>
-                </div>`;
+                    `;
+                });
+                container.innerHTML = html;
             });
+        }
 
-            listContainer.innerHTML = html;
-        });
+        function deleteGalleryVideo(vKey) {
+            if (confirm('هل أنت متأكد من حذف هذا الفيديو نهائياً من المعرض؟')) {
+                db.ref(`studio1_videos/${vKey}`).remove().then(() => {
+                    alert('تم حذف الفيديو بنجاح!');
+                });
+            }
+        }
 
-        window.toggleVerification = async function(username, status) {
-            await db.ref('chat_users/' + username).update({ verified: status });
+        function loadAdminRequests() {
+            const container = document.getElementById('admin-requests-list');
+            db.ref('studio1_requests').on('value', snap => {
+                const reqs = snap.val() || {};
+                const keys = Object.keys(reqs);
+
+                if (keys.length === 0) {
+                    container.innerHTML = `<p class="text-xs text-slate-500 text-center py-8 col-span-2">لا توجد طلبات جديدة حالياً.</p>`;
+                    return;
+                }
+
+                let html = '';
+                keys.reverse().forEach(k => {
+                    const r = reqs[k];
+                    
+                    let actionArea = `
+                        <div class="flex items-center gap-2 pt-2">
+                            <button onclick="updateReqStatus('${r.sessionId}', 'accepted')" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl cursor-pointer transition-all shadow-md">قبول</button>
+                            <button onclick="updateReqStatus('${r.sessionId}', 'rejected')" class="flex-1 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl cursor-pointer transition-all shadow-md">رفض</button>
+                        </div>
+                    `;
+
+                    if (r.status === 'accepted') {
+                        actionArea = `<div class="mt-2 py-2 px-3 bg-emerald-950/50 border border-emerald-900 text-emerald-400 text-center font-bold rounded-xl">تم قبول الطلب بنجاح ✅</div>`;
+                    } else if (r.status === 'rejected') {
+                        actionArea = `<div class="mt-2 py-2 px-3 bg-rose-950/50 border border-rose-900 text-rose-400 text-center font-bold rounded-xl">تم رفض الطلب ❌</div>`;
+                    }
+
+                    html += `
+                        <div class="p-4.5 cyber-input-red rounded-2xl space-y-2.5 text-xs shadow-md">
+                            <div class="flex items-center justify-between border-b border-rose-900/60 pb-2">
+                                <span class="font-mono text-rose-400 font-bold">جلسة: ${r.sessionId}</span>
+                                <span class="text-[10px] text-amber-400 font-bold px-2 py-0.5 bg-amber-950/40 rounded-lg border border-amber-900/50">${r.source}</span>
+                            </div>
+                            <p class="text-slate-200 leading-relaxed font-medium"><b>المشروع:</b> ${r.description}</p>
+                            <p class="text-emerald-400 font-bold"><b>التواصل:</b> ${r.contact}</p>
+                            ${actionArea}
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            });
+        }
+
+        function updateReqStatus(sessionId, status) {
+            db.ref(`studio1_requests/${sessionId}`).update({ status: status }).then(() => {
+                // التحديث لحظي
+            });
         }
     </script>
 </body>
